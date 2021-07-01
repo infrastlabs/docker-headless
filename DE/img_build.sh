@@ -11,61 +11,35 @@ echo "${DOCKER_REGISTRY_PW_infrastSubUser2}" |docker login --username=${DOCKER_R
 ns=infrastlabs
 # cache="--no-cache"
 # pull="--pull"
-ver=v2
+ver=v1
 
 cmd="$1"
 case "$cmd" in
-    src)   
-        img="docker-headless:compile"
-        docker build $cache $pull -t $repo/$ns/$img -f Dockerfile.compile . 
-        docker push $repo/$ns/$img
-        ;;
-    src2)   
-        img="docker-headless:compile2"
-        docker build $cache $pull -t $repo/$ns/$img -f Dockerfile.compile2 . 
-        docker push $repo/$ns/$img
-        ;;
-    src3) #deb9_xrdp  0.9.16
-        img="docker-headless:compile3"
-        docker build $cache $pull -t $repo/$ns/$img -f Dockerfile.compile3 . 
-        docker push $repo/$ns/$img
-        ;;
     deb)    #174.945 MB
-        img="docker-headless:deb9-$ver-slim"
+        img="docker-headless:xfce-deb9-$ver"
         docker build $cache $pull -t $repo/$ns/$img -f Dockerfile.deb . 
         docker push $repo/$ns/$img
         # 
-        img="docker-headless:deb10-$ver-slim"
-        docker build $cache $pull -t $repo/$ns/$img --build-arg VER_DISTRO=buster -f Dockerfile.deb . 
-        docker push $repo/$ns/$img
+        # img="docker-headless:xfce-deb10-$ver"
+        # docker build $cache $pull -t $repo/$ns/$img --build-arg VER_DISTRO=buster -f Dockerfile.deb . 
+        # docker push $repo/$ns/$img
 
-        # img="docker-headless:deb9"
-        # docker build $cache $pull -t $repo/$ns/$img --build-arg APP_LARGER=true -f Dockerfile.deb . 
-        # docker push $repo/$ns/$img
-        # # 
-        # img="docker-headless:deb10"
-        # docker build $cache $pull -t $repo/$ns/$img --build-arg APP_LARGER=true --build-arg VER_DISTRO=buster -f Dockerfile.deb . 
-        # docker push $repo/$ns/$img
         ;;
     ubt) #178.678 MB
-        img="docker-headless:ubt1804-$ver-slim"
+        img="docker-headless:xfce-ubt1804-$ver"
         docker build $cache $pull -t $repo/$ns/$img -f Dockerfile.ubt . 
         docker push $repo/$ns/$img
         # 
-        img="docker-headless:ubt2004-$ver-slim"
-        docker build $cache $pull -t $repo/$ns/$img --build-arg VER_DISTRO=focal -f Dockerfile.ubt . 
-        docker push $repo/$ns/$img
+        # img="docker-headless:xfce-ubt2004-$ver"
+        # docker build $cache $pull -t $repo/$ns/$img --build-arg VER_DISTRO=focal -f Dockerfile.ubt . 
+        # docker push $repo/$ns/$img
 
         # img="docker-headless:ubt1804"
         # docker build $cache $pull -t $repo/$ns/$img --build-arg APP_LARGER=true -f Dockerfile.ubt . 
         # docker push $repo/$ns/$img
-        # # 
-        # img="docker-headless:ubt2004"
-        # docker build $cache $pull -t $repo/$ns/$img --build-arg APP_LARGER=true --build-arg VER_DISTRO=focal -f Dockerfile.ubt . 
-        # docker push $repo/$ns/$img
         ;;
     *)
-        echo "please call with one param[compile/deb/ubt]"
+        echo "please call with one param[deb/ubt]"
         exit 1
         ;;
 esac

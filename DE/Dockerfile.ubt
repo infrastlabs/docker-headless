@@ -1,5 +1,4 @@
 ARG VER_DISTRO="bionic"
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile as xrdp
 FROM ubuntu:${VER_DISTRO}
 #FROM ubuntu:focal/20.04
 
@@ -12,12 +11,6 @@ ENV \
     LOC_APPS="tint2 plank thunar sakura geany rofi dunst" \
     LOC_APPS2="gnome-system-monitor engrampa ristretto" \
     LOC_XFCE="xfce4-settings xfce4-session xfwm4 xfdesktop4"
-
-ENV \
-    SSHD_PORT="10022" \
-    XRDP_PORT="10089" \
-    VNC_PORT="10081" \
-    VNC_ENABLE="false"
 
 # ADD ./box.sh /usr/bin/box
 # RUN box
@@ -40,9 +33,8 @@ RUN apt update \
 
 
 # locale>xx.mo: dpkg conf, use debian's tpl.
-ADD ./etc/dpkg/dpkg.cfg.d/deb-docker /etc/dpkg/dpkg.cfg.d/excludes
-RUN sed -i "s^path-exclude /usr/share/locale/\*^# path-exclude /usr/share/locale/\*^g" /etc/dpkg/dpkg.cfg.d/excludes;\
-  cat /etc/dpkg/dpkg.cfg.d/excludes;
+ADD ./excludes /etc/dpkg/dpkg.cfg.d/excludes
+RUN sed -i "s^path-exclude /usr/share/locale/\*^# path-exclude /usr/share/locale/\*^g" /etc/dpkg/dpkg.cfg.d/excludes;
 
 # APPS: 33.493 MB
 RUN apt update \
@@ -58,10 +50,6 @@ RUN apt update \
 RUN apt update \
   && apt -y install --no-install-recommends ${LOC_APPS2} && apt-get clean
 
-#XRDP,SSH 45.280 MB dropbear 2699 kB
-RUN apt update \
-  && apt -y install --no-install-recommends xrdp xorgxrdp dropbear && apt-get clean; 
-    # mkdir -p /var/run/dbus && mkdir -p /etc/xrdp && xrdp-keygen xrdp auto;
 #LOCALE 20.485 MB
 RUN apt update\
     && apt -y install --no-install-recommends \
@@ -95,35 +83,30 @@ RUN localedef -i ${LOC_LANG_COUNTRY} -c -f ${LOC_CODIFICATION} -A /usr/share/loc
     echo "LANG=${LANG}" >> /etc/default/locale; \
     echo "LANGUAGE=${LANGUAGE}" >> /etc/default/locale;
 
-# cp makeIns
-RUN apt -y remove xrdp xorgxrdp
-COPY --from=xrdp /usr/local/sysdata_ubt/var/lib/xrdp-pulseaudio-installer /var/lib/xrdp-pulseaudio-installer_1804
-COPY --from=xrdp /usr/local/sysdata_ubt2004/var/lib/xrdp-pulseaudio-installer /var/lib/xrdp-pulseaudio-installer_2004
-COPY --from=xrdp /usr/local/sysdata_ubt/usr/lib/xorg/modules /usr/lib/xorg/modules
-COPY --from=xrdp /usr/local/appdata_ubt/xrdp /usr/local/xrdp 
-# COPY --from=xrdp /usr/local/appdata_ubt/rofi /usr/local/rofi 
-RUN ln -s /usr/local/xrdp/sbin/xrdp /usr/sbin/;\
-  ln -s /usr/local/xrdp/sbin/xrdp-sesman /usr/sbin/;\
-  ln -s /usr/local/xrdp/bin/xrdp-keygen /usr/bin/;\
-  sed -i "s/allow_channels=false/allow_channels=true/g" /etc/xrdp/xrdp.ini;
-  # ln -s /usr/local/rofi/bin/rofi /usr/bin/;\
-RUN test "bionic" = "${VER_DISTRO}" && ln -s  /var/lib/xrdp-pulseaudio-installer_1804  /var/lib/xrdp-pulseaudio-installer \
- || ln -s  /var/lib/xrdp-pulseaudio-installer_2004  /var/lib/xrdp-pulseaudio-installer
-
-ADD box.sh /usr/bin/box
-ADD supervisor.conf /etc/supervisor/conf.d/xrdp.conf
-ADD entry.sh /entry.sh
-ADD ./usr/share/plank /usr/share/plank
+# ADD box.sh /usr/bin/box
+ADD supervisor.conf /etc/supervisor/conf.d/xfce4.conf
+COPY clear3d.theme /usr/share/plank/themes/Default/dock.theme
 COPY --chown=root:root ./dot/ /etc/skel/
 
 # HEADLESS
-RUN box userInit headless
+# RUN box userInit headless
+RUN \
+  user=headless; \
+  useradd -mp j9X2HRQvPCphA -s /bin/bash -G sudo $user \
+  && echo "$user:$user" |chpasswd \
+  && echo 'Cmnd_Alias SU = /bin/su' >> /etc/sudoers \
+  && echo "$user ALL=(root) NOPASSWD: ALL" >> /etc/sudoers \
+  \
+  && chmod +x /entry.sh \
+  && echo "welcome! HeadlessBox." > /etc/motd \
+  && ln -s /usr/bin/vim.tiny /usr/bin/vt \
+  && rm -f /bin/sh && ln -s /bin/bash /bin/sh \
+  && echo "alias ll='ls -lF'; alias la='ls -A'; alias l='ls -CF';" >> /home/$user/.bashrc
 
 
 # DCONF+IBUS env
-# dconf load / < dconf-dump.ini  ##error: Cannot autolaunch D-Bus without X11 $DISPLAY
-ADD ./usr/share/dconf-dump.ini /usr/share/dconf-dump.ini 
-ADD ./dot/.config/ibus/rime/default.yaml /home/headless/.config/ibus/rime/
+ADD ./dconf.ini /usr/share/dconf.ini 
+# ADD ./dot/.config/ibus/rime/default.yaml /home/headless/.config/ibus/rime/
 RUN ln -s /usr/share/rime-data/wubi_pinyin.schema.yaml /home/headless/.config/ibus/rime/; \
   chown -R headless:headless /home/headless/.config/ibus; \
   # ibus env
@@ -132,28 +115,14 @@ RUN ln -s /usr/share/rime-data/wubi_pinyin.schema.yaml /home/headless/.config/ib
   echo "export QT_IM_MODULE=ibus" >> /etc/profile;\
   # dconf: ibus, plank, engrampa
   mkdir -p /etc/dconf/db;\
-  su - headless -c "dbus-launch dconf reset -f /; dbus-launch dconf load / < /usr/share/dconf-dump.ini; ";\
-  dbus-launch dconf update; 
+  su - headless -c "dbus-launch dconf reset -f /; dbus-launch dconf load / < /usr/share/dconf.ini; ";\
+  dbus-launch dconf update; mkdir -p /var/run/dbus;
 
-
-# gen self-signed Key: https://hub.fastgit.org/neutrinolabs/xrdp/wiki/TLS-security-layer
-# openssl req -x509 -newkey rsa:2048 -nodes -keyout key.pem -out cert.pem -days 3650
-RUN mkdir -p /var/run/dbus && \
-    xrdp-keygen xrdp auto && \
-    sed -i -e "s/ssl_protocols=TLSv1.2, TLSv1.3/ssl_protocols=TLSv1, TLSv1.1, TLSv1.2/g" /etc/xrdp/xrdp.ini;\
-    sed -i "s/allow_channels=false/allow_channels=true/g" /etc/xrdp/xrdp.ini;\
-    sed -i "s/DEBUG/INFO/g" /etc/xrdp/xrdp.ini;\
-    sed -i "s/DEBUG/INFO/g" /etc/xrdp/sesman.ini;
-# Make sesman read environment variables
-RUN printf '%s\n' 'session required pam_env.so readenv=1' >> /etc/pam.d/xrdp-sesman
 
 ##ref: lazy
-ARG APP_LARGER=""
-RUN box largerApps
+# ARG APP_LARGER=""
+# RUN box largerApps
 
-
-# ENV DISPLAY=:1 \
-#   HOME=${ARG_HOME:-/home/headless}
-# CMD ["supervisord", "-n"]
-CMD ["/entry.sh"]
-EXPOSE 10089 10022
+# CMD ["/entry.sh"]
+# EXPOSE 10089 10022
+CMD ["supervisord", "-n"]
