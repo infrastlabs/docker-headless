@@ -65,10 +65,10 @@ RUN du -sh /usr/share/locale/; find /usr/share/locale/ |grep ".*\.mo$" |wc
 # https://hub.fastgit.org/joserprieto/docker-debian-i18n/blob/master/Dockerfile
 ARG LOC_LANG_COUNTRY="zh_CN"
 ARG LOC_CODIFICATION="UTF-8"
-ARG LOC_CODIFICATION_ENV="utf8"
+# ARG LOC_CODIFICATION_ENV="utf8"
 ENV LANG=${LOC_LANG_COUNTRY}.${LOC_CODIFICATION}\
-    LANGUAGE=${LOC_LANG_COUNTRY}:zh\
-    LC_ALL=${LOC_LANG_COUNTRY}.${LOC_CODIFICATION}
+    LANGUAGE=${LOC_LANG_COUNTRY}:zh
+    # LC_ALL=${LOC_LANG_COUNTRY}.${LOC_CODIFICATION}
 ENV TZ="Asia/Shanghai"\
     TERM="xterm"  
 
