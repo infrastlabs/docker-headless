@@ -33,13 +33,13 @@ RUN apt.sh supervisor dbus-x11 at-spi2-core
 
 
 # locale>xx.mo: dpkg conf, use debian's tpl.
-ENV LOC1="ar  en           en@quot  en_AU  en_GB  es_AR  es_MX  fr_CA  it  ko     pt     ru  zh_CN  zh_TW"\
-    LOC2="de  en@boldquot  en@shaw  en_CA  es     es_CO  fr     hi     ja  ko_KR  pt_BR  vi  zh_HK"
 # RUN echo "arr=(aa bb); for ONE in \${arr[@]}; do mkdir -p /usr/share/locale/\$ONE/LC_MESSAGES; done" |bash -; find /usr/share/locale/
 # RUN echo "aa=aa1; mkdir -p /tmp/\${aa}/{\${aa},bb,cc}" |bash -; find /tmp
 # ADD ./excludes /etc/dpkg/dpkg.cfg.d/docker
   # echo "path-include /usr/share/locale/*/LC_MESSAGES/*" >> /etc/dpkg/dpkg.cfg.d/docker; \
 
+# ENV LOC1="ar  en           en@quot  en_AU  en_GB  es_AR  es_MX  fr_CA  it  ko     pt     ru  zh_CN  zh_TW"\
+#     LOC2="de  en@boldquot  en@shaw  en_CA  es     es_CO  fr     hi     ja  ko_KR  pt_BR  vi  zh_HK"
 # RUN bash -c "arr=(\$LOC1 \$LOC2); for ONE in \${arr[@]}; do mkdir -p /usr/share/locale/\$ONE/LC_MESSAGES; done"; \
 #   sed -i "s^path-exclude /usr/share/locale/\*^# path-exclude /usr/share/locale/\*^g" /etc/dpkg/dpkg.cfg.d/docker;
 RUN sed -i "s^path-exclude /usr/share/locale/\*^# path-exclude /usr/share/locale/\*^g" /etc/dpkg/dpkg.cfg.d/docker;

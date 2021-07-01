@@ -34,12 +34,12 @@ ADD ./excludes /etc/dpkg/dpkg.cfg.d/excludes
 RUN sed -i "s^path-exclude /usr/share/locale/\*^# path-exclude /usr/share/locale/\*^g" /etc/dpkg/dpkg.cfg.d/excludes;
 
 # APPS: 33.493 MB
-RUN apt.sh ${LOC_APPS} \
+RUN apt.sh ${LOC_APPS}; \
   bash -c "du -sh /usr/share/icons/{Adwaita,Humanity,Humanity-Dark,LoginIcons,Tango,locolor,ubuntu-mono-dark,ubuntu-mono-light};\
   rm -rf /usr/share/icons/{Adwaita,Humanity,Humanity-Dark,LoginIcons,Tango,locolor,ubuntu-mono-dark,ubuntu-mono-light};\
   echo '---' && du -sh /usr/share/icons/*"
 # XFCE4: 3.968 MB > 13.932 MB
-RUN apt.sh${LOC_XFCE} greybird-gtk-theme gnome-icon-theme
+RUN apt.sh ${LOC_XFCE} greybird-gtk-theme gnome-icon-theme
 # APPS2 6.767 MB
 RUN apt.sh ${LOC_APPS2}
 

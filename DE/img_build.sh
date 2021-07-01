@@ -20,9 +20,9 @@ case "$cmd" in
         docker build $cache $pull -t $repo/$ns/$img -f Dockerfile.deb . 
         docker push $repo/$ns/$img
         # 
-        # img="docker-headless:xfce-deb10-$ver"
-        # docker build $cache $pull -t $repo/$ns/$img --build-arg VER_DISTRO=buster -f Dockerfile.deb . 
-        # docker push $repo/$ns/$img
+        img="docker-headless:xfce-deb10-$ver"
+        docker build $cache $pull -t $repo/$ns/$img --build-arg VER_DISTRO=buster -f Dockerfile.deb . 
+        docker push $repo/$ns/$img
 
         ;;
     ubt) #178.678 MB
