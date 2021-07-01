@@ -17,19 +17,16 @@ ENV \
 RUN \
   echo "deb http://${DOMAIN}/ubuntu ${VER_DISTRO} main restricted universe multiverse" > /etc/apt/sources.list \
   && echo "deb http://${DOMAIN}/ubuntu ${VER_DISTRO}-updates main restricted universe multiverse">> /etc/apt/sources.list
+RUN echo 'apt update -qq && apt install -yq --no-install-recommends $@ && apt-get clean && rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
+    && chmod +x /usr/local/bin/apt.sh
 
 # BASE: 35.254 MB > 24.808 MB
-RUN apt update \
-  && apt -y install --no-install-recommends \
+RUN apt.sh \
   htop rsync tree tmux lrzsz psmisc fuse net-tools iputils-ping procps sudo iproute2 iptables \
-  zip unzip xz-utils vim-tiny && \
-    apt-get clean
+  zip unzip xz-utils vim-tiny
 # UTILES: 17.964 MB
 # dbus-user-session > dbus-x11
-RUN apt update \
-  && apt -y install --no-install-recommends \
-  supervisor dbus-x11 at-spi2-core && \
-  apt-get clean
+RUN apt.sh supervisor dbus-x11 at-spi2-core
 
 
 # locale>xx.mo: dpkg conf, use debian's tpl.
@@ -37,28 +34,21 @@ ADD ./excludes /etc/dpkg/dpkg.cfg.d/excludes
 RUN sed -i "s^path-exclude /usr/share/locale/\*^# path-exclude /usr/share/locale/\*^g" /etc/dpkg/dpkg.cfg.d/excludes;
 
 # APPS: 33.493 MB
-RUN apt update \
-  && apt -y install --no-install-recommends ${LOC_APPS} && apt-get clean;\
+RUN apt.sh ${LOC_APPS} \
   bash -c "du -sh /usr/share/icons/{Adwaita,Humanity,Humanity-Dark,LoginIcons,Tango,locolor,ubuntu-mono-dark,ubuntu-mono-light};\
   rm -rf /usr/share/icons/{Adwaita,Humanity,Humanity-Dark,LoginIcons,Tango,locolor,ubuntu-mono-dark,ubuntu-mono-light};\
   echo '---' && du -sh /usr/share/icons/*"
 # XFCE4: 3.968 MB > 13.932 MB
-RUN apt update \
-  && apt -y install --no-install-recommends \
-  ${LOC_XFCE} greybird-gtk-theme gnome-icon-theme && apt-get clean	
+RUN apt.sh${LOC_XFCE} greybird-gtk-theme gnome-icon-theme
 # APPS2 6.767 MB
-RUN apt update \
-  && apt -y install --no-install-recommends ${LOC_APPS2} && apt-get clean
+RUN apt.sh ${LOC_APPS2}
 
 #LOCALE 20.485 MB
-RUN apt update\
-    && apt -y install --no-install-recommends \
+RUN apt.sh \
     dconf-cli locales tzdata apt-utils \
-    fonts-wqy-zenhei language-pack-gnome-zh-hans && \
-    apt-get clean
+    fonts-wqy-zenhei language-pack-gnome-zh-hans
 #AUDIO pavucontrol:2,363 kB pnmixer:815 kB;  +pulseaudio:14.6 MB/ubt:2805kB; +qmmp:28.7 MB
-RUN apt update\
-    && apt -y install --no-install-recommends pavucontrol pnmixer pulseaudio && apt-get clean; 
+RUN apt.sh pavucontrol pnmixer 
 
 # https://hub.fastgit.org/joserprieto/docker-debian-i18n/blob/master/Dockerfile
 ARG LOC_LANG_COUNTRY="zh_CN"
