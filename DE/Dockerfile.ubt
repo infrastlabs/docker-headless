@@ -1,0 +1,159 @@
+ARG VER_DISTRO="bionic"
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile as xrdp
+FROM ubuntu:${VER_DISTRO}
+#FROM ubuntu:focal/20.04
+
+#env
+ARG VER_DISTRO="bionic"
+ENV \
+    DEBIAN_FRONTEND="noninteractive" \
+    DOMAIN="mirrors.aliyun.com" \
+    VER_DISTRO=${VER_DISTRO} \
+    LOC_APPS="tint2 plank thunar sakura geany rofi dunst" \
+    LOC_APPS2="gnome-system-monitor engrampa ristretto" \
+    LOC_XFCE="xfce4-settings xfce4-session xfwm4 xfdesktop4"
+
+ENV \
+    SSHD_PORT="10022" \
+    XRDP_PORT="10089" \
+    VNC_PORT="10081" \
+    VNC_ENABLE="false"
+
+# ADD ./box.sh /usr/bin/box
+# RUN box
+RUN \
+  echo "deb http://${DOMAIN}/ubuntu ${VER_DISTRO} main restricted universe multiverse" > /etc/apt/sources.list \
+  && echo "deb http://${DOMAIN}/ubuntu ${VER_DISTRO}-updates main restricted universe multiverse">> /etc/apt/sources.list
+
+# BASE: 35.254 MB > 24.808 MB
+RUN apt update \
+  && apt -y install --no-install-recommends \
+  htop rsync tree tmux lrzsz psmisc fuse net-tools iputils-ping procps sudo iproute2 iptables \
+  zip unzip xz-utils vim-tiny && \
+    apt-get clean
+# UTILES: 17.964 MB
+# dbus-user-session > dbus-x11
+RUN apt update \
+  && apt -y install --no-install-recommends \
+  supervisor dbus-x11 at-spi2-core && \
+  apt-get clean
+
+
+# locale>xx.mo: dpkg conf, use debian's tpl.
+ADD ./etc/dpkg/dpkg.cfg.d/deb-docker /etc/dpkg/dpkg.cfg.d/excludes
+RUN sed -i "s^path-exclude /usr/share/locale/\*^# path-exclude /usr/share/locale/\*^g" /etc/dpkg/dpkg.cfg.d/excludes;\
+  cat /etc/dpkg/dpkg.cfg.d/excludes;
+
+# APPS: 33.493 MB
+RUN apt update \
+  && apt -y install --no-install-recommends ${LOC_APPS} && apt-get clean;\
+  bash -c "du -sh /usr/share/icons/{Adwaita,Humanity,Humanity-Dark,LoginIcons,Tango,locolor,ubuntu-mono-dark,ubuntu-mono-light};\
+  rm -rf /usr/share/icons/{Adwaita,Humanity,Humanity-Dark,LoginIcons,Tango,locolor,ubuntu-mono-dark,ubuntu-mono-light};\
+  echo '---' && du -sh /usr/share/icons/*"
+# XFCE4: 3.968 MB > 13.932 MB
+RUN apt update \
+  && apt -y install --no-install-recommends \
+  ${LOC_XFCE} greybird-gtk-theme gnome-icon-theme && apt-get clean	
+# APPS2 6.767 MB
+RUN apt update \
+  && apt -y install --no-install-recommends ${LOC_APPS2} && apt-get clean
+
+#XRDP,SSH 45.280 MB dropbear 2699 kB
+RUN apt update \
+  && apt -y install --no-install-recommends xrdp xorgxrdp dropbear && apt-get clean; 
+    # mkdir -p /var/run/dbus && mkdir -p /etc/xrdp && xrdp-keygen xrdp auto;
+#LOCALE 20.485 MB
+RUN apt update\
+    && apt -y install --no-install-recommends \
+    dconf-cli locales tzdata apt-utils \
+    fonts-wqy-zenhei language-pack-gnome-zh-hans && \
+    apt-get clean
+#AUDIO pavucontrol:2,363 kB pnmixer:815 kB;  +pulseaudio:14.6 MB/ubt:2805kB; +qmmp:28.7 MB
+RUN apt update\
+    && apt -y install --no-install-recommends pavucontrol pnmixer pulseaudio && apt-get clean; 
+
+# https://hub.fastgit.org/joserprieto/docker-debian-i18n/blob/master/Dockerfile
+ARG LOC_LANG_COUNTRY="zh_CN"
+ARG LOC_CODIFICATION="UTF-8"
+ARG LOC_CODIFICATION_ENV="utf8"
+ENV LANG=${LOC_LANG_COUNTRY}.${LOC_CODIFICATION}\
+    LANGUAGE=${LOC_LANG_COUNTRY}:zh\
+    LC_ALL=${LOC_LANG_COUNTRY}.${LOC_CODIFICATION}
+ENV TZ="Asia/Shanghai"\
+    TERM="xterm"  
+
+# LOCALE TZ #1.786 MB
+RUN localedef -i ${LOC_LANG_COUNTRY} -c -f ${LOC_CODIFICATION} -A /usr/share/locale/locale.alias ${LANG} \
+  && sed -i -e "s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen \
+  && sed -i -e "s/# ${LANG} ${LOC_CODIFICATION}/${LANG} ${LOC_CODIFICATION}/" /etc/locale.gen \
+  && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime && echo "${TZ}" >/etc/timezone \
+  && dpkg-reconfigure --frontend=noninteractive locales tzdata \
+  && locale-gen ${LANG} \
+  && /usr/sbin/update-locale LANG=${LANG}; \
+    # /etc/default/locale
+    echo "# " > /etc/default/locale; \
+    echo "LANG=${LANG}" >> /etc/default/locale; \
+    echo "LANGUAGE=${LANGUAGE}" >> /etc/default/locale;
+
+# cp makeIns
+RUN apt -y remove xrdp xorgxrdp
+COPY --from=xrdp /usr/local/sysdata_ubt/var/lib/xrdp-pulseaudio-installer /var/lib/xrdp-pulseaudio-installer_1804
+COPY --from=xrdp /usr/local/sysdata_ubt2004/var/lib/xrdp-pulseaudio-installer /var/lib/xrdp-pulseaudio-installer_2004
+COPY --from=xrdp /usr/local/sysdata_ubt/usr/lib/xorg/modules /usr/lib/xorg/modules
+COPY --from=xrdp /usr/local/appdata_ubt/xrdp /usr/local/xrdp 
+# COPY --from=xrdp /usr/local/appdata_ubt/rofi /usr/local/rofi 
+RUN ln -s /usr/local/xrdp/sbin/xrdp /usr/sbin/;\
+  ln -s /usr/local/xrdp/sbin/xrdp-sesman /usr/sbin/;\
+  ln -s /usr/local/xrdp/bin/xrdp-keygen /usr/bin/;\
+  sed -i "s/allow_channels=false/allow_channels=true/g" /etc/xrdp/xrdp.ini;
+  # ln -s /usr/local/rofi/bin/rofi /usr/bin/;\
+RUN test "bionic" = "${VER_DISTRO}" && ln -s  /var/lib/xrdp-pulseaudio-installer_1804  /var/lib/xrdp-pulseaudio-installer \
+ || ln -s  /var/lib/xrdp-pulseaudio-installer_2004  /var/lib/xrdp-pulseaudio-installer
+
+ADD box.sh /usr/bin/box
+ADD supervisor.conf /etc/supervisor/conf.d/xrdp.conf
+ADD entry.sh /entry.sh
+ADD ./usr/share/plank /usr/share/plank
+COPY --chown=root:root ./dot/ /etc/skel/
+
+# HEADLESS
+RUN box userInit headless
+
+
+# DCONF+IBUS env
+# dconf load / < dconf-dump.ini  ##error: Cannot autolaunch D-Bus without X11 $DISPLAY
+ADD ./usr/share/dconf-dump.ini /usr/share/dconf-dump.ini 
+ADD ./dot/.config/ibus/rime/default.yaml /home/headless/.config/ibus/rime/
+RUN ln -s /usr/share/rime-data/wubi_pinyin.schema.yaml /home/headless/.config/ibus/rime/; \
+  chown -R headless:headless /home/headless/.config/ibus; \
+  # ibus env
+  echo "export XMODIFIERS=@im=ibus" >> /etc/profile;\
+  echo "export GTK_IM_MODULE=ibus" >> /etc/profile;\
+  echo "export QT_IM_MODULE=ibus" >> /etc/profile;\
+  # dconf: ibus, plank, engrampa
+  mkdir -p /etc/dconf/db;\
+  su - headless -c "dbus-launch dconf reset -f /; dbus-launch dconf load / < /usr/share/dconf-dump.ini; ";\
+  dbus-launch dconf update; 
+
+
+# gen self-signed Key: https://hub.fastgit.org/neutrinolabs/xrdp/wiki/TLS-security-layer
+# openssl req -x509 -newkey rsa:2048 -nodes -keyout key.pem -out cert.pem -days 3650
+RUN mkdir -p /var/run/dbus && \
+    xrdp-keygen xrdp auto && \
+    sed -i -e "s/ssl_protocols=TLSv1.2, TLSv1.3/ssl_protocols=TLSv1, TLSv1.1, TLSv1.2/g" /etc/xrdp/xrdp.ini;\
+    sed -i "s/allow_channels=false/allow_channels=true/g" /etc/xrdp/xrdp.ini;\
+    sed -i "s/DEBUG/INFO/g" /etc/xrdp/xrdp.ini;\
+    sed -i "s/DEBUG/INFO/g" /etc/xrdp/sesman.ini;
+# Make sesman read environment variables
+RUN printf '%s\n' 'session required pam_env.so readenv=1' >> /etc/pam.d/xrdp-sesman
+
+##ref: lazy
+ARG APP_LARGER=""
+RUN box largerApps
+
+
+# ENV DISPLAY=:1 \
+#   HOME=${ARG_HOME:-/home/headless}
+# CMD ["supervisord", "-n"]
+CMD ["/entry.sh"]
+EXPOSE 10089 10022
