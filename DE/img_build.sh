@@ -30,9 +30,9 @@ case "$cmd" in
         docker build $cache $pull -t $repo/$ns/$img -f Dockerfile.ubt . 
         docker push $repo/$ns/$img
         # 
-        # img="docker-headless:xfce-ubt2004-$ver"
-        # docker build $cache $pull -t $repo/$ns/$img --build-arg VER_DISTRO=focal -f Dockerfile.ubt . 
-        # docker push $repo/$ns/$img
+        img="docker-headless:xfce-ubt2004-$ver"
+        docker build $cache $pull -t $repo/$ns/$img --build-arg VER_DISTRO=focal -f Dockerfile.ubt . 
+        docker push $repo/$ns/$img
 
         # img="docker-headless:ubt1804"
         # docker build $cache $pull -t $repo/$ns/$img --build-arg APP_LARGER=true -f Dockerfile.ubt . 
