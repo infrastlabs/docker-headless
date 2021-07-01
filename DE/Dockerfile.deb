@@ -37,9 +37,14 @@ RUN apt update \
 
 
 # locale>xx.mo: dpkg conf, use debian's tpl.
+ENV LOC1="ar  en           en@quot  en_AU  en_GB  es_AR  es_MX  fr_CA  it  ko     pt     ru  zh_CN  zh_TW"\
+    LOC2="de  en@boldquot  en@shaw  en_CA  es     es_CO  fr     hi     ja  ko_KR  pt_BR  vi  zh_HK"
 ADD ./excludes /etc/dpkg/dpkg.cfg.d/excludes
-RUN mkdir -p /usr/share/locale/zh_CN/LC_MESSAGES;\
-  sed -i "s^path-exclude /usr/share/locale/\*^# path-exclude /usr/share/locale/\*^g" /etc/dpkg/dpkg.cfg.d/excludes;
+RUN /bin/bash -c "arr=(aa bb); for ONE in ${arr[@]}; do mkdir -p /usr/share/locale/$ONE/LC_MESSAGES; done"; \
+  find /usr/share/locale/;
+# RUN bash -c "arr=($LOC1 $LOC2); for ONE in ${arr[@]}; do mkdir -p /usr/share/locale/$ONE/LC_MESSAGES; done"; \
+#   sed -i "s^path-exclude /usr/share/locale/\*^# path-exclude /usr/share/locale/\*^g" /etc/dpkg/dpkg.cfg.d/excludes; \
+#   find /usr/share/locale/;
 
 # APPS: 33.493 MB; remove rofi v131(not support text/launcher.sh)
 RUN apt update \
