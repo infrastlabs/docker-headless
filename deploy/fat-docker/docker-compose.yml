@@ -1,0 +1,34 @@
+version: '2.2'
+networks:
+  net:
+    external:
+      name: ${FAT_NETWORK}      
+services:
+  box:
+    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless
+    container_name: ${FAT_BOXNAME}
+    hostname: ${FAT_BOXNAME}
+    restart: always
+    privileged: true
+    networks:
+      net:
+        ipv4_address: ${FAT_BOXIP}
+    volumes: #lxcfs
+      - /var/lib/lxcfs/proc/cpuinfo:/proc/cpuinfo:rw
+      - /var/lib/lxcfs/proc/diskstats:/proc/diskstats:rw
+      - /var/lib/lxcfs/proc/meminfo:/proc/meminfo:rw
+      - /var/lib/lxcfs/proc/stat:/proc/stat:rw
+      - /var/lib/lxcfs/proc/swaps:/proc/swaps:rw
+      - /var/lib/lxcfs/proc/uptime:/proc/uptime:rw
+      #
+      - /:/mnt
+      - /_ext:/_ext
+      - /opt_dbox190:/opt
+      - /data3-ssd/docker-ct3:/data3-ssd/docker-ct3
+    cpuset: ${FAT_BOXCPU}
+    mem_limit: ${FAT_BOXMEM}
+    shm_size: 1g
+    # blkio_config:
+    #   device_write_bps:
+    #     - path: /dev/sdb
+    #       rate: '100mb'

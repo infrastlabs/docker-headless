@@ -1,0 +1,25 @@
+version: '2.2'
+services:
+  xvnc:
+    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:xser-xvnc
+    restart: always
+    ports:
+      - "6090:6090"
+      - "3389:3389"
+      - "8000:8000"
+  pulse:
+    image: jess/pulseaudio
+    command: " --exit-idle-time=-1"
+    restart: always
+    # privileged: true
+    # networks_mode: host
+    # --device /dev/snd
+    # https://docs.docker.com/compose/compose-file/compose-file-v2/#devices
+    devices:
+      - "/dev/snd:/dev/snd"
+    ports:
+      - "14713:4713"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/dbus:/var/run/dbus
+      - /etc/machine-id:/etc/machine-id
