@@ -57,6 +57,9 @@ RUN apt.sh \
     fonts-wqy-zenhei
 #AUDIO pavucontrol:2,363 kB pnmixer:815 kB;  +qmmp:28.7 MB
 RUN apt.sh pavucontrol pnmixer
+# notifyd 234 kB; clipit 336 kB;
+RUN apt.sh \
+  xfce4-notifyd clipit && apt -y remove dunst
 RUN du -sh /usr/share/locale/; find /usr/share/locale/ |grep ".*\.mo$" |wc
 
 # https://hub.fastgit.org/joserprieto/docker-debian-i18n/blob/master/Dockerfile

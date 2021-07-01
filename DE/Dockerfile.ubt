@@ -52,7 +52,10 @@ RUN apt.sh pavucontrol pnmixer
 #xfwm4-deps@ubt2004
 RUN test "bionic" = "${VER_DISTRO}" && exit 0 \
     || apt.sh libgl1
-
+# notifyd 234 kB; clipit 336 kB;
+RUN apt.sh \
+  xfce4-notifyd clipit && apt -y remove dunst
+  
 # https://hub.fastgit.org/joserprieto/docker-debian-i18n/blob/master/Dockerfile
 ARG LOC_LANG_COUNTRY="zh_CN"
 ARG LOC_CODIFICATION="UTF-8"
