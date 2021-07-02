@@ -56,10 +56,13 @@ RUN apt.sh \
     dconf-cli locales tzdata apt-utils \
     fonts-wqy-zenhei
 #AUDIO pavucontrol:2,363 kB pnmixer:815 kB;  +qmmp:28.7 MB
-RUN apt.sh pavucontrol pnmixer
+# pulseaudio: needed by pnmixer
+# volti: py? startErr. no sound card.
+RUN apt.sh pavucontrol pnmixer pulseaudio
 # notifyd 234 kB; clipit 336 kB;
+# gtk2-engines-pixbuf 58.9 kB; ##Gtk-WARNING **: 11:29:10.844: 无法在模块路径中找到主题引擎：“pixmap”，
 RUN apt.sh \
-  xfce4-notifyd clipit && apt -y remove dunst
+  xfce4-notifyd clipit gtk2-engines-pixbuf && apt -y remove dunst
 RUN du -sh /usr/share/locale/; find /usr/share/locale/ |grep ".*\.mo$" |wc
 
 # https://hub.fastgit.org/joserprieto/docker-debian-i18n/blob/master/Dockerfile
@@ -127,10 +130,11 @@ RUN ln -s /usr/share/rime-data/wubi_pinyin.schema.yaml /home/headless/.config/ib
 # RUN PS1='\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\u@\h|'${VER_DISTRO}':\w\$ ' \
 #   && echo "PS1='$PS1'" >> /home/headless/.bashrc
 
-# # Setup D-Bus
-# RUN mkdir /run/dbus/ && chown messagebus:messagebus /run/dbus/
-# RUN dbus-uuidgen > /etc/machine-id
-# RUN ln -sf /etc/machine-id /var/lib/dbus/machine-id
+#dbg: docker-headless:xfce-ubt2004-v1
+# Setup D-Bus
+RUN mkdir -p /run/dbus/ && chown messagebus:messagebus /run/dbus/; \
+ dbus-uuidgen > /etc/machine-id; \
+ ln -sf /etc/machine-id /var/lib/dbus/machine-id
 
 #ref: lazy
 # ARG APP_LARGER=""

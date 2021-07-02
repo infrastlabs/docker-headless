@@ -48,9 +48,11 @@ RUN apt.sh \
     dconf-cli locales tzdata apt-utils \
     fonts-wqy-zenhei language-pack-gnome-zh-hans
 #AUDIO pavucontrol:2,363 kB pnmixer:815 kB;  +pulseaudio:14.6 MB/ubt:2805kB; +qmmp:28.7 MB
-RUN apt.sh pavucontrol pnmixer 
+# pulseaudio: needed by pnmixer
+RUN apt.sh pavucontrol pnmixer pulseaudio
 #xfwm4-deps@ubt2004 40.234 MB
-RUN test "bionic" = "${VER_DISTRO}" && exit 0 \
+# gtk2-engines-pixbuf @ubt1804    
+RUN test "bionic" = "${VER_DISTRO}" && apt.sh gtk2-engines-pixbuf; exit 0 \
     || apt.sh libgl1
 # notifyd 234 kB; clipit 336 kB;
 RUN apt.sh \
@@ -114,6 +116,17 @@ RUN ln -s /usr/share/rime-data/wubi_pinyin.schema.yaml /home/headless/.config/ib
   su - headless -c "dbus-launch dconf reset -f /; dbus-launch dconf load / < /usr/share/dconf.ini; ";\
   dbus-launch dconf update; mkdir -p /var/run/dbus;
 
+
+# PS1
+# # \[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\u@\h:\w\$
+# RUN PS1='\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\u@\h|'${VER_DISTRO}':\w\$ ' \
+#   && echo "PS1='$PS1'" >> /home/headless/.bashrc
+
+#dbg: docker-headless:xfce-ubt2004-v1
+# Setup D-Bus
+RUN mkdir -p /run/dbus/ && chown messagebus:messagebus /run/dbus/; \
+ dbus-uuidgen > /etc/machine-id; \
+ ln -sf /etc/machine-id /var/lib/dbus/machine-id
 
 ##ref: lazy
 # ARG APP_LARGER=""
