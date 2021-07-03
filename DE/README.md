@@ -1,5 +1,17 @@
 # 
 
+## TZ/LOCALE
+
+```bash
+# zh_CN zh_TW zh_HK
+# err: de it 
+# OK: es_AR pt_BR fr_CA
+
+# headless @ vm23-197 in ~ |08:59:54  
+$ docker run -it --rm --net=host -e LOC_LANG_COUNTRY=zh_HK  registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:xfce-deb9-v1
+
+```
+
 ## debug
 
 ```bash

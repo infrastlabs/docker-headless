@@ -66,29 +66,30 @@ RUN apt.sh \
 RUN du -sh /usr/share/locale/; find /usr/share/locale/ |grep ".*\.mo$" |wc
 
 # https://hub.fastgit.org/joserprieto/docker-debian-i18n/blob/master/Dockerfile
-ARG LOC_LANG_COUNTRY="zh_CN"
-ARG LOC_CODIFICATION="UTF-8"
-# ARG LOC_CODIFICATION_ENV="utf8"
-ENV LANG=${LOC_LANG_COUNTRY}.${LOC_CODIFICATION}\
-    LANGUAGE=${LOC_LANG_COUNTRY}:zh
-    # LC_ALL=${LOC_LANG_COUNTRY}.${LOC_CODIFICATION}
-ENV TZ="Asia/Shanghai"\
-    TERM="xterm"  
+# ARG LOC_LANG_COUNTRY="zh_CN"
+# ARG LOC_CODIFICATION="UTF-8"
+# # ARG LOC_CODIFICATION_ENV="utf8"
+# ENV LANG=${LOC_LANG_COUNTRY}.${LOC_CODIFICATION}\
+#     LANGUAGE=${LOC_LANG_COUNTRY}:zh
+#     # LC_ALL=${LOC_LANG_COUNTRY}.${LOC_CODIFICATION}
+# ENV TZ="Asia/Shanghai"\
+#     TERM="xterm"  
 
 # LOCALE TZ #1.786 MB
-RUN localedef -i ${LOC_LANG_COUNTRY} -c -f ${LOC_CODIFICATION} -A /usr/share/locale/locale.alias ${LANG} \
-  && sed -i -e "s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen \
-  && sed -i -e "s/# ${LANG} ${LOC_CODIFICATION}/${LANG} ${LOC_CODIFICATION}/" /etc/locale.gen \
-  && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime && echo "${TZ}" >/etc/timezone \
-  && dpkg-reconfigure --frontend=noninteractive locales tzdata \
-  && locale-gen ${LANG} \
-  && /usr/sbin/update-locale LANG=${LANG}; \
-    # /etc/default/locale
-    echo "# " > /etc/default/locale; \
-    echo "LANG=${LANG}" >> /etc/default/locale; \
-    echo "LANGUAGE=${LANGUAGE}" >> /etc/default/locale;
+# RUN localedef -i ${LOC_LANG_COUNTRY} -c -f ${LOC_CODIFICATION} -A /usr/share/locale/locale.alias ${LANG} \
+#   && sed -i -e "s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen \
+#   && sed -i -e "s/# ${LANG} ${LOC_CODIFICATION}/${LANG} ${LOC_CODIFICATION}/" /etc/locale.gen \
+#   && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime && echo "${TZ}" >/etc/timezone \
+#   && dpkg-reconfigure --frontend=noninteractive locales tzdata \
+#   && locale-gen ${LANG} \
+#   && /usr/sbin/update-locale LANG=${LANG}; \
+#     # /etc/default/locale
+#     echo "# " > /etc/default/locale; \
+#     echo "LANG=${LANG}" >> /etc/default/locale; \
+#     echo "LANGUAGE=${LANGUAGE}" >> /etc/default/locale;
 
 # ADD box.sh /usr/bin/box
+ADD entry.sh /entry.sh
 ADD supervisor.conf /etc/supervisor/conf.d/xfce4.conf
 COPY clear3d.theme /usr/share/plank/themes/Default/dock.theme
 COPY --chown=root:root ./dot/ /etc/skel/
@@ -102,11 +103,11 @@ RUN \
   && echo 'Cmnd_Alias SU = /bin/su' >> /etc/sudoers \
   && echo "$user ALL=(root) NOPASSWD: ALL" >> /etc/sudoers \
   \
+  && chmod +x /entry.sh \
   && echo "welcome! HeadlessBox." > /etc/motd \
   && ln -s /usr/bin/vim.tiny /usr/bin/vt \
   && rm -f /bin/sh && ln -s /bin/bash /bin/sh \
   && echo "alias ll='ls -lF'; alias la='ls -A'; alias l='ls -CF';" >> /home/$user/.bashrc
-  # && chmod +x /entry.sh \
     
 
 
@@ -140,7 +141,16 @@ RUN mkdir -p /run/dbus/ && chown messagebus:messagebus /run/dbus/; \
 # ARG APP_LARGER=""
 # RUN box largerApps
 
+# ARG LOC_CODIFICATION_ENV="utf8"
+ENV \
+  LOC_LANG_COUNTRY="zh_CN" \
+  LOC_CODIFICATION="UTF-8" \
+  TZ="Asia/Shanghai"
+  # LANG=${LOC_LANG_COUNTRY}.${LOC_CODIFICATION} \
+  # LANGUAGE=${LOC_LANG_COUNTRY}:zh \
+  # LC_ALL=${LOC_LANG_COUNTRY}.${LOC_CODIFICATION}
 
-# CMD ["/entry.sh"]
+
+CMD ["bash", "/entry.sh"]
 # EXPOSE 10089 10022
-CMD ["supervisord", "-n"]
+# CMD ["supervisord", "-n"]
