@@ -182,7 +182,7 @@ RUN test -z "$FULL" && exit 0;\
 # # dconf load / < dconf.ini  ##error: Cannot autolaunch D-Bus without X11 $DISPLAY
 # # ADD > COPY
 ADD src/f/dconf.ini /usr/share/dconf.ini 
-COPY src/f/.config/ /home/headless/.config/
+COPY src/f/.config/emp${FULL} /home/headless/.config/
 RUN test -z "$FULL" && exit 0;\
   find /home/headless/.config |wc; \
   ln -s /usr/share/rime-data/wubi_pinyin.schema.yaml /home/headless/.config/ibus/rime/; \
