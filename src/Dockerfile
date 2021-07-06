@@ -157,8 +157,47 @@ ENV \
     VNC_OFFSET=0 \
     VNC_LIMIT=3
 
-WORKDIR /
+RUN echo "welcome! HeadlessBox." > /etc/motd \
+    && ln -s /usr/bin/vim.tiny /usr/bin/vt \
+    && rm -f /bin/sh && ln -s /bin/bash /bin/sh \
+    && echo "alias ll='ls -lF'; alias la='ls -A'; alias l='ls -CF';" >> /home/headless/.bashrc
+# Make sesman read environment variables
+RUN printf '%s\n' 'session required pam_env.so readenv=1' >> /etc/pam.d/xrdp-sesman
+# locale>xx.mo: dpkg conf, use debian's tpl.
+RUN sed -i "s^path-exclude /usr/share/locale/\*^# path-exclude /usr/share/locale/\*^g" /etc/dpkg/dpkg.cfg.d/excludes
 
+##FULL###########################
+# # LOCALE TZ #1.786 MB #TODO /usr/share/locale1 +link
+# COPY --from=loc /usr/share/locale1 /usr/share/locale1
+# RUN bash -c "arr=\"$(cd /usr/share/locale1; ls)\"; for ONE in \${arr[@]}; do rm -rf /usr/share/locale/\$ONE ; ln -s /usr/share/locale1/\$ONE /usr/share/locale/ ; done";
+
+# # theme <property name="IconThemeName" type="string" value="gnome"/>
+# RUN sed -i "s^value=\"gnome\"^value=\"ePapirus\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
+
+# DCONF+IBUS env
+# # dconf load / < dconf.ini  ##error: Cannot autolaunch D-Bus without X11 $DISPLAY
+# # ADD > COPY
+# ADD src/f/dconf.ini /usr/share/dconf.ini 
+# COPY src/f/.config/ /home/headless/.config/
+RUN test -z "$FULL" && exit 0;\
+  find /home/headless/.config |wc; \
+  ln -s /usr/share/rime-data/wubi_pinyin.schema.yaml /home/headless/.config/ibus/rime/; \
+  chown -R headless:headless /home/headless/.config; \
+  # ibus env
+  echo "export XMODIFIERS=@im=ibus" >> /etc/profile;\
+  echo "export GTK_IM_MODULE=ibus" >> /etc/profile;\
+  echo "export QT_IM_MODULE=ibus" >> /etc/profile;\
+  # dconf: ibus, plank, engrampa
+  mkdir -p /etc/dconf/db;\
+  su - headless -c "dbus-launch dconf reset -f /; dbus-launch dconf load / < /usr/share/dconf.ini; ";\
+  dbus-launch dconf update; 
+
+  # L="zh_CN" \
+ENV \
+  TZ="Asia/Shanghai"
+
+
+WORKDIR /
 # EXPOSE 3389/tcp 6080/tcp 22/tcp 6000/tcp 4713/tcp
 EXPOSE 10089/tcp 10081/tcp 10022/tcp
 # CMD ["supervisord", "-n"]
