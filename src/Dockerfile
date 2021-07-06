@@ -70,6 +70,46 @@ RUN test -z "$SLIM" && exit 0;\
   apt.sh \
   xfce4-notifyd clipit gtk2-engines-pixbuf && apt -y remove dunst
 
+
+ARG FULL=""
+RUN test -z "$FULL" && exit 0;\
+  VER_DISTRO="stretch" DOMAIN="mirrors.163.com"; \
+  echo "deb http://${DOMAIN}/debian/ ${VER_DISTRO} main contrib non-free" > /etc/apt/sources.list \
+  && echo "deb http://${DOMAIN}/debian/ ${VER_DISTRO}-updates main contrib non-free">> /etc/apt/sources.list \
+  && echo "deb http://${DOMAIN}/debian/ ${VER_DISTRO}-backports main non-free contrib">> /etc/apt/sources.list \
+  && echo "deb http://${DOMAIN}/debian-security/ ${VER_DISTRO}/updates main non-free contrib">> /etc/apt/sources.list;
+
+# papirus-icon-theme:  backports?@deb9
+RUN test -z "$FULL" && exit 0;\
+  apt.sh at-spi2-core  geany rofi papirus-icon-theme
+# APPS2 6.767 MB gnome-system-monitor engrampa ristretto
+RUN test -z "$FULL" && exit 0;\
+  apt.sh ${LOC_APPS2}
+#LOCALE 20.485 MB --language-pack-gnome-zh-hans 
+RUN test -z "$FULL" && exit 0;\
+  apt.sh \
+    dconf-cli locales tzdata  \
+    fonts-wqy-zenhei
+
+#######largerApps
+# IBUS: 26.5 MB
+# PIC: flameshot 10M, tumbler 6666kB(image cache) 10.5 MB (xrandr: x11-xserver-utils)
+# AUDIO: mpv 36M;
+# DEV: vscode 5.453 MB
+# SHELL: git 12.4 MB; on-my-bash; asbru-cm 11.3M
+RUN test -z "$FULL" && exit 0;\
+  apt.sh \
+  ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
+  flameshot tumbler arandr \
+  gnupg libsecret-1-0 libnss3 libxtst6 libasound2 \
+  curl wget git
+
+# ohmybash, asbru-cm
+RUN test -z "$FULL" && exit 0;\
+  su headless -c "$(curl -fsSL https://gitee.com/g-system/oh-my-bash/raw/sam-custom/tools/install.sh)"; \
+  curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash; \
+  apt.sh asbru-cm;
+
 # xrdp0914, xrdp3: v0916
 COPY --from=xrdp3 /usr/local/appdata/xrdp0916 /usr/local/xrdp
 COPY --from=xrdp /usr/local/sysdata/var/lib/xrdp-pulseaudio-installer /var/lib/xrdp-pulseaudio-installer
