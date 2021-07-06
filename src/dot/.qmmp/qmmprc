@@ -1,0 +1,228 @@
+[ConfigDialog]
+splitter_sizes=176, 508
+window_size=@Size(700 470)
+
+[Cover]
+depth=0
+exclude=*back*
+include=*.jpg, *.png
+use_files=true
+
+[Equalizer_10]
+band_0=0
+band_1=0
+band_2=0
+band_3=0
+band_4=0
+band_5=0
+band_6=0
+band_7=0
+band_8=0
+band_9=0
+enabled=false
+preamp=0
+
+[%General]
+default_pl_name=Playlist
+exclude_filters=@Invalid()
+last_dir=/home/headless
+locale=auto
+restrict_filters=@Invalid()
+resume_on_startup=false
+resume_playback=false
+resume_playback_time=5713
+use_default_pl=false
+
+[Misc]
+determine_file_by_content=false
+
+[Output]
+buffer_size=500
+dithering=true
+format=2
+software_volume=false
+volume_step=5
+
+[PlayList]
+autosave=true
+clear_previous=false
+convert_twenty=true
+convert_underscore=true
+group_format="%p%if(%p&%a, - %if(%y,[%y] ,),)%a"
+groups=false
+load_metadata=true
+no_advance=false
+repeate_list=false
+repeate_track=false
+shuffle=false
+
+[PluginCache]
+usr\lib\qmmp\qmmp\Effect\libbs2b.so=bs2b, 1, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Effect\libcrossfade.so=crossfade, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Effect\libladspa.so=ladspa, 1, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Effect\libsoxr.so=soxr, 2, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Effect\libstereo.so=stereo, 1, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Engines\libmplayer.so=mplayer, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\FileDialogs\libqmmpfiledialog.so=qmmp_dialog, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\FileDialogs\libtwopanelfiledialog.so=twopanel_dialog, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\General\libconverter.so=converter, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\General\libcopypaste.so=copypaste, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\General\libcovermanager.so=cover_manager, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\General\libfileops.so=fileops, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\General\libgnomehotkey.so=gnomehotkey, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\General\libhotkey.so=hotkey, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\General\libkdenotify.so=kdenotify_icon, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\General\liblyrics.so=lyrics, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\General\libmpris.so=mpris, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\General\libnotifier.so=notifier, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\General\librgscan.so=rgscan, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\General\libscrobbler.so=scrobbler, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\General\libstatusicon.so=status_icon, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\General\libstreambrowser.so=streambrowser, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\General\libtrackchange.so=trackchange, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\General\libudisks2.so=udisks2, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Input\libaac.so=aac, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Input\libcdaudio.so=cdaudio, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Input\libcue.so=cue, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Input\libffmpeg.so=ffmpeg, 10, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Input\libflac.so=flac, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Input\libgme.so=gme, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Input\libmad.so=mad, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Input\libmodplug.so=modplug, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Input\libmpc.so=mpc, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Input\libopus.so=opus, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Input\libsid.so=sid, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Input\libsndfile.so=sndfile, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Input\libvorbis.so=vorbis, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Input\libwavpack.so=wavpack, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Input\libwildmidi.so=wildmidi, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Output\libalsa.so=alsa, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Output\libjack.so=jack, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Output\libnull.so=null, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Output\libpulseaudio.so=pulse, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Output\libqtmultimedia.so=qtmultimedia, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Transports\libhttp.so=http, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Transports\libmms.so=mms, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Ui\libqsui.so=qsui, 0, 2017-01-29T12:00:10
+usr\lib\qmmp\qmmp\Ui\libskinned.so=skinned, 0, 2017-01-29T12:00:10
+
+[Proxy]
+authentication=false
+url=@Variant(\0\0\0\x11\0\0\0\x6//:@:0)
+use_proxy=false
+
+[ReplayGain]
+default_gain=0
+mode=2
+preamp=0
+prevent_clipping=true
+
+[Skinned]
+always_on_top=false
+antialiasing=false
+autoscroll=true
+bitmap_font=false
+disp_elapsed=true
+disp_shaded=false
+double_size=false
+eq_opacity=1
+eq_pos=@Point(100 216)
+eq_shaded=false
+eq_visible=true
+hide_on_close=false
+mw_font="Sans Serif,9,-1,5,50,0,0,0,0,0"
+mw_opacity=1
+mw_pos=@Point(100 100)
+pl_align_numbers=false
+pl_autoresize_column=-1
+pl_column_alignment=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\0)
+pl_column_names=Artist - Title
+pl_column_patterns="%if(%p,%p - %t,%t)"
+pl_column_sizes=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x96)
+pl_font="Sans Serif,9,-1,5,50,0,0,0,0,0"
+pl_header_font="Sans Serif,9,-1,5,50,0,0,0,0,0"
+pl_opacity=1
+pl_pos=@Point(100 332)
+pl_separator=::
+pl_shaded=false
+pl_show_anchor=false
+pl_show_create_button=false
+pl_show_header=false
+pl_show_lengths=true
+pl_show_numbers=true
+pl_show_plalists=false
+pl_show_popup=false
+pl_show_protocol=false
+pl_size=@Size(275 116)
+pl_track_state_column=-1
+pl_visible=true
+scroller_transparency=true
+show_on_all_desktops=false
+skin_cursors=false
+skin_name=Dark_Materia.wsz
+skin_path=/home/headless/.qmmp/cache/skin
+start_hidden=false
+vis_analyzer_falloff=2.2
+vis_analyzer_mode=0
+vis_analyzer_type=1
+vis_peaks_falloff=0.2
+vis_rate=25
+vis_show_peaks=true
+vis_transparent_bg=false
+vis_type=Analyzer
+window_title_format="%if(%p,%p - %t,%t)"
+
+[SkinnedShortcuts]
+about=
+about_qt=
+add_dir=D
+add_file=F
+add_url=U
+always_on_top=
+anti_aliasing=
+clear_queue=Alt+Q
+clear_selection=
+close_pl=Ctrl+W
+double_size=Meta+D
+enqueue=Q
+exit=Ctrl+Q
+group_tracks=Ctrl+G
+invert_selection=
+jump=J
+load_pl=O
+new_pl=Ctrl+T
+next=B
+next_pl=Ctrl+PgDown
+no_playlist_advance=Ctrl+N
+pause=C
+pl_rename=F2
+play=X
+play_pause=Space
+prev_pl=Ctrl+PgUp
+previous=Z
+refresh=F5
+remove_all=
+remove_duplicates=
+remove_invalid=
+remove_selected=Del
+remove_unselected=
+repeate_playlist=R
+repeate_track=Ctrl+R
+save_pl=Shift+S
+select_all=Ctrl+A
+show_equalizer=Alt+G
+show_header=Ctrl+H
+show_info=Alt+I
+show_playlist=Alt+E
+show_playlists=P
+show_settings=Ctrl+P
+shuffle=S
+sticky=
+stop=V
+stop_after_selected=Ctrl+S
+vol_dec=9
+vol_enc=0
+vol_mute=M
+
+[URLDialog]
+use_clipboard=false
