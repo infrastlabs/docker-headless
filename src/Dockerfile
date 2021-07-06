@@ -73,25 +73,23 @@ RUN test -z "$SLIM" && exit 0;\
 # xrdp0914, xrdp3: v0916
 COPY --from=xrdp3 /usr/local/appdata/xrdp0916 /usr/local/xrdp
 COPY --from=xrdp /usr/local/sysdata/var/lib/xrdp-pulseaudio-installer /var/lib/xrdp-pulseaudio-installer
-ADD ./etc/xrdp/pulse/default.pa /etc/xrdp/pulse/default.pa
+ADD src/etc/xrdp/pulse/default.pa /etc/xrdp/pulse/default.pa
 RUN ln -s /usr/local/xrdp/sbin/xrdp /usr/sbin/;\
   ln -s /usr/local/xrdp/sbin/xrdp-sesman /usr/sbin/;\
   ln -s /usr/local/xrdp/sbin/xrdp-chansrv /usr/sbin/;\
   ln -s /usr/local/xrdp/bin/xrdp-keygen /usr/bin/;
 
-COPY --chown=root:root ./dot/ /etc/skel/
-COPY clear3d.theme /usr/share/plank/themes/Default/dock.theme
-COPY ./xser2/servers2.conf /etc/supervisor/conf.d/servers.conf
-ADD ./xser2/entry.sh /entry.sh
-ADD ./xser2/etc/xrdp/sesman.ini /etc/xrdp/sesman.ini
-ADD ./xser2/etc/xrdp/xrdp.ini /etc/xrdp/xrdp.ini
-ADD ./xser2/etc/xrdp/vnc_pass /etc/xrdp/vnc_pass
-ADD ./xser2/etc/pulse/* /etc/pulse/
-ADD ./xser2/etc/nginx/nginx.conf /etc/nginx/nginx.conf
-ADD ./xser2/etc/novnc/* /etc/novnc/
+COPY --chown=root:root ./src/dot/ /etc/skel/
+ADD src/etc /etc
+# ADD src/etc/xrdp/* /etc/xrdp/
+# ADD src/etc/pulse/* /etc/pulse/
+# ADD src/etc/novnc/* /etc/novnc/
+# ADD src/index.html /usr/local/novnc/index.html
+ADD src/entry.sh /entry.sh
+ADD src/xvnc.sh /xvnc.sh
+ADD src/xrdp.conf /etc/supervisor/conf.d/xrdp.conf
+COPY src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
 
-# COPY ./xser2/index.html /usr/local/novnc/index.html
-ADD ./xser2/xvnc.sh /xvnc.sh
 # +headless
 # sv_user: http://blog.chinaunix.net/uid-26817066-id-5792715.html
 RUN useradd -mp j9X2HRQvPCphA -s /bin/bash -G sudo headless \
@@ -99,16 +97,17 @@ RUN useradd -mp j9X2HRQvPCphA -s /bin/bash -G sudo headless \
   && echo 'Cmnd_Alias SU = /bin/su' >> /etc/sudoers \
   && echo "headless ALL=(root) NOPASSWD: ALL" >> /etc/sudoers \
   \
-  && chmod +x /xvnc.sh && chmod +x /entry.sh; \
+  && chmod +x /*.sh; \
   test -f /usr/bin/dbus-daemon && chown headless:headless /usr/bin/dbus-* || echo "dbus skip chown."; \
   \
   line=$(cat /etc/supervisor/supervisord.conf |grep  "^chmod=0700" -n |cut -d':' -f1); \
   sed -i "${line}cchmod=0770" /etc/supervisor/supervisord.conf; \
   sed -i "${line}achown=headless:headless" /etc/supervisor/supervisord.conf;
 # Setup D-Bus
-RUN mkdir -p /run/dbus/ && chown messagebus:messagebus /run/dbus/; \
- dbus-uuidgen > /etc/machine-id; \
- ln -sf /etc/machine-id /var/lib/dbus/machine-id
+RUN test -z "$SLIM" && exit 0;\
+  mkdir -p /run/dbus/ && chown messagebus:messagebus /run/dbus/; \
+  dbus-uuidgen > /etc/machine-id; \
+  ln -sf /etc/machine-id /var/lib/dbus/machine-id
 
 
 ENV \

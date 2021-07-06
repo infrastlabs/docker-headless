@@ -33,6 +33,7 @@ function setVnc(){
         useradd -ms /usr/sbin/nologin xvnc$N;
 
         # genTpl<sv, index.html, xrdp>
+        mkdir -p /etc/novnc
         local port=$(expr 5900 + $N)
         echo "display$N: 127.0.0.1:$port" >> /etc/novnc/token.conf
         echo "<li><a target=\"_blank\" href=\"/vnc.html?path=websockify/?token=display$N&password=passwd\">display$N</a>&nbsp;&nbsp;<a target=\"_blank\" href=\"/vnc_lite.html?path=websockify/?token=display$N&password=passwd\">lite_display$N</a></li>" >> /usr/local/novnc/index.html
@@ -43,7 +44,7 @@ function setVnc(){
 environment=DISPLAY=\":1\",HOME=\"/home/xvnc$N\"
 priority=35
 user=xvnc$N
-command=/cmd.sh :$N
+command=/xvnc.sh :$N
 stdout_logfile=/dev/fd/1
 stdout_logfile_maxbytes=0
 redirect_stderr=true
@@ -103,4 +104,6 @@ function setLocale(){
 }
 test -z "$L" || setLocale
 
+# rm -f /home/headless/.config/plank/dock1/launchers/*.dockitem;
+su - headless -c "mkdir -p /home/headless/.config/plank/dock1/launchers"
 exec supervisord -n
