@@ -41,7 +41,7 @@ function setVnc(){
         # sv
         echo """
 [program:xvnc$N]
-environment=DISPLAY=\":1\",HOME=\"/home/xvnc$N\"
+environment=DISPLAY=:$N,HOME=/home/xvnc$N
 priority=35
 user=xvnc$N
 command=/xvnc.sh :$N
