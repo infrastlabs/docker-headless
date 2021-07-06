@@ -11,7 +11,7 @@ echo "${DOCKER_REGISTRY_PW_infrastSubUser2}" |docker login --username=${DOCKER_R
 ns=infrastlabs
 # cache="--no-cache"
 # pull="--pull"
-ver=box01
+ver=box02 #02: +full
 
 img="docker-headless:$ver-slim"
 docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile .
@@ -21,6 +21,6 @@ img="docker-headless:$ver"
 docker build $cache $pull -t $repo/$ns/$img  --build-arg SLIM=false -f src/Dockerfile .
 docker push $repo/$ns/$img
 
-# img="docker-headless:$ver-full"
-# docker build $cache $pull -t $repo/$ns/$img  --build-arg SLIM=false -f src/Dockerfile.full .
-# docker push $repo/$ns/$img
+img="docker-headless:$ver-full"
+docker build $cache $pull -t $repo/$ns/$img  --build-arg SLIM=false --build-arg FULL=true -f src/Dockerfile .
+docker push $repo/$ns/$img

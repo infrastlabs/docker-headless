@@ -164,21 +164,22 @@ RUN echo "welcome! HeadlessBox." > /etc/motd \
 # Make sesman read environment variables
 RUN printf '%s\n' 'session required pam_env.so readenv=1' >> /etc/pam.d/xrdp-sesman
 # locale>xx.mo: dpkg conf, use debian's tpl.
-RUN sed -i "s^path-exclude /usr/share/locale/\*^# path-exclude /usr/share/locale/\*^g" /etc/dpkg/dpkg.cfg.d/excludes
+RUN sed -i "s^path-exclude /usr/share/locale/\*^# path-exclude /usr/share/locale/\*^g" /etc/dpkg/dpkg.cfg.d/docker
 
 ##FULL###########################
-# # LOCALE TZ #1.786 MB #TODO /usr/share/locale1 +link
+# # LOCALE TZ #1.786 MB #TODO /usr/share/locale1 +link ##TODO ARG:FULL
 # COPY --from=loc /usr/share/locale1 /usr/share/locale1
 # RUN bash -c "arr=\"$(cd /usr/share/locale1; ls)\"; for ONE in \${arr[@]}; do rm -rf /usr/share/locale/\$ONE ; ln -s /usr/share/locale1/\$ONE /usr/share/locale/ ; done";
 
-# # theme <property name="IconThemeName" type="string" value="gnome"/>
-# RUN sed -i "s^value=\"gnome\"^value=\"ePapirus\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
+# theme <property name="IconThemeName" type="string" value="gnome"/>
+RUN test -z "$FULL" && exit 0;\
+  sed -i "s^value=\"gnome\"^value=\"ePapirus\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
 
 # DCONF+IBUS env
 # # dconf load / < dconf.ini  ##error: Cannot autolaunch D-Bus without X11 $DISPLAY
 # # ADD > COPY
-# ADD src/f/dconf.ini /usr/share/dconf.ini 
-# COPY src/f/.config/ /home/headless/.config/
+ADD src/f/dconf.ini /usr/share/dconf.ini 
+COPY src/f/.config/ /home/headless/.config/
 RUN test -z "$FULL" && exit 0;\
   find /home/headless/.config |wc; \
   ln -s /usr/share/rime-data/wubi_pinyin.schema.yaml /home/headless/.config/ibus/rime/; \
