@@ -1,3 +1,4 @@
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:xfce-deb9-v1 as loc
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile2 as xrdp
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile3 as xrdp3
 FROM debian:stretch-slim
@@ -167,9 +168,11 @@ RUN printf '%s\n' 'session required pam_env.so readenv=1' >> /etc/pam.d/xrdp-ses
 RUN sed -i "s^path-exclude /usr/share/locale/\*^# path-exclude /usr/share/locale/\*^g" /etc/dpkg/dpkg.cfg.d/docker
 
 ##FULL###########################
-# # LOCALE TZ #1.786 MB #TODO /usr/share/locale1 +link ##TODO ARG:FULL
-# COPY --from=loc /usr/share/locale1 /usr/share/locale1
-# RUN bash -c "arr=\"$(cd /usr/share/locale1; ls)\"; for ONE in \${arr[@]}; do rm -rf /usr/share/locale/\$ONE ; ln -s /usr/share/locale1/\$ONE /usr/share/locale/ ; done";
+# ref: mkdir /usr/share/locale1/emp/
+# LOCALE TZ #1.786 MB #TODO /usr/share/locale1 +link ##TODO ARG:FULL
+COPY --from=loc /usr/share/locale1/emp${FULL} /usr/share/locale1
+RUN test -z "$FULL" && exit 0;\
+  bash -c "arr=\"$(cd /usr/share/locale1; ls)\"; for ONE in \${arr[@]}; do rm -rf /usr/share/locale/\$ONE ; ln -s /usr/share/locale1/\$ONE /usr/share/locale/ ; done";
 
 # theme <property name="IconThemeName" type="string" value="gnome"/>
 RUN test -z "$FULL" && exit 0;\
@@ -193,6 +196,7 @@ RUN test -z "$FULL" && exit 0;\
   su - headless -c "dbus-launch dconf reset -f /; dbus-launch dconf load / < /usr/share/dconf.ini; ";\
   dbus-launch dconf update; 
 
+  # ${FULL} > nonFull: if locale isn't installed.(entry.sh)
   # L="zh_CN" \
 ENV \
   TZ="Asia/Shanghai"

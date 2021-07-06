@@ -115,13 +115,14 @@ RUN mkdir -p /run/dbus/ && chown messagebus:messagebus /run/dbus/; \
 # RUN echo "arr=(aa bb); for ONE in \${arr[@]}; do mkdir -p /usr/share/locale/\$ONE/LC_MESSAGES; done" |bash -; find /usr/share/locale/
 # RUN echo "aa=aa1; mkdir -p /tmp/\${aa}/{\${aa},bb,cc}" |bash -; find /tmp
 
+# locale1/emp: for box03-nonFull's empty copy
 # Administrator@sam-pincun MINGW64 /d/UserData/Desktop/loc_anay/loc_select
 # $ dir
 # _ex   ar  de  en_CA  es_AR  fr_CA  ja  ko_KR  pt     ru  vi     zh_HK
 # _ex2  cs  en  es     fr     it     ko  nl     pt_BR  tr  zh_CN  zh_TW
 ENV LOC1="ar  de  en_CA  es_AR  fr_CA  ja  pt     ru  vi     zh_HK"\
     LOC2="cs  en  es     fr     it     ko  nl     pt_BR  tr  zh_CN  zh_TW"
-RUN bash -c "mkdir -p /usr/share/locale1; cd /usr/share/locale; arr=(\$LOC1 \$LOC2); for ONE in \${arr[@]}; do mv \$ONE ../locale1; ln -s ../locale1/\$ONE . ; done";
+RUN bash -c "mkdir -p /usr/share/locale1/emp; cd /usr/share/locale; arr=(\$LOC1 \$LOC2); for ONE in \${arr[@]}; do mv \$ONE ../locale1; ln -s ../locale1/\$ONE . ; done";
 
 ENV \
   L="zh_CN" \
