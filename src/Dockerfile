@@ -202,7 +202,7 @@ ENV \
   TZ="Asia/Shanghai"
 
 
-WORKDIR /
+WORKDIR /home/headless
 # EXPOSE 3389/tcp 6080/tcp 22/tcp 6000/tcp 4713/tcp
 EXPOSE 10089/tcp 10081/tcp 10022/tcp
 # CMD ["supervisord", "-n"]
