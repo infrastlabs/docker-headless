@@ -110,11 +110,13 @@ RUN test -z "$FULL" && exit 0;\
   su headless -c "$(curl -fsSL https://gitee.com/g-system/oh-my-bash/raw/sam-custom/tools/install.sh)"; \
   curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash; \
   apt.sh asbru-cm;
+# vncpasswd #66.6 kB
+RUN apt.sh tigervnc-common
 
 # xrdp0914, xrdp3: v0916
+ADD src/etc/xrdp/pulse/default.pa /etc/xrdp/pulse/default.pa
 COPY --from=xrdp3 /usr/local/appdata/xrdp0916 /usr/local/xrdp
 COPY --from=xrdp /usr/local/sysdata/var/lib/xrdp-pulseaudio-installer /var/lib/xrdp-pulseaudio-installer
-ADD src/etc/xrdp/pulse/default.pa /etc/xrdp/pulse/default.pa
 RUN ln -s /usr/local/xrdp/sbin/xrdp /usr/sbin/;\
   ln -s /usr/local/xrdp/sbin/xrdp-sesman /usr/sbin/;\
   ln -s /usr/local/xrdp/sbin/xrdp-chansrv /usr/sbin/;\
@@ -156,7 +158,9 @@ ENV \
     XRDP_PORT="10089" \
     VNC_PORT="10081" \
     VNC_OFFSET=0 \
-    VNC_LIMIT=3
+    VNC_LIMIT=3 \
+    VNC_RW=passwd!@# \
+    VNC_RO=passwd
 
 RUN echo "welcome! HeadlessBox." > /etc/motd \
     && ln -s /usr/bin/vim.tiny /usr/bin/vt \

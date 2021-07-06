@@ -104,6 +104,11 @@ function setLocale(){
 }
 test -z "$L" || setLocale
 
+
+# VNC_PASS: ro??
+# echo "passwd" | vncpasswd -f >> /etc/xrdp/vnc_pass; chmod 600 /etc/xrdp/vnc_pass
+echo -e "$VNC_RW\n$VNC_RW\ny\n$VNC_RO\n$VNC_RO"  |vncpasswd /etc/xrdp/vnc_pass; chmod 644 /etc/xrdp/vnc_pass
+
 # rm -f /home/headless/.config/plank/dock1/launchers/*.dockitem;
 su - headless -c "mkdir -p /home/headless/.config/plank/dock1/launchers"
 exec supervisord -n
