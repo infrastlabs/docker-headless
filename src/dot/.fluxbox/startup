@@ -23,7 +23,7 @@
 # thunar --daemon &
 dunst &
 xcompmgr &
-sleep 5 && stterm & #directRun: topPosition HideBar
+sleep 2 && stterm & #directRun: topPosition HideBar
 
 # Change your keymap:
 # xmodmap "/home/alexsson/.Xmodmap"

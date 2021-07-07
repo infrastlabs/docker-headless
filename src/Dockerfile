@@ -1,6 +1,7 @@
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:xfce-deb9-v1 as loc
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile2 as xrdp
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile3 as xrdp3
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile-v1 as bins
+# FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile2 as xrdp
+# FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile3 as xrdp3
 FROM debian:stretch-slim
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -110,13 +111,19 @@ RUN test -z "$FULL" && exit 0;\
   su headless -c "$(curl -fsSL https://gitee.com/g-system/oh-my-bash/raw/sam-custom/tools/install.sh)"; \
   curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash; \
   apt.sh asbru-cm;
-# vncpasswd #66.6 kB
+# Attach1: vncpasswd #66.6 kB; st.libharfbuzz0b 3447 kB
 RUN apt.sh tigervnc-common
+RUN test -z "$SLIM" && exit 0;\
+  apt.sh libharfbuzz0b; \
+  apt -y remove stterm; ln -s /usr/local/st/st /bin/stterm;
+# moveUp
+COPY --from=loc /usr/share/locale1/emp${FULL} /usr/share/locale1
 
 # xrdp0914, xrdp3: v0916
 ADD src/etc/xrdp/pulse/default.pa /etc/xrdp/pulse/default.pa
-COPY --from=xrdp3 /usr/local/appdata/xrdp0916 /usr/local/xrdp
-COPY --from=xrdp /usr/local/sysdata/var/lib/xrdp-pulseaudio-installer /var/lib/xrdp-pulseaudio-installer
+COPY --from=bins /usr/local/appdata/xrdp /usr/local/xrdp
+COPY --from=bins /usr/local/sysdata/var/lib/xrdp-pulseaudio-installer /var/lib/xrdp-pulseaudio-installer
+COPY --from=bins /usr/local/st/st /usr/local/st/st
 RUN ln -s /usr/local/xrdp/sbin/xrdp /usr/sbin/;\
   ln -s /usr/local/xrdp/sbin/xrdp-sesman /usr/sbin/;\
   ln -s /usr/local/xrdp/sbin/xrdp-chansrv /usr/sbin/;\
@@ -154,9 +161,9 @@ RUN test -z "$SLIM" && exit 0;\
 
 
 ENV \
-    SSHD_PORT="10022" \
-    XRDP_PORT="10089" \
-    VNC_PORT="10081" \
+    SSHD_PORT=10022 \
+    XRDP_PORT=10089 \
+    VNC_PORT=10081 \
     VNC_OFFSET=0 \
     VNC_LIMIT=3 \
     VNC_RW=passwd!@# \
@@ -174,7 +181,7 @@ RUN sed -i "s^path-exclude /usr/share/locale/\*^# path-exclude /usr/share/locale
 ##FULL###########################
 # ref: mkdir /usr/share/locale1/emp/
 # LOCALE TZ #1.786 MB #TODO /usr/share/locale1 +link ##TODO ARG:FULL
-COPY --from=loc /usr/share/locale1/emp${FULL} /usr/share/locale1
+# COPY --from=loc /usr/share/locale1/emp${FULL} /usr/share/locale1
 RUN test -z "$FULL" && exit 0;\
   bash -c "arr=\"$(cd /usr/share/locale1; ls)\"; for ONE in \${arr[@]}; do rm -rf /usr/share/locale/\$ONE ; ln -s /usr/share/locale1/\$ONE /usr/share/locale/ ; done";
 
@@ -202,8 +209,10 @@ RUN test -z "$FULL" && exit 0;\
 
   # ${FULL} > nonFull: if locale isn't installed.(entry.sh)
   # L="zh_CN" \
+  # stterm: TERM="xterm|vt100"
 ENV \
-  TZ="Asia/Shanghai"
+  TZ=Asia/Shanghai \
+  TERM=xterm
 
 
 WORKDIR /home/headless

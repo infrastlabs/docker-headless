@@ -5,7 +5,7 @@ echo "SSHD_PORT: $SSHD_PORT"     #10022 22
 echo "XRDP_PORT: $XRDP_PORT"     #10089 3389
 echo "VNC_PORT:  $VNC_PORT"      #10081 6081 # VNC_ENABLE
 
-sed -i "s/EFRp 22/EFRp ${SSHD_PORT}/g" /etc/supervisor/conf.d/servers.conf #supervisor.conf +dropbear
+sed -i "s/EFRp 22/EFRp ${SSHD_PORT}/g" /etc/supervisor/conf.d/xrdp.conf #supervisor.conf +dropbear
 # ubt1804 tcp6: still open @3389
 # sed -i "s^port=3389^port=tcp://:${XRDP_PORT}^g" /etc/xrdp/xrdp.ini  #port=tcp://:3389   *:3389 #only ip_v4
 sed -i "s^port=3389^port=${XRDP_PORT}^g" /etc/xrdp/xrdp.ini

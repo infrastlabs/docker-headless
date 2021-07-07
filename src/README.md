@@ -3,7 +3,7 @@
 ## TODO
 
 - ~~novnc: change_pw, readonly~~; UI:input_pass
-- compile: xrdp/xrdp-pulse, rofi, stterm
+- ~~compile: xrdp/xrdp-pulse, rofi, stterm~~
 - novnc-audio: ffmpeg?+jsmpeg
 
 **vncpasswd**
