@@ -5,7 +5,9 @@ FROM debian:stretch-slim as stage-base
 ENV DEBIAN_FRONTEND noninteractive
 RUN domain="mirrors.163.com" \
  && echo "deb http://$domain/debian/ stretch main contrib non-free" > /etc/apt/sources.list \
- && echo "deb http://$domain/debian/ stretch-updates main contrib non-free">> /etc/apt/sources.list
+ && echo "deb http://$domain/debian/ stretch-updates main contrib non-free">> /etc/apt/sources.list \
+ && echo "deb http://$domain/debian/ stretch-backports main non-free contrib">> /etc/apt/sources.list \
+ && echo "deb http://$domain/debian-security/ stretch/updates main non-free contrib">> /etc/apt/sources.list;
 # --no-install-recommends 
 RUN echo 'apt update -qq && apt install -yq $@ && apt-get clean && rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
     && chmod +x /usr/local/bin/apt.sh
@@ -14,7 +16,7 @@ RUN apt.sh \
   htop rsync tree tmux lrzsz wget psmisc openssl net-tools \
   curl sudo iputils-ping procps iproute2 iptables ca-certificates \
   zip unzip xz-utils
-# BUILD_common
+# BUILD_common 81M
 RUN apt.sh \
   git autoconf libtool pkg-config gcc g++ make \
   autoconf m4 intltool build-essential dpkg-dev \
@@ -64,7 +66,7 @@ sudo make install;
 FROM stage-base as stage-pulsexrdp
 #### pulseaudio-module-xrdp >> pulseaudio ver: 10.0
 # RUN git submodule update --init --recursive
-RUN apt install -q -y pulseaudio libpulse-dev \
+RUN apt update && apt install -qy pulseaudio libpulse-dev \
   autoconf m4 intltool build-essential dpkg-dev
 RUN domain="mirrors.163.com" \
  && echo "deb-src http://$domain/debian/ stretch main contrib non-free" >> /etc/apt/sources.list \
@@ -87,6 +89,7 @@ FROM stage-base as stage-rofi
 # # deps https://github.com/davatorium/rofi/blob/next/INSTALL.md
 RUN apt.sh \
   libglib2.0 libxkbcommon* libxcb* libpango* libstartup-notification* gdk-pixbuf* check
+RUN apt.sh flex bison
 RUN git clone https://gitee.com/g-system/rofi; \
 cd rofi; ls -lh;
 RUN cd rofi; sed -i "s/github.com/hub.fastgit.org/g" .gitmodules;\
@@ -103,7 +106,7 @@ RUN cd rofi; sed -i "s/0.11.0/0.10.0/g" configure ;\
 # $ docker run -it --rm -v $(pwd):/src ubuntu:18.04
 FROM stage-base as stage-stterm
 RUN apt.sh build-essential libxft-dev libharfbuzz-dev 
-RUN git clone http://hub.fastgit.org/LukeSmithxyz/st; \
+RUN git clone https://hub.fastgit.org/LukeSmithxyz/st; \
   cd st; ls -lh; \
   make; \
   make install; ls -lh
@@ -124,7 +127,8 @@ COPY --from=stage-pulsexrdp /var/lib/xrdp-pulseaudio-installer /usr/local/sysdat
 # COPY --from=stage-pulsexrdp_deb10 /var/lib/xrdp-pulseaudio-installer /usr/local/sysdata_deb10/var/lib/xrdp-pulseaudio-installer
 
 COPY --from=stage-rofi /usr/local/rofi /usr/local/appdata/rofi 
-
+COPY --from=stage-stterm /opt/st/st /usr/local/st/st
+RUN find /usr/local
 
 # xrdp_ubt
 # COPY --from=xrdp_ubt /usr/lib/xorg/modules /usr/local/sysdata_ubt/usr/lib/xorg/modules

@@ -17,7 +17,7 @@ cmd="$1"
 case "$cmd" in
     src)   
         img="docker-headless:compile-v1"
-        docker build $cache $pull -t $repo/$ns/$img -f Dockerfile.compile . 
+        docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile.compile . 
         docker push $repo/$ns/$img
         ;;
     *)
