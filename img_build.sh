@@ -13,17 +13,28 @@ ns=infrastlabs
 # pull="--pull"
 ver=box03 #02: +full
 
-# SLIM
-img="docker-headless:$ver-slim"
-docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile .
-docker push $repo/$ns/$img
+cmd="$1"
+case "$cmd" in
+    src)   
+        img="docker-headless:compile-v1"
+        docker build $cache $pull -t $repo/$ns/$img -f Dockerfile.compile . 
+        docker push $repo/$ns/$img
+        ;;
+    *)
+        # SLIM
+        img="docker-headless:$ver-slim"
+        docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile .
+        docker push $repo/$ns/$img
 
-# AUDIO=true
-img="docker-headless:$ver"
-docker build $cache $pull -t $repo/$ns/$img  --build-arg SLIM=false -f src/Dockerfile .
-docker push $repo/$ns/$img
+        # AUDIO=true
+        img="docker-headless:$ver"
+        docker build $cache $pull -t $repo/$ns/$img  --build-arg SLIM=false -f src/Dockerfile .
+        docker push $repo/$ns/$img
 
-# FULL=/.. #for COPY
-img="docker-headless:$ver-full"
-docker build $cache $pull -t $repo/$ns/$img  --build-arg SLIM=false --build-arg FULL=/.. -f src/Dockerfile .
-docker push $repo/$ns/$img
+        # FULL=/.. #for COPY
+        img="docker-headless:$ver-full"
+        docker build $cache $pull -t $repo/$ns/$img  --build-arg SLIM=false --build-arg FULL=/.. -f src/Dockerfile .
+        docker push $repo/$ns/$img
+        ;;
+esac
+
