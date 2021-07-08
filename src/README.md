@@ -1,5 +1,9 @@
 # 
 
+- box04-slim `91.811 MB` #gw
+- box04 `174.405 MB` #audio
+- box04-full `296.650 MB` #extend
+
 ## TODO
 
 - ~~novnc: change_pw, readonly~~; UI:input_pass

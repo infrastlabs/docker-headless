@@ -1,25 +1,34 @@
 version: '2.2'
 services:
-  xvnc:
-    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:xser-xvnc
+  xserver:
+    # box04, box04-slim, box04-full
+    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:latest
     restart: always
-    ports:
-      - "6090:6090"
-      - "3389:3389"
-      - "8000:8000"
-  pulse:
-    image: jess/pulseaudio
-    command: " --exit-idle-time=-1"
-    restart: always
-    # privileged: true
-    # networks_mode: host
-    # --device /dev/snd
-    # https://docs.docker.com/compose/compose-file/compose-file-v2/#devices
-    devices:
-      - "/dev/snd:/dev/snd"
-    ports:
-      - "14713:4713"
+    environment:
+      - VNC_RW=passwd!@#
+      - VNC_RO=passwd
+      # - VNC_OFFSET=0
+      # - VNC_LIMIT=3
+      - TZ=Asia/Shanghai
+      - L=zh_CN
     volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /var/run/dbus:/var/run/dbus
-      - /etc/machine-id:/etc/machine-id
+      - /_ext:/_ext
+      - /opt:/opt
+    ports:
+      - "10089:10089"
+      - "10081:10081"
+      - "10022:10022"
+      # - "6000-6009:6000-6009" #VNC: offset 0, limit 10;
+      # - "4700-4709:4700-4709"
+    # network_mode: host
+    privileged: true
+    shm_size: 1g
+  # de-mate:
+  #   image: x11docker/mate
+  #   # command: mate-session
+  #   restart: always
+  #   links:
+  #     - xserver
+  #   environment:
+  #     - DISPLAY=xserver:1
+  #     - PULSE_SERVER=xserver:47001
