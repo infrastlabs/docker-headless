@@ -12,16 +12,16 @@ RUN domain="mirrors.163.com" \
 RUN echo 'apt update -qq && apt install -yq --no-install-recommends $@ && apt-get clean && rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
     && chmod +x /usr/local/bin/apt.sh
 
-#XRDP
+#XRDP 26.673 MB
 RUN apt.sh \
   supervisor tigervnc-standalone-server xrdp && \
   mkdir -p /var/run/dbus && mkdir -p /etc/xrdp && xrdp-keygen xrdp auto \
   && apt -y remove xrdp
-#AUDIO pavucontrol:2,363 kB pnmixer:815 kB;  +pulseaudio:14.6 MB/ubt:2805kB; +qmmp:28.7 MB
+#AUDIO 19.893 MB; pavucontrol:2,363 kB pnmixer:815 kB;  +pulseaudio:14.6 MB/ubt:2805kB; +qmmp:28.7 MB
 # chansrv: libfdk-aac.so.1
 RUN apt.sh \
     libfdk-aac1 pulseaudio
-#noVnc
+#noVnc 9.793 MB + 1.352 MB
 # python-numpy 4643 kB #warnings.warn("no 'numpy' module, HyBi protocol will be slower")
 # rm -rf .github package.json README.md .gitignore .eslint* .gitmodules tests docs
 # ./utils/websockify/{tests,Windows,docs}
@@ -31,12 +31,12 @@ RUN export NO_VNC_HOME="/usr/local/novnc"; \
   && wget -qO- https://github.com.cnpmjs.org/novnc/noVNC/archive/v1.2.0.tar.gz | tar xz --strip 1 -C ${NO_VNC_HOME} \
   && wget -qO- https://github.com.cnpmjs.org/novnc/websockify/archive/v0.9.0.tar.gz | tar xz --strip 1 -C ${NO_VNC_HOME}/utils/websockify
 
-# BASE
+# BASE 4.279 MB
 RUN apt.sh \
   htop rsync tree tmux lrzsz psmisc fuse net-tools iputils-ping procps sudo iproute2 iptables \
   zip unzip xz-utils vim-tiny
 
-# FLUX
+# FLUX 6.932 MB
 # dropbear 2M?
 # https://linuxtoy.org/archives/5-mins-fluxbox-guide.html
 # rm -rf /usr/share/fluxbox{nls,styles}
@@ -50,23 +50,23 @@ ENV \
     LOC_XFCE="xfce4-settings xfce4-session xfwm4 xfdesktop4"
 # --build-arg SLIM=false
 ARG SLIM=""
-# greybird.svg: 2.0M
+# XFCE 36.596 MB; greybird.svg: 2.0M
 RUN test -z "$SLIM" && exit 0;\
     apt.sh ${LOC_XFCE} greybird-gtk-theme; \
     rm -f /usr/share/backgrounds/greybird.svg; 
-# APP1
+# APP1 19.746 MB
 RUN test -z "$SLIM" && exit 0;\
     apt.sh tint2 plank thunar sakura dunst;
-# MP3 
+# MP3 23.872 MB
 RUN test -z "$SLIM" && exit 0;\
     apt.sh pavucontrol pnmixer qmmp; 
-# FluxEx: lxappearance ##xfce4-appearance-settings: no use in box.
+# FluxEx: 735.819 KB; lxappearance ##xfce4-appearance-settings: no use in box.
 # dbus-x11 fewSize 92.5Kb?, cause xvnc1,2: with two more processes. 
 # 700; chown headless: can only run with headless; dbus-daemon/dbus-launch; dbus-*: x8;
 RUN test -z "$SLIM" && exit 0;\
     apt.sh lxappearance dbus-x11; \
     chmod 700 /usr/bin/dbus-*
-# notifyd 234 kB; clipit 336 kB;
+# NOTIFY 864.768 KB; notifyd 234 kB; clipit 336 kB;
 # gtk2-engines-pixbuf 58.9 kB; ##Gtk-WARNING **: 11:29:10.844: 无法在模块路径中找到主题引擎：“pixmap”，
 RUN test -z "$SLIM" && exit 0;\
   apt.sh \
@@ -81,19 +81,19 @@ RUN test -z "$FULL" && exit 0;\
   && echo "deb http://${DOMAIN}/debian/ ${VER_DISTRO}-backports main non-free contrib">> /etc/apt/sources.list \
   && echo "deb http://${DOMAIN}/debian-security/ ${VER_DISTRO}/updates main non-free contrib">> /etc/apt/sources.list;
 
-# papirus-icon-theme:  backports?@deb9
+# 19.642 MB; papirus-icon-theme:  backports?@deb9
 RUN test -z "$FULL" && exit 0;\
   apt.sh at-spi2-core  geany rofi papirus-icon-theme
-# APPS2 6.767 MB gnome-system-monitor engrampa ristretto
+# APPS2 5.624 MB gnome-system-monitor engrampa ristretto
 RUN test -z "$FULL" && exit 0;\
   apt.sh ${LOC_APPS2}
-#LOCALE 20.485 MB --language-pack-gnome-zh-hans 
+#LOCALE 13.450 MB --language-pack-gnome-zh-hans 
 RUN test -z "$FULL" && exit 0;\
   apt.sh \
     dconf-cli locales tzdata  \
     fonts-wqy-zenhei
 
-#######largerApps
+#######largerApps 63.789 MB
 # IBUS: 26.5 MB
 # PIC: flameshot 10M, tumbler 6666kB(image cache) 10.5 MB (xrandr: x11-xserver-utils)
 # AUDIO: mpv 36M;
@@ -106,17 +106,18 @@ RUN test -z "$FULL" && exit 0;\
   gnupg libsecret-1-0 libnss3 libxtst6 libasound2 \
   curl wget git
 
-# ohmybash, asbru-cm
+# ohmybash, asbru-cm: 10.269 MB
 RUN test -z "$FULL" && exit 0;\
-  su headless -c "$(curl -fsSL https://gitee.com/g-system/oh-my-bash/raw/sam-custom/tools/install.sh)"; \
   curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash; \
-  apt.sh asbru-cm;
-# Attach1: vncpasswd #66.6 kB; st.libharfbuzz0b 3447 kB
+  apt.sh asbru-cm; rm -f /etc/apt/sources.list.d/asbru-cm-release.list;
+# RUN su - headless -c "$(curl -fsSL https://gitee.com/g-system/oh-my-bash/raw/sam-custom/tools/install.sh)";
+# Attach1: 749.137 KB + 684.210 KB
+# vncpasswd #66.6 kB; st.libharfbuzz0b 3447 kB
 RUN apt.sh tigervnc-common
 RUN test -z "$SLIM" && exit 0;\
   apt.sh libharfbuzz0b; \
   apt -y remove stterm; ln -s /usr/local/st/st /bin/stterm;
-# moveUp
+# moveUp 9.214 MB
 COPY --from=loc /usr/share/locale1/emp${FULL} /usr/share/locale1
 
 # xrdp0914, xrdp3: v0916
@@ -140,6 +141,21 @@ ADD src/xvnc.sh /xvnc.sh
 ADD src/xrdp.conf /etc/supervisor/conf.d/xrdp.conf
 COPY src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
 
+
+  # stterm: TERM="xterm|vt100"
+  # L="zh_CN" \ # ${FULL} > nonFull: if locale isn't installed.(entry.sh)
+ENV \
+  TZ=Asia/Shanghai \
+  TERM=xterm \
+  SSHD_PORT=10022 \
+  XRDP_PORT=10089 \
+  VNC_PORT=10081 \
+  VNC_OFFSET=0 \
+  VNC_LIMIT=1 \
+  VNC_RW=passwd!@# \
+  VNC_RO=passwd
+
+
 # +headless
 # sv_user: http://blog.chinaunix.net/uid-26817066-id-5792715.html
 RUN useradd -mp j9X2HRQvPCphA -s /bin/bash -G sudo headless \
@@ -152,22 +168,14 @@ RUN useradd -mp j9X2HRQvPCphA -s /bin/bash -G sudo headless \
   \
   line=$(cat /etc/supervisor/supervisord.conf |grep  "^chmod=0700" -n |cut -d':' -f1); \
   sed -i "${line}cchmod=0770" /etc/supervisor/supervisord.conf; \
-  sed -i "${line}achown=headless:headless" /etc/supervisor/supervisord.conf;
+  sed -i "${line}achown=headless:headless" /etc/supervisor/supervisord.conf; \
+  \ 
+  test -z "$FULL" && exit 0 || su - headless -c "$(curl -fsSL https://gitee.com/g-system/oh-my-bash/raw/sam-custom/tools/install.sh)";
 # Setup D-Bus
 RUN test -z "$SLIM" && exit 0;\
   mkdir -p /run/dbus/ && chown messagebus:messagebus /run/dbus/; \
   dbus-uuidgen > /etc/machine-id; \
   ln -sf /etc/machine-id /var/lib/dbus/machine-id
-
-
-ENV \
-    SSHD_PORT=10022 \
-    XRDP_PORT=10089 \
-    VNC_PORT=10081 \
-    VNC_OFFSET=0 \
-    VNC_LIMIT=3 \
-    VNC_RW=passwd!@# \
-    VNC_RO=passwd
 
 RUN echo "welcome! HeadlessBox." > /etc/motd \
     && ln -s /usr/bin/vim.tiny /usr/bin/vt \
@@ -185,10 +193,6 @@ RUN sed -i "s^path-exclude /usr/share/locale/\*^# path-exclude /usr/share/locale
 RUN test -z "$FULL" && exit 0;\
   bash -c "arr=\"$(cd /usr/share/locale1; ls)\"; for ONE in \${arr[@]}; do rm -rf /usr/share/locale/\$ONE ; ln -s /usr/share/locale1/\$ONE /usr/share/locale/ ; done";
 
-# theme <property name="IconThemeName" type="string" value="gnome"/>
-RUN test -z "$FULL" && exit 0;\
-  sed -i "s^value=\"gnome\"^value=\"ePapirus\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
-
 # DCONF+IBUS env
 # # dconf load / < dconf.ini  ##error: Cannot autolaunch D-Bus without X11 $DISPLAY
 # # ADD > COPY
@@ -205,14 +209,16 @@ RUN test -z "$FULL" && exit 0;\
   # dconf: ibus, plank, engrampa
   mkdir -p /etc/dconf/db;\
   su - headless -c "dbus-launch dconf reset -f /; dbus-launch dconf load / < /usr/share/dconf.ini; ";\
-  dbus-launch dconf update; 
+  dbus-launch dconf update;\
+  \
+  mkdir -p  /usr/share/man/man1/;
 
-  # ${FULL} > nonFull: if locale isn't installed.(entry.sh)
-  # L="zh_CN" \
-  # stterm: TERM="xterm|vt100"
-ENV \
-  TZ=Asia/Shanghai \
-  TERM=xterm
+##SETTINGS
+# theme <property name="IconThemeName" type="string" value="gnome"/>
+  # sed -i "s^value=\"gnome\"^value=\"ePapirus\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
+RUN test -z "$FULL" && exit 0;\
+  sed -i "s^OSH_THEME=\"font\"^OSH_THEME=\"axin\"^g" /home/headless/.bashrc; \
+  cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*;
 
 
 WORKDIR /home/headless
