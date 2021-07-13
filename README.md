@@ -45,7 +45,7 @@ vols="""
 """
 docker run -d --name=devbox --privileged --shm-size 1g \
   --net=host -e L=zh_CN -e VNC_RW=ChangeMe -e VNC_RO=View123 $vols \
-    infrastlabs/docker-headless:box05-full
+    infrastlabs/docker-headless:full
 
 # 290.545 MB
 docker container update --restart=always devbox
