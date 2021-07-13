@@ -3,11 +3,11 @@
 Based on `TigerVNC/XRDP/PulseAudio` with `Fluxbox/XFCE4`, Formatting a Headless Remote Desktop Box for Developers/Operators.
 
 - Size: latest: `168.723 MB`, slim: `89.305 MB`, full: `289.230 MB`
-- User: `headless`, Pass: `headless`, VNC: `headless`
+- User: `headless`, SSHPass: `headless`, VNCPass: `headless`
 - Ports
-  - vnc 5901 > 10001
-  - rdp 3389 > 10089
-  - ssh 22   > 10022
+  - novnc 6080 > 10081
+  - xrdp  3389 > 10089
+  - sshd  22   > 10022
 - HotKeys `super: Alt`
   - `sup+t`: terminal
   - `sup+f`: thunar
@@ -27,22 +27,24 @@ Based on `TigerVNC/XRDP/PulseAudio` with `Fluxbox/XFCE4`, Formatting a Headless 
 **Run**
 
 ```bash
-# ENV
+# Caution: Please change the SSHPass when the Box started!!!
+# ENV (default); VNC_RW=headless, VNC_RO=View123; 
   SSH_PORT=10022 \
   RDP_PORT=10089 \
   VNC_PORT=10081 \
-  L=zh_CN \ 
+  # L=zh_CN \ 
   TZ=Asia/Shanghai \
   VNC_RW=headless \
-  VNC_RO=headless!@#
+  VNC_RO=View123
 
+# example: VNC_RW=ChangeMe, VNC_RO=View123
 vols="""
 -v /_ext:/_ext 
 -v /opt:/opt 
 -v /var/run/docker.sock:/var/run/docker.sock
 """
 docker run -d --name=devbox --privileged --shm-size 1g \
---net=host -e VNC_RW=passwd!@# -e VNC_RO=passwd $vols \
+--net=host -e VNC_RW=ChangeMe -e VNC_RO=View123 $vols \
 registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless
 
 # 290.545 MB
