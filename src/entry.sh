@@ -102,8 +102,20 @@ function setLocale(){
     cat /etc/default/locale
     # sleep 2
 }
-test -z "$L" || setLocale
+function setLocale_en_US(){
+    charset="UTF-8"
+    lang_area="en_US"
+    export LANG=${lang_area}.${charset}
+    export LANGUAGE=${lang_area}:en #default> en
 
+    # LOCALE
+    sed -i -e "s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
+    locale-gen ${LANG}
+    update-locale LANG=${LANG} LANGUAGE=${LANGUAGE}
+}
+if [ ! -z "$(dpkg -l |grep locales)" ]; then #if locale installed. ##which locale exist.
+    test -z "$L" && setLocale_en_US || setLocale
+fi
 
 # VNC_PASS: ro??
 # echo "passwd" | vncpasswd -f >> /etc/xrdp/vnc_pass; chmod 600 /etc/xrdp/vnc_pass

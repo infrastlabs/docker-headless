@@ -102,7 +102,9 @@ RUN test -z "$FULL" && exit 0;\
 # ohmybash, asbru-cm: 10.269 MB
 RUN test -z "$FULL" && exit 0;\
   curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash; \
-  apt.sh asbru-cm; rm -f /etc/apt/sources.list.d/asbru-cm-release.list;
+  apt.sh asbru-cm; rm -f /etc/apt/sources.list.d/asbru-cm-release.list; \
+  mv /opt/asbru /usr/local; rm -f /usr/bin/asbru-cm; ln -s /usr/local/asbru/asbru-cm /usr/bin/; \
+  cd /usr/share/icons/hicolor/scalable/apps; rm -f asbru-cm.svg; ln -s /usr/local/asbru/res/asbru-logo.svg ./asbru-cm.svg
 
 # moveUp 9.214 MB
 COPY --from=loc /usr/share/locale1/emp${FULL} /usr/share/locale1
