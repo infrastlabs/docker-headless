@@ -1,10 +1,12 @@
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:xfce-deb9-v1 as loc
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile-v1 as bins
-# FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile2 as xrdp
-# FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile3 as xrdp3
 FROM debian:stretch-slim
+ENV \
+  DEBIAN_FRONTEND=noninteractive \
+  LOC_APPS="tint2 plank thunar sakura geany rofi dunst" \
+  LOC_APPS2="gnome-system-monitor engrampa ristretto" \
+  LOC_XFCE="xfce4-settings xfce4-session xfwm4 xfdesktop4"
 
-# ENV DEBIAN_FRONTEND noninteractive
 RUN domain="mirrors.163.com" \
   && echo "deb http://$domain/debian/ stretch main contrib non-free" > /etc/apt/sources.list \
   && echo "deb http://$domain/debian/ stretch-updates main contrib non-free">> /etc/apt/sources.list; \
@@ -12,20 +14,20 @@ RUN domain="mirrors.163.com" \
   echo 'apt update -qq && apt install -yq --no-install-recommends $@ && apt-get clean && rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
   && chmod +x /usr/local/bin/apt.sh
 
-#XRDP 26.673 MB
-# vncpasswd: tigervnc-common #66.6 kB;
-#AUDIO 19.893 MB; pavucontrol:2,363 kB pnmixer:815 kB;  +pulseaudio:14.6 MB/ubt:2805kB; +qmmp:28.7 MB
-# chansrv: libfdk-aac.so.1
-#noVnc 9.793 MB + 1.352 MB
-# python-numpy 4643 kB #warnings.warn("no 'numpy' module, HyBi protocol will be slower")
+# XRDP 26.673 MB
+#  vncpasswd: tigervnc-common #66.6 kB;
+# AUDIO 19.893 MB; pavucontrol:2,363 kB pnmixer:815 kB;  +pulseaudio:14.6 MB/ubt:2805kB; +qmmp:28.7 MB
+#  chansrv: libfdk-aac.so.1
+# noVnc 9.793 MB + 1.352 MB
+#  python-numpy 4643 kB #warnings.warn("no 'numpy' module, HyBi protocol will be slower")
 # BASE 4.279 MB
 # FLUX 6.932 MB # dropbear 2M?
 RUN apt.sh \
-  supervisor tigervnc-standalone-server tigervnc-common xrdp && \
-  mkdir -p /var/run/dbus && mkdir -p /etc/xrdp && xrdp-keygen xrdp auto \
+  tigervnc-standalone-server tigervnc-common xrdp && \
+  mkdir -p /etc/xrdp && xrdp-keygen xrdp auto \
   && apt -y remove xrdp; \
   \
-  apt.sh libfdk-aac1 pulseaudio; \
+  apt.sh libfdk-aac1 pulseaudio supervisor; \
   \
   apt.sh wget ca-certificates python-numpy; \
   \
@@ -43,21 +45,17 @@ RUN export NO_VNC_HOME="/usr/local/novnc"; \
   && wget -qO- https://github.com.cnpmjs.org/novnc/noVNC/archive/v1.2.0.tar.gz | tar xz --strip 1 -C ${NO_VNC_HOME} \
   && wget -qO- https://github.com.cnpmjs.org/novnc/websockify/archive/v0.9.0.tar.gz | tar xz --strip 1 -C ${NO_VNC_HOME}/utils/websockify
 
-ENV \
-    LOC_APPS="tint2 plank thunar sakura geany rofi dunst" \
-    LOC_APPS2="gnome-system-monitor engrampa ristretto" \
-    LOC_XFCE="xfce4-settings xfce4-session xfwm4 xfdesktop4"
-# --build-arg SLIM=false
-ARG SLIM=""
-
+# --build-arg AUDIO=true
+ARG AUDIO=""
 # XFCE 36.596 MB; greybird.svg: 2.0M
 # APP1 19.746 MB
 # MP3 23.872 MB
 # FluxEx: 735.819 KB; lxappearance ##xfce4-appearance-settings: no use in box.
 # NOTIFY 864.768 KB; notifyd 234 kB; clipit 336 kB;
 #  gtk2-engines-pixbuf 58.9 kB; ##Gtk-WARNING **: 11:29:10.844: 无法在模块路径中找到主题引擎：“pixmap”，
-# Attach1: 684.210 KB  st.libharfbuzz0b 3447 kB
-RUN test -z "$SLIM" && exit 0;\
+# Attach1: 684.210 KB  st.libharfbuzz0b 3447 kB 
+#  apt.sh libharfbuzz0b; ln -s /usr/local/st/st /bin/stterm;
+RUN test -z "$AUDIO" && exit 0;\
     apt.sh ${LOC_XFCE} greybird-gtk-theme; \
     rm -f /usr/share/backgrounds/greybird.svg; \
     \
@@ -69,15 +67,13 @@ RUN test -z "$SLIM" && exit 0;\
     \
     apt.sh xfce4-notifyd clipit gtk2-engines-pixbuf && apt -y remove dunst; \
     \
-    apt.sh libharfbuzz0b; apt -y remove stterm; ln -s /usr/local/st/st /bin/stterm;
+    apt -y remove stterm; 
 
 ARG FULL=""
 RUN test -z "$FULL" && exit 0;\
-  VER_DISTRO="stretch" DOMAIN="mirrors.163.com"; \
-  echo "deb http://${DOMAIN}/debian/ ${VER_DISTRO} main contrib non-free" > /etc/apt/sources.list \
-  && echo "deb http://${DOMAIN}/debian/ ${VER_DISTRO}-updates main contrib non-free">> /etc/apt/sources.list \
-  && echo "deb http://${DOMAIN}/debian/ ${VER_DISTRO}-backports main non-free contrib">> /etc/apt/sources.list \
-  && echo "deb http://${DOMAIN}/debian-security/ ${VER_DISTRO}/updates main non-free contrib">> /etc/apt/sources.list;
+  domain="mirrors.163.com" \
+  && echo "deb http://$domain/debian/ stretch-backports main non-free contrib">> /etc/apt/sources.list \
+  && echo "deb http://$domain/debian-security/ stretch/updates main non-free contrib">> /etc/apt/sources.list;
 
 # 19.642 MB; papirus-icon-theme:  backports?@deb9
 # APPS2 5.624 MB gnome-system-monitor engrampa ristretto
@@ -114,7 +110,7 @@ COPY --from=loc /usr/share/locale1/emp${FULL} /usr/share/locale1
 # ADD src/etc/xrdp/pulse/default.pa /etc/xrdp/pulse/default.pa
 COPY --from=bins /usr/local/appdata/xrdp /usr/local/xrdp
 COPY --from=bins /usr/local/sysdata/var/lib/xrdp-pulseaudio-installer /var/lib/xrdp-pulseaudio-installer
-COPY --from=bins /usr/local/st/st /usr/local/st/st
+# COPY --from=bins /usr/local/st/st /usr/local/st/st
 RUN ln -s /usr/local/xrdp/sbin/xrdp /usr/sbin/;\
   ln -s /usr/local/xrdp/sbin/xrdp-sesman /usr/sbin/;\
   ln -s /usr/local/xrdp/sbin/xrdp-chansrv /usr/sbin/;\
@@ -123,15 +119,15 @@ RUN ln -s /usr/local/xrdp/sbin/xrdp /usr/sbin/;\
 # COPY --chown=root:root ./src
 ADD src/dot /etc/skel
 ADD src/etc /etc
-ADD src/entry.sh /entry.sh
-ADD src/xvnc.sh /xvnc.sh
+ADD src/*.sh /
+# ADD src/entry.sh /entry.sh
+# ADD src/xvnc.sh /xvnc.sh
 ADD src/xrdp.conf /etc/supervisor/conf.d/xrdp.conf
 Add src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
 
   # stterm: TERM="xterm|vt100"
   # L="zh_CN" \ # ${FULL} > nonFull: if locale isn't installed.(entry.sh)
 ENV \
-  DEBIAN_FRONTEND=noninteractive \
   TZ=Asia/Shanghai \
   TERM=xterm \
   SSHD_PORT=10022 \
@@ -173,7 +169,7 @@ RUN echo "welcome! HeadlessBox." > /etc/motd \
 
 ##AUDIO###########################
 # Setup D-Bus; ;
-RUN test -z "$SLIM" && exit 0;\
+RUN test -z "$AUDIO" && exit 0;\
   mkdir -p /run/dbus/ && chown messagebus:messagebus /run/dbus/; \
   dbus-uuidgen > /etc/machine-id; \
   ln -sf /etc/machine-id /var/lib/dbus/machine-id;
@@ -181,10 +177,9 @@ RUN test -z "$SLIM" && exit 0;\
 
 
 ##FULL###########################
-
 # DCONF+IBUS env
-# # dconf load / < dconf.ini  ##error: Cannot autolaunch D-Bus without X11 $DISPLAY
-# # ADD > COPY
+#  dconf load / < dconf.ini  ##error: Cannot autolaunch D-Bus without X11 $DISPLAY
+#  ADD > COPY
 ADD src/f/dconf.ini /usr/share/dconf.ini 
 COPY src/f/.config/emp${FULL} /home/headless/.config/
 RUN test -z "$FULL" && exit 0;\
@@ -202,7 +197,6 @@ RUN test -z "$FULL" && exit 0;\
   su - headless -c "dbus-launch dconf reset -f /; dbus-launch dconf load / < /usr/share/dconf.ini; ";\
   dbus-launch dconf update;
 
-
 # LOCALE, OHMYBASH, SETTINGS
 # ref: mkdir /usr/share/locale1/emp/
 # COPY --from=loc /usr/share/locale1/emp${FULL} /usr/share/locale1
@@ -212,6 +206,7 @@ RUN test -z "$FULL" && exit 0;\
   bash -c "arr=\"$(cd /usr/share/locale1; ls)\"; for ONE in \${arr[@]}; do rm -rf /usr/share/locale/\$ONE ; ln -s /usr/share/locale1/\$ONE /usr/share/locale/ ; done"; \
   \
   su - headless -c "$(curl -fsSL https://gitee.com/g-system/oh-my-bash/raw/sam-custom/tools/install.sh)"; \
+  rm -rf /home/headless/.oh-my-bash/.git; bash -c 'cd /home/headless/.oh-my-bash/themes; rm -rf `ls |grep -v "axin\|sh$"`'; \
   \
   sed -i "s^OSH_THEME=\"font\"^OSH_THEME=\"axin\"^g" /home/headless/.bashrc; \
   cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*;
@@ -219,6 +214,6 @@ RUN test -z "$FULL" && exit 0;\
 
 WORKDIR /home/headless
 # EXPOSE 3389/tcp 6080/tcp 22/tcp 6000/tcp 4713/tcp
-EXPOSE 10089/tcp 10081/tcp 10022/tcp
 # CMD ["supervisord", "-n"]
+EXPOSE 10089/tcp 10081/tcp 10022/tcp
 CMD ["/entry.sh"]
