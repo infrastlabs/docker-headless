@@ -1,8 +1,9 @@
 # docker-healess
 
-Based on `TigerVNC/XRDP/PulseAudio` with `Fluxbox/Xfce4`, Formatting a Headless Remote Desktop Box for Developers/Operators.
+Based on `TigerVNC/XRDP/PulseAudio` with `Fluxbox/XFCE4`, Formatting a Headless Remote Desktop Box for Developers/Operators.
 
-- User: `headless`, Pass: `headless`
+- Size: latest: `168.723 MB`, slim: `89.305 MB`, full: `289.230 MB`
+- User: `headless`, Pass: `headless`, VNC: `headless`
 - Ports
   - vnc 5901 > 10001
   - rdp 3389 > 10089
@@ -17,7 +18,6 @@ Based on `TigerVNC/XRDP/PulseAudio` with `Fluxbox/Xfce4`, Formatting a Headless 
   - `sup+down`: cycle windows
   - `sup+left`: left workspace
   - `sup+right`: right workspace
-- Size: `latest: 168.723 MB`, `slim: 89.305 MB` `full: 289.230 MB`
 - xrdp, dropbear
 - 命令工具：`tree htop gawk expect tmux rsync iproute2`
 - 图形工具：`sakura tint2 plank flameshot`, `gnome-system-monitor engrampa ristretto`
@@ -33,8 +33,8 @@ Based on `TigerVNC/XRDP/PulseAudio` with `Fluxbox/Xfce4`, Formatting a Headless 
   VNC_PORT=10081 \
   L=zh_CN \ 
   TZ=Asia/Shanghai \
-  VNC_RW=passwd!@# \
-  VNC_RO=passwd
+  VNC_RW=headless \
+  VNC_RO=headless!@#
 
 vols="""
 -v /_ext:/_ext 

@@ -36,7 +36,7 @@ function setVnc(){
         mkdir -p /etc/novnc
         local port=$(expr 5900 + $N)
         echo "display$N: 127.0.0.1:$port" >> /etc/novnc/token.conf
-        echo "<li><a target=\"_blank\" href=\"/vnc.html?path=websockify/?token=display$N&password=passwd\">display$N</a>&nbsp;&nbsp;<a target=\"_blank\" href=\"/vnc_lite.html?path=websockify/?token=display$N&password=passwd\">lite_display$N</a></li>" >> /usr/local/novnc/index.html
+        echo "<li><a target=\"_blank\" href=\"/vnc.html?path=websockify/?token=display$N&password=headless\">display$N</a>&nbsp;&nbsp;<a target=\"_blank\" href=\"/vnc_lite.html?path=websockify/?token=display$N&password=headless\">lite_display$N</a></li>" >> /usr/local/novnc/index.html
 
         # sv
         echo """

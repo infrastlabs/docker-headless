@@ -135,8 +135,8 @@ ENV \
   VNC_PORT=10081 \
   VNC_OFFSET=0 \
   VNC_LIMIT=1 \
-  VNC_RW=passwd!@# \
-  VNC_RO=passwd
+  VNC_RW=headless \
+  VNC_RO=headless!@#
 
 
 # +headless
