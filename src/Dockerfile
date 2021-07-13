@@ -4,45 +4,43 @@ FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile-v1 as
 # FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile3 as xrdp3
 FROM debian:stretch-slim
 
-ENV DEBIAN_FRONTEND noninteractive
+# ENV DEBIAN_FRONTEND noninteractive
 RUN domain="mirrors.163.com" \
- && echo "deb http://$domain/debian/ stretch main contrib non-free" > /etc/apt/sources.list \
- && echo "deb http://$domain/debian/ stretch-updates main contrib non-free">> /etc/apt/sources.list
-
-RUN echo 'apt update -qq && apt install -yq --no-install-recommends $@ && apt-get clean && rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
-    && chmod +x /usr/local/bin/apt.sh
+  && echo "deb http://$domain/debian/ stretch main contrib non-free" > /etc/apt/sources.list \
+  && echo "deb http://$domain/debian/ stretch-updates main contrib non-free">> /etc/apt/sources.list; \
+  \
+  echo 'apt update -qq && apt install -yq --no-install-recommends $@ && apt-get clean && rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
+  && chmod +x /usr/local/bin/apt.sh
 
 #XRDP 26.673 MB
+#AUDIO 19.893 MB; pavucontrol:2,363 kB pnmixer:815 kB;  +pulseaudio:14.6 MB/ubt:2805kB; +qmmp:28.7 MB
+# chansrv: libfdk-aac.so.1
+#noVnc 9.793 MB + 1.352 MB
+# python-numpy 4643 kB #warnings.warn("no 'numpy' module, HyBi protocol will be slower")
+# BASE 4.279 MB
+# FLUX 6.932 MB # dropbear 2M?
 RUN apt.sh \
   supervisor tigervnc-standalone-server xrdp && \
   mkdir -p /var/run/dbus && mkdir -p /etc/xrdp && xrdp-keygen xrdp auto \
-  && apt -y remove xrdp
-#AUDIO 19.893 MB; pavucontrol:2,363 kB pnmixer:815 kB;  +pulseaudio:14.6 MB/ubt:2805kB; +qmmp:28.7 MB
-# chansrv: libfdk-aac.so.1
-RUN apt.sh \
-    libfdk-aac1 pulseaudio
-#noVnc 9.793 MB + 1.352 MB
-# python-numpy 4643 kB #warnings.warn("no 'numpy' module, HyBi protocol will be slower")
-# rm -rf .github package.json README.md .gitignore .eslint* .gitmodules tests docs
-# ./utils/websockify/{tests,Windows,docs}
-RUN apt.sh wget ca-certificates python-numpy;
+  && apt -y remove xrdp; \
+  \
+  apt.sh libfdk-aac1 pulseaudio; \
+  \
+  apt.sh wget ca-certificates python-numpy; \
+  \
+  apt.sh \
+  htop rsync tree tmux lrzsz psmisc fuse net-tools iputils-ping procps sudo iproute2 iptables \
+  zip unzip xz-utils vim-tiny; \
+  \
+  apt.sh \
+  fluxbox stterm dropbear hsetroot xcompmgr; \
+  bash -c "rm -rf /usr/share/fluxbox{nls,styles}";
+
+# NOVNC
 RUN export NO_VNC_HOME="/usr/local/novnc"; \
   mkdir -p ${NO_VNC_HOME}/utils/websockify \ 
   && wget -qO- https://github.com.cnpmjs.org/novnc/noVNC/archive/v1.2.0.tar.gz | tar xz --strip 1 -C ${NO_VNC_HOME} \
   && wget -qO- https://github.com.cnpmjs.org/novnc/websockify/archive/v0.9.0.tar.gz | tar xz --strip 1 -C ${NO_VNC_HOME}/utils/websockify
-
-# BASE 4.279 MB
-RUN apt.sh \
-  htop rsync tree tmux lrzsz psmisc fuse net-tools iputils-ping procps sudo iproute2 iptables \
-  zip unzip xz-utils vim-tiny
-
-# FLUX 6.932 MB
-# dropbear 2M?
-# https://linuxtoy.org/archives/5-mins-fluxbox-guide.html
-# rm -rf /usr/share/fluxbox{nls,styles}
-RUN apt.sh \
-  fluxbox stterm dropbear \
-  hsetroot xcompmgr
 
 ENV \
     LOC_APPS="tint2 plank thunar sakura geany rofi dunst" \
@@ -50,28 +48,30 @@ ENV \
     LOC_XFCE="xfce4-settings xfce4-session xfwm4 xfdesktop4"
 # --build-arg SLIM=false
 ARG SLIM=""
+
 # XFCE 36.596 MB; greybird.svg: 2.0M
-RUN test -z "$SLIM" && exit 0;\
-    apt.sh ${LOC_XFCE} greybird-gtk-theme; \
-    rm -f /usr/share/backgrounds/greybird.svg; 
 # APP1 19.746 MB
-RUN test -z "$SLIM" && exit 0;\
-    apt.sh tint2 plank thunar sakura dunst;
 # MP3 23.872 MB
-RUN test -z "$SLIM" && exit 0;\
-    apt.sh pavucontrol pnmixer qmmp; 
 # FluxEx: 735.819 KB; lxappearance ##xfce4-appearance-settings: no use in box.
-# dbus-x11 fewSize 92.5Kb?, cause xvnc1,2: with two more processes. 
-# 700; chown headless: can only run with headless; dbus-daemon/dbus-launch; dbus-*: x8;
-RUN test -z "$SLIM" && exit 0;\
-    apt.sh lxappearance dbus-x11; \
-    chmod 700 /usr/bin/dbus-*
 # NOTIFY 864.768 KB; notifyd 234 kB; clipit 336 kB;
 # gtk2-engines-pixbuf 58.9 kB; ##Gtk-WARNING **: 11:29:10.844: 无法在模块路径中找到主题引擎：“pixmap”，
 RUN test -z "$SLIM" && exit 0;\
-  apt.sh \
-  xfce4-notifyd clipit gtk2-engines-pixbuf && apt -y remove dunst
-
+    apt.sh ${LOC_XFCE} greybird-gtk-theme; \
+    rm -f /usr/share/backgrounds/greybird.svg; \
+    \
+    apt.sh tint2 plank thunar sakura dunst; \
+    \
+    apt.sh pavucontrol pnmixer qmmp; \
+    \
+    apt.sh lxappearance dbus-x11; \
+    \
+    apt.sh xfce4-notifyd clipit gtk2-engines-pixbuf && apt -y remove dunst;
+# Attach1: 749.137 KB + 684.210 KB
+# vncpasswd #66.6 kB; st.libharfbuzz0b 3447 kB
+RUN apt.sh tigervnc-common
+RUN test -z "$SLIM" && exit 0;\
+  apt.sh libharfbuzz0b; \
+  apt -y remove stterm; ln -s /usr/local/st/st /bin/stterm;
 
 ARG FULL=""
 RUN test -z "$FULL" && exit 0;\
@@ -82,16 +82,14 @@ RUN test -z "$FULL" && exit 0;\
   && echo "deb http://${DOMAIN}/debian-security/ ${VER_DISTRO}/updates main non-free contrib">> /etc/apt/sources.list;
 
 # 19.642 MB; papirus-icon-theme:  backports?@deb9
-RUN test -z "$FULL" && exit 0;\
-  apt.sh at-spi2-core  geany rofi papirus-icon-theme
 # APPS2 5.624 MB gnome-system-monitor engrampa ristretto
+# LOCALE 13.450 MB --language-pack-gnome-zh-hans 
 RUN test -z "$FULL" && exit 0;\
-  apt.sh ${LOC_APPS2}
-#LOCALE 13.450 MB --language-pack-gnome-zh-hans 
-RUN test -z "$FULL" && exit 0;\
-  apt.sh \
-    dconf-cli locales tzdata  \
-    fonts-wqy-zenhei
+  apt.sh at-spi2-core  geany rofi papirus-icon-theme; \
+  \
+  apt.sh ${LOC_APPS2}; \
+  \
+  apt.sh dconf-cli locales tzdata fonts-wqy-zenhei; \
 
 #######largerApps 63.789 MB
 # IBUS: 26.5 MB
@@ -110,13 +108,7 @@ RUN test -z "$FULL" && exit 0;\
 RUN test -z "$FULL" && exit 0;\
   curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash; \
   apt.sh asbru-cm; rm -f /etc/apt/sources.list.d/asbru-cm-release.list;
-# RUN su - headless -c "$(curl -fsSL https://gitee.com/g-system/oh-my-bash/raw/sam-custom/tools/install.sh)";
-# Attach1: 749.137 KB + 684.210 KB
-# vncpasswd #66.6 kB; st.libharfbuzz0b 3447 kB
-RUN apt.sh tigervnc-common
-RUN test -z "$SLIM" && exit 0;\
-  apt.sh libharfbuzz0b; \
-  apt -y remove stterm; ln -s /usr/local/st/st /bin/stterm;
+
 # moveUp 9.214 MB
 COPY --from=loc /usr/share/locale1/emp${FULL} /usr/share/locale1
 
@@ -145,6 +137,7 @@ COPY src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
   # stterm: TERM="xterm|vt100"
   # L="zh_CN" \ # ${FULL} > nonFull: if locale isn't installed.(entry.sh)
 ENV \
+  DEBIAN_FRONTEND=noninteractive \
   TZ=Asia/Shanghai \
   TERM=xterm \
   SSHD_PORT=10022 \
@@ -158,12 +151,15 @@ ENV \
 
 # +headless
 # sv_user: http://blog.chinaunix.net/uid-26817066-id-5792715.html
+# dbus-x11 fewSize 92.5Kb?, cause xvnc1,2: with two more processes. 
+# 700; chown headless: can only run with headless; dbus-daemon/dbus-launch; dbus-*: x8;
 RUN useradd -mp j9X2HRQvPCphA -s /bin/bash -G sudo headless \
   && echo "headless:headless" |chpasswd \
   && echo 'Cmnd_Alias SU = /bin/su' >> /etc/sudoers \
   && echo "headless ALL=(root) NOPASSWD: ALL" >> /etc/sudoers \
   \
   && chmod +x /*.sh; \
+  test -f /usr/bin/dbus-daemon && chmod 700 /usr/bin/dbus-* || echo "dbus skip chmod."; \
   test -f /usr/bin/dbus-daemon && chown headless:headless /usr/bin/dbus-* || echo "dbus skip chown."; \
   \
   line=$(cat /etc/supervisor/supervisord.conf |grep  "^chmod=0700" -n |cut -d':' -f1); \
