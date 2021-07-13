@@ -13,6 +13,7 @@ RUN domain="mirrors.163.com" \
   && chmod +x /usr/local/bin/apt.sh
 
 #XRDP 26.673 MB
+# vncpasswd: tigervnc-common #66.6 kB;
 #AUDIO 19.893 MB; pavucontrol:2,363 kB pnmixer:815 kB;  +pulseaudio:14.6 MB/ubt:2805kB; +qmmp:28.7 MB
 # chansrv: libfdk-aac.so.1
 #noVnc 9.793 MB + 1.352 MB
@@ -20,7 +21,7 @@ RUN domain="mirrors.163.com" \
 # BASE 4.279 MB
 # FLUX 6.932 MB # dropbear 2M?
 RUN apt.sh \
-  supervisor tigervnc-standalone-server xrdp && \
+  supervisor tigervnc-standalone-server tigervnc-common xrdp && \
   mkdir -p /var/run/dbus && mkdir -p /etc/xrdp && xrdp-keygen xrdp auto \
   && apt -y remove xrdp; \
   \
@@ -54,7 +55,8 @@ ARG SLIM=""
 # MP3 23.872 MB
 # FluxEx: 735.819 KB; lxappearance ##xfce4-appearance-settings: no use in box.
 # NOTIFY 864.768 KB; notifyd 234 kB; clipit 336 kB;
-# gtk2-engines-pixbuf 58.9 kB; ##Gtk-WARNING **: 11:29:10.844: 无法在模块路径中找到主题引擎：“pixmap”，
+#  gtk2-engines-pixbuf 58.9 kB; ##Gtk-WARNING **: 11:29:10.844: 无法在模块路径中找到主题引擎：“pixmap”，
+# Attach1: 684.210 KB  st.libharfbuzz0b 3447 kB
 RUN test -z "$SLIM" && exit 0;\
     apt.sh ${LOC_XFCE} greybird-gtk-theme; \
     rm -f /usr/share/backgrounds/greybird.svg; \
@@ -65,13 +67,9 @@ RUN test -z "$SLIM" && exit 0;\
     \
     apt.sh lxappearance dbus-x11; \
     \
-    apt.sh xfce4-notifyd clipit gtk2-engines-pixbuf && apt -y remove dunst;
-# Attach1: 749.137 KB + 684.210 KB
-# vncpasswd #66.6 kB; st.libharfbuzz0b 3447 kB
-RUN apt.sh tigervnc-common
-RUN test -z "$SLIM" && exit 0;\
-  apt.sh libharfbuzz0b; \
-  apt -y remove stterm; ln -s /usr/local/st/st /bin/stterm;
+    apt.sh xfce4-notifyd clipit gtk2-engines-pixbuf && apt -y remove dunst; \
+    \
+    apt.sh libharfbuzz0b; apt -y remove stterm; ln -s /usr/local/st/st /bin/stterm;
 
 ARG FULL=""
 RUN test -z "$FULL" && exit 0;\
@@ -113,7 +111,7 @@ RUN test -z "$FULL" && exit 0;\
 COPY --from=loc /usr/share/locale1/emp${FULL} /usr/share/locale1
 
 # xrdp0914, xrdp3: v0916
-ADD src/etc/xrdp/pulse/default.pa /etc/xrdp/pulse/default.pa
+# ADD src/etc/xrdp/pulse/default.pa /etc/xrdp/pulse/default.pa
 COPY --from=bins /usr/local/appdata/xrdp /usr/local/xrdp
 COPY --from=bins /usr/local/sysdata/var/lib/xrdp-pulseaudio-installer /var/lib/xrdp-pulseaudio-installer
 COPY --from=bins /usr/local/st/st /usr/local/st/st
@@ -122,17 +120,13 @@ RUN ln -s /usr/local/xrdp/sbin/xrdp /usr/sbin/;\
   ln -s /usr/local/xrdp/sbin/xrdp-chansrv /usr/sbin/;\
   ln -s /usr/local/xrdp/bin/xrdp-keygen /usr/bin/;
 
-COPY --chown=root:root ./src/dot/ /etc/skel/
+# COPY --chown=root:root ./src
+ADD src/dot /etc/skel
 ADD src/etc /etc
-# ADD src/etc/xrdp/* /etc/xrdp/
-# ADD src/etc/pulse/* /etc/pulse/
-# ADD src/etc/novnc/* /etc/novnc/
-# ADD src/index.html /usr/local/novnc/index.html
 ADD src/entry.sh /entry.sh
 ADD src/xvnc.sh /xvnc.sh
 ADD src/xrdp.conf /etc/supervisor/conf.d/xrdp.conf
-COPY src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
-
+Add src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
 
   # stterm: TERM="xterm|vt100"
   # L="zh_CN" \ # ${FULL} > nonFull: if locale isn't installed.(entry.sh)
@@ -164,30 +158,29 @@ RUN useradd -mp j9X2HRQvPCphA -s /bin/bash -G sudo headless \
   \
   line=$(cat /etc/supervisor/supervisord.conf |grep  "^chmod=0700" -n |cut -d':' -f1); \
   sed -i "${line}cchmod=0770" /etc/supervisor/supervisord.conf; \
-  sed -i "${line}achown=headless:headless" /etc/supervisor/supervisord.conf; \
-  \ 
-  test -z "$FULL" && exit 0 || su - headless -c "$(curl -fsSL https://gitee.com/g-system/oh-my-bash/raw/sam-custom/tools/install.sh)";
-# Setup D-Bus
-RUN test -z "$SLIM" && exit 0;\
-  mkdir -p /run/dbus/ && chown messagebus:messagebus /run/dbus/; \
-  dbus-uuidgen > /etc/machine-id; \
-  ln -sf /etc/machine-id /var/lib/dbus/machine-id
-
+  sed -i "${line}achown=headless:headless" /etc/supervisor/supervisord.conf; 
+# +002
+# Make sesman read environment variables
+# locale>xx.mo: dpkg conf, use debian's tpl.
 RUN echo "welcome! HeadlessBox." > /etc/motd \
     && ln -s /usr/bin/vim.tiny /usr/bin/vt \
     && rm -f /bin/sh && ln -s /bin/bash /bin/sh \
-    && echo "alias ll='ls -lF'; alias la='ls -A'; alias l='ls -CF';" >> /home/headless/.bashrc
-# Make sesman read environment variables
-RUN printf '%s\n' 'session required pam_env.so readenv=1' >> /etc/pam.d/xrdp-sesman
-# locale>xx.mo: dpkg conf, use debian's tpl.
-RUN sed -i "s^path-exclude /usr/share/locale/\*^# path-exclude /usr/share/locale/\*^g" /etc/dpkg/dpkg.cfg.d/docker
+    && echo "alias ll='ls -lF'; alias la='ls -A'; alias l='ls -CF';" >> /home/headless/.bashrc; \
+    \
+    printf '%s\n' 'session required pam_env.so readenv=1' >> /etc/pam.d/xrdp-sesman; \
+    sed -i "s^path-exclude /usr/share/locale/\*^# path-exclude /usr/share/locale/\*^g" /etc/dpkg/dpkg.cfg.d/docker; \
+    mkdir -p  /usr/share/man/man1/;
+
+##AUDIO###########################
+# Setup D-Bus; ;
+RUN test -z "$SLIM" && exit 0;\
+  mkdir -p /run/dbus/ && chown messagebus:messagebus /run/dbus/; \
+  dbus-uuidgen > /etc/machine-id; \
+  ln -sf /etc/machine-id /var/lib/dbus/machine-id;
+  
+
 
 ##FULL###########################
-# ref: mkdir /usr/share/locale1/emp/
-# LOCALE TZ #1.786 MB #TODO /usr/share/locale1 +link ##TODO ARG:FULL
-# COPY --from=loc /usr/share/locale1/emp${FULL} /usr/share/locale1
-RUN test -z "$FULL" && exit 0;\
-  bash -c "arr=\"$(cd /usr/share/locale1; ls)\"; for ONE in \${arr[@]}; do rm -rf /usr/share/locale/\$ONE ; ln -s /usr/share/locale1/\$ONE /usr/share/locale/ ; done";
 
 # DCONF+IBUS env
 # # dconf load / < dconf.ini  ##error: Cannot autolaunch D-Bus without X11 $DISPLAY
@@ -198,21 +191,28 @@ RUN test -z "$FULL" && exit 0;\
   find /home/headless/.config |wc; \
   ln -s /usr/share/rime-data/wubi_pinyin.schema.yaml /home/headless/.config/ibus/rime/; \
   chown -R headless:headless /home/headless/.config; \
+  \
   # ibus env
   echo "export XMODIFIERS=@im=ibus" >> /etc/profile;\
   echo "export GTK_IM_MODULE=ibus" >> /etc/profile;\
   echo "export QT_IM_MODULE=ibus" >> /etc/profile;\
+  \
   # dconf: ibus, plank, engrampa
   mkdir -p /etc/dconf/db;\
   su - headless -c "dbus-launch dconf reset -f /; dbus-launch dconf load / < /usr/share/dconf.ini; ";\
-  dbus-launch dconf update;\
-  \
-  mkdir -p  /usr/share/man/man1/;
+  dbus-launch dconf update;
 
-##SETTINGS
+
+# LOCALE, OHMYBASH, SETTINGS
+# ref: mkdir /usr/share/locale1/emp/
+# COPY --from=loc /usr/share/locale1/emp${FULL} /usr/share/locale1
 # theme <property name="IconThemeName" type="string" value="gnome"/>
   # sed -i "s^value=\"gnome\"^value=\"ePapirus\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
 RUN test -z "$FULL" && exit 0;\
+  bash -c "arr=\"$(cd /usr/share/locale1; ls)\"; for ONE in \${arr[@]}; do rm -rf /usr/share/locale/\$ONE ; ln -s /usr/share/locale1/\$ONE /usr/share/locale/ ; done"; \
+  \
+  su - headless -c "$(curl -fsSL https://gitee.com/g-system/oh-my-bash/raw/sam-custom/tools/install.sh)"; \
+  \
   sed -i "s^OSH_THEME=\"font\"^OSH_THEME=\"axin\"^g" /home/headless/.bashrc; \
   cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*;
 
