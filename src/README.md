@@ -8,6 +8,7 @@
 
 - ~~novnc: change_pw, readonly~~; UI:input_pass
 - ~~compile: xrdp/xrdp-pulse, rofi, stterm~~
+- multi: xvnc0-de +offset; pulsePort_N;
 - novnc-audio: ffmpeg?+jsmpeg
 
 **vncpasswd**

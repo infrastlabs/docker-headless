@@ -23,7 +23,7 @@ case "$cmd" in
     *)
         # SLIM
         img="docker-headless:$ver-slim"
-        docker build $cache $pull -t $repo/$ns/$img  --build-arg AUDIO= -f src/Dockerfile .
+        docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile .
         docker push $repo/$ns/$img
 
         # AUDIO=true

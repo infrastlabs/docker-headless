@@ -46,7 +46,7 @@ RUN export NO_VNC_HOME="/usr/local/novnc"; \
   && wget -qO- https://github.com.cnpmjs.org/novnc/websockify/archive/v0.9.0.tar.gz | tar xz --strip 1 -C ${NO_VNC_HOME}/utils/websockify
 
 # --build-arg AUDIO=true
-ARG AUDIO="true"
+ARG AUDIO=""
 # XFCE 36.596 MB; greybird.svg: 2.0M
 # APP1 19.746 MB
 # MP3 23.872 MB
@@ -131,13 +131,14 @@ Add src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
   # stterm: TERM="xterm|vt100"
   # L="zh_CN" \ # ${FULL} > nonFull: if locale isn't installed.(entry.sh)
 ENV \
-  TZ=Asia/Shanghai \
   TERM=xterm \
-  SSHD_PORT=10022 \
-  XRDP_PORT=10089 \
+  SSH_PORT=10022 \
+  RDP_PORT=10089 \
   VNC_PORT=10081 \
   VNC_OFFSET=0 \
   VNC_LIMIT=1 \
+  # L=zh_CN
+  TZ=Asia/Shanghai \
   VNC_RW=headless \
   VNC_RO=View123
 
