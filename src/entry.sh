@@ -24,6 +24,7 @@ env | grep -Ev '^(PWD|OLDPWD|HOME|USER|SHELL|TERM|([^=]*(PASSWORD|SECRET)[^=]*))
 # RUN printf '%s\n' 'session required pam_env.so readenv=1' >> /etc/pam.d/xrdp-sesman
 
 function setVnc(){
+    cat /usr/local/novnc/index.html.tpl > /usr/local/novnc/index.html
     for ((i=0; i< $VNC_LIMIT; i++)); do
         local N=$(expr $i + $VNC_OFFSET)
         echo "setVnc_N: $N"
@@ -38,7 +39,9 @@ function setVnc(){
         mkdir -p /etc/novnc
         local port=$(expr 5900 + $N)
         echo "display$N: 127.0.0.1:$port" >> /etc/novnc/token.conf
-        echo "<li><a target=\"_blank\" href=\"/vnc.html?path=websockify/?token=display$N&password=headless\">display$N</a>&nbsp;&nbsp;<a target=\"_blank\" href=\"/vnc_lite.html?path=websockify/?token=display$N&password=headless\">lite_display$N</a></li>" >> /usr/local/novnc/index.html
+        echo "<li><a target=\"_blank\" href=\"/vnc.html?path=websockify/?token=display$N&password=headless\">display$N</a></li>" >> /usr/local/novnc/index.html
+        echo "<li><a target=\"_blank\" href=\"/vnc_lite.html?path=websockify/?token=display$N&password=headless\">display$N-lite</a></li>" >> /usr/local/novnc/index.html
+        echo "<li></li>" >> /usr/local/novnc/index.html
 
         # sv
         echo """
@@ -72,12 +75,13 @@ chansrvport=DISPLAY($N)
         # sed -i "${line}cchmod=0770" /etc/xrdp/xrdp.ini
         sed -i "$line r /tmp/xrdp-sesOne$N.conf" /etc/xrdp/xrdp.ini
     done
+    echo -e "</ul>\n</div>\n</body>" >> /usr/local/novnc/index.html
     rm -f /tmp/xrdp-sesOne*.conf
     cat /etc/xrdp/xrdp.ini |grep "^\[Xvnc"
 
     # xvnc0-de
     local port2=$(expr 0 + $VNC_OFFSET)
-    sed -i "s/DISPLAY=:0/DISPLAY=:$port2/" /etc/xrdp/xrdp.ini
+    sed -i "s/DISPLAY=\:0/DISPLAY=\:$port2/" /etc/supervisor/conf.d/xrdp.conf
 }
 setVnc
 

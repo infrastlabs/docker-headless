@@ -121,6 +121,7 @@ ADD src/dot /etc/skel
 ADD src/etc /etc
 ADD src/*.sh /
 ADD src/xrdp.conf /etc/supervisor/conf.d/xrdp.conf
+ADD src/index.html.tpl /usr/local/novnc/index.html.tpl
 Add src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
 
 # stterm: TERM="xterm|vt100"
