@@ -17,7 +17,7 @@
     
     # Accept clients -- very important
     load-module module-native-protocol-unix
-    load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1;192.168.0.0/24 auth-anonymous=1
+    load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1;192.168.0.0/24 auth-anonymous=1 port=4700
 
 .nofail
 .ifexists module-x11-publish.so
