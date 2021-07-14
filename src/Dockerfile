@@ -22,7 +22,7 @@ RUN domain="mirrors.163.com" \
 # noVnc 9.793 MB 
 #  python-numpy 4643 kB #warnings.warn("no 'numpy' module, HyBi protocol will be slower")
 # BASE 4.279 MB
-# FLUX 6.932 MB # dropbear 2M?
+# FLUX 6.932 MB #dropbear 2M? #openssh-sftp-server 39.5 kB
 RUN apt.sh \
   tigervnc-standalone-server tigervnc-common xrdp; \
   mkdir -p /etc/xrdp && xrdp-keygen xrdp auto && apt -y remove xrdp; \
@@ -34,7 +34,7 @@ RUN apt.sh \
   apt.sh htop rsync tree tmux lrzsz psmisc fuse net-tools iputils-ping procps sudo iproute2 iptables \
   zip unzip xz-utils vim-tiny; \
   \
-  apt.sh fluxbox stterm dropbear hsetroot xcompmgr; \
+  apt.sh fluxbox stterm hsetroot xcompmgr  dropbear openssh-sftp-server lftp jq; \
   bash -c "rm -rf /usr/share/fluxbox{nls,styles}";
 
 # NOVNC +1.352 MB; clear: 6.5M > 5.4M
