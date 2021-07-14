@@ -29,8 +29,10 @@ function setVnc(){
         echo "setVnc_N: $N"
 
         # createUser
-        #TODO drop /etc/skel; TODO2: user recreat?
+        #drop /etc/skel; TODO2: user recreat?
+        echo "SKEL=/etc/skel2" >> /etc/default/useradd
         useradd -ms /usr/sbin/nologin xvnc$N;
+        sed -i "s^SKEL=/etc/skel2^# SKEL=/etc/skel2^g" /etc/default/useradd
 
         # genTpl<sv, index.html, xrdp>
         mkdir -p /etc/novnc

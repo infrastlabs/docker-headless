@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # PULSE#################################################
+# touch /var/run/dbus/system_bus_socket && chmod 777 /var/run/dbus/system_bus_socket; #>>pulse: conn dbus err.
 pulseaudio &
 
 # XRDP##################################################

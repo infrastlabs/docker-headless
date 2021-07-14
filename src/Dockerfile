@@ -18,6 +18,7 @@ RUN domain="mirrors.163.com" \
 #  vncpasswd: tigervnc-common #66.6 kB;
 # AUDIO 19.893 MB; pavucontrol:2,363 kB pnmixer:815 kB;  +pulseaudio:14.6 MB/ubt:2805kB; +qmmp:28.7 MB
 #  chansrv: libfdk-aac.so.1
+#  mkdir -p /var/run/dbus #E: [pulseaudio] core-util.c: Failed to connect to system bus: Failed to connect to socket /var/run/dbus/system_bus_socket: 没有那个文件或目录
 # noVnc 9.793 MB 
 #  python-numpy 4643 kB #warnings.warn("no 'numpy' module, HyBi protocol will be slower")
 # BASE 4.279 MB
