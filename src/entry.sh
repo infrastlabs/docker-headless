@@ -72,6 +72,10 @@ chansrvport=DISPLAY($N)
     done
     rm -f /tmp/xrdp-sesOne*.conf
     cat /etc/xrdp/xrdp.ini |grep "^\[Xvnc"
+
+    # xvnc0-de
+    local port2=$(expr 0 + $VNC_OFFSET)
+    sed -i "s/DISPLAY=:0/DISPLAY=:$port2/" /etc/xrdp/xrdp.ini
 }
 setVnc
 

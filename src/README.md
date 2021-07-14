@@ -6,9 +6,10 @@
 
 ## TODO
 
-- ~~novnc: change_pw, readonly~~; UI:input_pass
 - ~~compile: xrdp/xrdp-pulse, rofi, stterm~~
-- multi: xvnc0-de +offset; pulsePort_N;
+- ~~novnc: change_pw, readonly~~; UI:input_pass
+- ~~multi: xvnc0-de +offset;~~ pulsePort_N;
+- ~~bunsen-grey-theme: Papirus-Bunsen-grey~~
 - novnc-audio: ffmpeg?+jsmpeg
 
 **vncpasswd**

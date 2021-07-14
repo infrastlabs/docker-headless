@@ -198,15 +198,19 @@ RUN test -z "$FULL" && exit 0;\
 # ref: mkdir /usr/share/locale1/emp/
 # COPY --from=loc /usr/share/locale1/emp${FULL} /usr/share/locale1
 # theme <property name="IconThemeName" type="string" value="gnome"/>
-  # sed -i "s^value=\"gnome\"^value=\"ePapirus\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
 RUN test -z "$FULL" && exit 0;\
   bash -c "arr=\"$(cd /usr/share/locale1; ls)\"; for ONE in \${arr[@]}; do rm -rf /usr/share/locale/\$ONE ; ln -s /usr/share/locale1/\$ONE /usr/share/locale/ ; done"; \
   \
+  # ohmybash
   su - headless -c "$(curl -fsSL https://gitee.com/g-system/oh-my-bash/raw/sam-custom/tools/install.sh)"; \
   rm -rf /home/headless/.oh-my-bash/.git; bash -c 'cd /home/headless/.oh-my-bash/themes; rm -rf `ls |grep -v "axin\|sh$"`'; \
   \
+  # sed -i "s^value=\"gnome\"^value=\"Papirus-Bunsen-grey\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
   sed -i "s^OSH_THEME=\"font\"^OSH_THEME=\"axin\"^g" /home/headless/.bashrc; \
-  cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*;
+  cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*; \
+  \
+  wget http://asia.pkg.bunsenlabs.org/debian/pool/main/b/bunsen-papirus-icon-theme/bunsen-papirus-icon-theme_10.3-2_all.deb; \
+  dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb;
 
 
 WORKDIR /home/headless

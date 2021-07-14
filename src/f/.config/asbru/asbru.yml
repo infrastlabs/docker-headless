@@ -1,0 +1,470 @@
+---
+__PAC__EXPORTED__FULL__: 1
+config version: 2
+config version change: Added keybindings settings
+defaults:
+  allow more instances: ''
+  append group name: 1
+  audible bell: ''
+  auto accept key: 1
+  auto cluster: {}
+  auto hide button bar: ''
+  auto hide connections list: ''
+  auto save: 1
+  autostart shell upon PAC start: ''
+  autostart shell upon start: 0
+  back color: '#000000000000'
+  bold color: '#cc62cc62cc62'
+  bold color like text: ''
+  bold is brigth: ''
+  capture xterm title: 0
+  change main title: ''
+  check versions at start: 0
+  close terminal on disconnect: ''
+  close to tray: ''
+  color black: '#000000000000'
+  color blue: '#34346565a4a4'
+  color bright black: '#555557575353'
+  color bright blue: '#72729f9fcfcf'
+  color bright cyan: '#3434e2e2e2e2'
+  color bright green: '#8a8ae2e23434'
+  color bright magenta: '#adad7f7fa8a8'
+  color bright red: '#efef29292929'
+  color bright white: '#eeeeeeeeecec'
+  color bright yellow: '#fcfce9e94f4f'
+  color cyan: '#060698209a9a'
+  color green: '#4e4e9a9a0606'
+  color magenta: '#757550507b7b'
+  color red: '#cccc00000000'
+  color white: '#d3d3d7d7cfcf'
+  color yellow: '#c4c4a0a00000'
+  command prompt: '[#%\$>~→]|\:\/\s*$'
+  config version: 1
+  confirm chains: 1
+  confirm exit: 1
+  connected color: '#0c0cbaba0000'
+  cursor shape: block
+  debug: ''
+  disconnected color: '#ffff00000000'
+  enable tree lines: ''
+  force split tabs to 50%: ''
+  global variables: {}
+  gui password: ''
+  hide connections submenu: ''
+  hide on connect: ''
+  hostkey changed prompt: '^.+ontinue connecting \(([^/]+)\/([^/]+)(?:[^)]+)?\)\?\s*$'
+  info font: monospace
+  jump ip: ''
+  jump key: ''
+  jump pass: ''
+  jump port: 22
+  jump user: ''
+  keepass:
+    database: ''
+    keyfile: ''
+    password: 53616c7465645f5f3132333435363738a9fd581c1ddfc1c2
+    pathcli: ''
+    use_keepass: 0
+  keybindings:
+    pacmain:
+      Alt+n:
+        - Main Window
+        - showconnections
+        - Show/Hide connections list
+      Ctrl+T:
+        - Main Window
+        - localshell
+        - Open a local shell
+      Ctrl+f:
+        - Main Window
+        - find
+        - Find in connection tree
+      Ctrl+q:
+        - Main Window
+        - quit
+        - Exit Ásbrú
+    pactabs:
+      Ctrl+F4:
+        - Tabs
+        - close
+        - Close current Tab
+      Ctrl+Page_Down:
+        - Tabs
+        - next
+        - Next Tab
+      Ctrl+Page_Up:
+        - Tabs
+        - previous
+        - Previous Tab
+      Ctrl+Tab:
+        - Tabs
+        - last
+        - Last focused Tab
+      undef-infotab:
+        - Tabs
+        - infotab
+        - Got to Info Tab
+    terminal:
+      Alt+e:
+        - Terminal
+        - edit_node
+        - Edit Connection
+      Alt+n:
+        - Terminal
+        - showconnections
+        - Show/Hide connections list
+      AltCtrl+X:
+        - Terminal
+        - reset-clear
+        - Reset Terminal and Clear window
+      AltCtrl+s:
+        - Terminal
+        - sftp
+        - Open SFTP session
+      AltCtrl+x:
+        - Terminal
+        - reset
+        - Reset Terminal
+      Ctrl+0:
+        - Terminal
+        - zoomreset
+        - Zoom reset text
+      Ctrl+D:
+        - Terminal
+        - duplicate
+        - Duplicate connection
+      Ctrl+F3:
+        - Terminal
+        - find-terminal
+        - Find Terminal
+      Ctrl+I:
+        - Terminal
+        - infotab
+        - Show the Info tab
+      Ctrl+Insert:
+        - Terminal
+        - copy
+        - Copy selection to clipboard
+      Ctrl+N:
+        - Terminal
+        - close-disconected
+        - Close disconnected sessions
+      Ctrl+R:
+        - Terminal
+        - restart
+        - Restart connection (close and start)
+      Ctrl+Return:
+        - Terminal
+        - start
+        - Start Terminal
+      Ctrl+V:
+        - Terminal
+        - paste
+        - Paste clipboard into terminal
+      Ctrl+W:
+        - Terminal
+        - disconnect
+        - Disconnect Terminal
+      Ctrl+ampersand:
+        - Terminal
+        - cisco
+        - Send Cisco interrupt keypress
+      Ctrl+b:
+        - Terminal
+        - paste-delete
+        - Paste and regex delete
+      Ctrl+f:
+        - Terminal
+        - find
+        - Find in connection tree
+      Ctrl+g:
+        - Terminal
+        - hostname
+        - Guess hostname
+      Ctrl+minus:
+        - Terminal
+        - zoomout
+        - Zoom out text
+      Ctrl+p:
+        - Terminal
+        - paste-passwd
+        - Paste terminal password
+      Ctrl+plus:
+        - Terminal
+        - zoomin
+        - Zoom in text
+      Ctrl+q:
+        - Terminal
+        - quit
+        - Exit Ásbrú
+      Ctrl+w:
+        - Terminal
+        - close
+        - Close Terminal
+      CtrlAlt+r:
+        - Terminal
+        - remove_from_cluster
+        - Remove terminal from cluster
+      CtrlShift+F4:
+        - Terminal
+        - closealltabs
+        - Close all tabs
+      F11:
+        - Terminal
+        - fullscreen
+        - Go full screen
+      Shift+Insert:
+        - Terminal
+        - paste-primary
+        - Paste selection into terminal
+    treeClusters:
+      Alt+e:
+        - Clusters Tree
+        - edit_node
+        - Edit selected node
+    treeConnections:
+      Alt+F:
+        - Connections Tree
+        - del_favourite
+        - Remove connection from favourites
+      Alt+c:
+        - Connections Tree
+        - connect_node
+        - Connect selected node
+      Alt+e:
+        - Connections Tree
+        - edit_node
+        - Edit selected node
+      Alt+f:
+        - Connections Tree
+        - add_favourite
+        - Add connection to favourites
+      Alt+r:
+        - Connections Tree
+        - protection
+        - Toggle protection
+      Ctrl+c:
+        - Connections Tree
+        - copy
+        - Copy node
+      Ctrl+d:
+        - Connections Tree
+        - clone
+        - Clone connection
+      Ctrl+f:
+        - Connections Tree
+        - find
+        - Find in connection tree
+      Ctrl+r:
+        - Connections Tree
+        - expand_all
+        - Expand tree completly
+      Ctrl+t:
+        - Connections Tree
+        - collaps_all
+        - Collaps tree completly
+      Ctrl+v:
+        - Connections Tree
+        - paste
+        - Paste node
+      Ctrl+x:
+        - Connections Tree
+        - cut
+        - Cut node
+      F2:
+        - Connections Tree
+        - rename
+        - Rename node
+    treeFavourites:
+      Alt+F:
+        - Favourites Tree
+        - del_favourite
+        - Remove connection from favourites
+      Alt+e:
+        - Favourites Tree
+        - edit_node
+        - Edit selected node
+    treeHistory:
+      Alt+e:
+        - History Tree
+        - edit_node
+        - Edit selected node
+  layout: Traditional
+  layout previous: Traditional
+  layout traditional settings: 1
+  local commands: []
+  log timestamp: ''
+  lt auto save: 1
+  lt close to tray: 0
+  lt start iconified: 0
+  lt tabs in main window: 1
+  max retry on disconnect: 50
+  new data color: '#00008888ffff'
+  open connections in tabs: 1
+  password prompt: "([pP]ass|[pP]ass[wW]or[dt](\\s+for\\s+|\\w+@[\\w\\-\\.]+)*|[cC]ontrase.a|Enter passphrase for key '.+')\\s*:\\s*$"
+  press any key prompt: .*(any key to continue|tecla para continuar).*
+  prevent mouse over show tree: 1
+  protected color: '#ffffb0b02222'
+  protected set: background
+  proxy: No
+  proxy ip: ''
+  proxy pass: ''
+  proxy port: 8080
+  proxy user: ''
+  remember main size: 1
+  remote commands: []
+  remote host changed prompt: .*ffending .*key in (.+?)\:(\d+).*
+  remove control chars: ''
+  save on exit: ''
+  save session logs: ''
+  screenshots external viewer: /usr/bin/xdg-open
+  screenshots use external viewer: ''
+  selection to clipboard: 1
+  session log pattern: <UUID>_<NAME>_<DATE_Y><DATE_M><DATE_D>_<TIME_H><TIME_M><TIME_S>.txt
+  session logs amount: 10
+  session logs folder: /home/headless/.config/asbru/session_logs
+  shell binary: /bin/bash
+  shell directory: /home/headless
+  shell options: ''
+  show commands box: 0
+  show connections tooltips: ''
+  show favourites in unity: ''
+  show global commands box: ''
+  show screenshots: 1
+  show statistics: 1
+  show tray icon: 1
+  show tree titles: 1
+  skip first chain expect: 1
+  sort groups first: 1
+  start PAC tree on: connections
+  start at session startup: 0
+  start iconified: ''
+  start main maximized: ''
+  start maximized: ''
+  sudo password: 53616c7465645f5f3132333435363738246b8c24e7c1a87e58018a4945fd0de0
+  sudo prompt: '[__PAC__SUDO__PROMPT__]'
+  sudo show password: ''
+  tabs in main window: 1
+  tabs position: top
+  terminal backspace: auto
+  terminal character encoding: UTF-8
+  terminal font: Monospace 11
+  terminal scrollback lines: 5000
+  terminal show status bar: 1
+  terminal support transparency: ''
+  terminal transparency: 0
+  terminal windows hsize: 800
+  terminal windows vsize: 600
+  text color: '#cc62cc62cc62'
+  theme: default
+  timeout command: 60
+  timeout connect: 40
+  tree font: Normal
+  tree on right side: ''
+  tree overlay scrolling: 1
+  unprotected color: '#000000000000'
+  unprotected set: foreground
+  unsplit disconnected terminals: ''
+  use bw icon: ''
+  use gui password: ''
+  use gui password tray: ''
+  use login shell to connect: ''
+  use proxy: 0
+  use system proxy: 1
+  username prompt: '([lL]ogin|[uU]suario|([uU]ser-?)*[nN]ame.*|[uU]ser)\s*:\s*$'
+  version: 6.3.2
+  when no more tabs: 0
+  word characters: -.:_/
+environments:
+  __PAC_SHELL__:
+    KPX title regexp: .*Local.*
+    _protected: 0
+    auth fallback: 1
+    auth type: manual
+    autoreconnect: 0
+    autossh: 0
+    cluster: []
+    description: A shell on the local machine
+    embed: 0
+    expect: []
+    favourite: 0
+    ip: bash
+    local after: []
+    local before: []
+    local connected: []
+    mac: ''
+    macros: []
+    method: PACShell
+    name: PACShell
+    options: ''
+    parent: __PAC__ROOT__
+    pass: 53616c7465645f5f3132333435363738a9fd581c1ddfc1c2
+    passphrase: 53616c7465645f5f3132333435363738a9fd581c1ddfc1c2
+    passphrase user: ''
+    port: 22
+    prepend command: ''
+    proxy ip: ''
+    proxy pass: ''
+    proxy port: 8080
+    proxy user: ''
+    public key: ''
+    quote command: 0
+    remove control chars: 0
+    save session logs: 0
+    screenshots: []
+    search pass on KPX: 0
+    send slow: 0
+    send string active: 0
+    send string every: 60
+    send string intro: 1
+    send string txt: ''
+    session log pattern: PACShell_<DATE_Y><DATE_M><DATE_D>_<TIME_H><TIME_M><TIME_S>.txt
+    session logs amount: 10
+    session logs folder: /home/headless/.config/asbru/session_logs
+    startup launch: 0
+    startup script: 0
+    startup script name: ''
+    terminal options:
+      audible bell: 0
+      back color: '#000000000000'
+      bold color: '#cc62cc62cc62'
+      bold color like text: 1
+      command prompt: '(\]\#|\$\s)+'
+      cursor shape: block
+      open in tab: 1
+      password prompt: "([pP]ass|[pP]ass[wW]or[dt](\\s+for\\s+|\\w+@[\\w\\-\\.]+)*|[cC]ontrase.a|Enter passphrase for key '.+')\\s*:\\s*$"
+      tab back color: '#000000000000'
+      terminal backspace: auto
+      terminal character encoding: UTF-8
+      terminal font: Monospace 9
+      terminal scrollback lines: -2
+      terminal select words: -.:_/
+      terminal transparency: 0
+      terminal window hsize: 800
+      terminal window vsize: 600
+      text color: '#cc62cc62cc62'
+      timeout command: 40
+      timeout connect: 40
+      use personal settings: 0
+      use tab back color: 0
+      username prompt: '([lL]ogin|[uU]suario|[uU]ser-?[nN]ame|[uU]ser):\s*$'
+    title: Local
+    use prepend command: 0
+    use proxy: 0
+    use sudo: 0
+    user: ''
+    variables: []
+  __PAC__ROOT__:
+    children: {}
+    expect: []
+    pass: 53616c7465645f5f3132333435363738a9fd581c1ddfc1c2
+    passphrase: 53616c7465645f5f3132333435363738a9fd581c1ddfc1c2
+    screenshots: []
+    variables: []
+tmp:
+  changed: 0
+  log file: '/home/headless/.config/asbru/tmp/asbru_PID{377}_n2.txt'
+  socket: '/home/headless/.config/asbru/sockets/asbru_PID{377}_n2.socket'
+  socket exec: '/home/headless/.config/asbru/sockets/asbru_PID{377}_n2.exec.socket'
+  tray available: warning
+  uuid: 'asbru_PID{377}_n2'
