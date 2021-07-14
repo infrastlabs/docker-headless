@@ -18,32 +18,30 @@ RUN domain="mirrors.163.com" \
 #  vncpasswd: tigervnc-common #66.6 kB;
 # AUDIO 19.893 MB; pavucontrol:2,363 kB pnmixer:815 kB;  +pulseaudio:14.6 MB/ubt:2805kB; +qmmp:28.7 MB
 #  chansrv: libfdk-aac.so.1
-# noVnc 9.793 MB + 1.352 MB
+# noVnc 9.793 MB 
 #  python-numpy 4643 kB #warnings.warn("no 'numpy' module, HyBi protocol will be slower")
 # BASE 4.279 MB
 # FLUX 6.932 MB # dropbear 2M?
 RUN apt.sh \
-  tigervnc-standalone-server tigervnc-common xrdp && \
-  mkdir -p /etc/xrdp && xrdp-keygen xrdp auto \
-  && apt -y remove xrdp; \
+  tigervnc-standalone-server tigervnc-common xrdp; \
+  mkdir -p /etc/xrdp && xrdp-keygen xrdp auto && apt -y remove xrdp; \
   \
   apt.sh libfdk-aac1 pulseaudio supervisor; \
   \
   apt.sh wget ca-certificates python-numpy; \
   \
-  apt.sh \
-  htop rsync tree tmux lrzsz psmisc fuse net-tools iputils-ping procps sudo iproute2 iptables \
+  apt.sh htop rsync tree tmux lrzsz psmisc fuse net-tools iputils-ping procps sudo iproute2 iptables \
   zip unzip xz-utils vim-tiny; \
   \
-  apt.sh \
-  fluxbox stterm dropbear hsetroot xcompmgr; \
+  apt.sh fluxbox stterm dropbear hsetroot xcompmgr; \
   bash -c "rm -rf /usr/share/fluxbox{nls,styles}";
 
-# NOVNC
+# NOVNC +1.352 MB; clear: 6.5M > 5.4M
 RUN export NO_VNC_HOME="/usr/local/novnc"; \
   mkdir -p ${NO_VNC_HOME}/utils/websockify \ 
   && wget -qO- https://github.com.cnpmjs.org/novnc/noVNC/archive/v1.2.0.tar.gz | tar xz --strip 1 -C ${NO_VNC_HOME} \
-  && wget -qO- https://github.com.cnpmjs.org/novnc/websockify/archive/v0.9.0.tar.gz | tar xz --strip 1 -C ${NO_VNC_HOME}/utils/websockify
+  && wget -qO- https://github.com.cnpmjs.org/novnc/websockify/archive/v0.9.0.tar.gz | tar xz --strip 1 -C ${NO_VNC_HOME}/utils/websockify; \
+  bash -c "cd /usr/local/novnc; rm -rf .github package.json README.md .gitignore .eslint* .gitmodules tests docs; rm -rf ./utils/websockify/{tests,Windows,docs}; ";
 
 # --build-arg AUDIO=true
 ARG AUDIO=""
@@ -93,11 +91,10 @@ RUN test -z "$FULL" && exit 0;\
 # DEV: vscode 5.453 MB
 # SHELL: git 12.4 MB; on-my-bash; asbru-cm 11.3M
 RUN test -z "$FULL" && exit 0;\
-  apt.sh \
-  ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
-  flameshot tumbler arandr \
-  gnupg libsecret-1-0 libnss3 libxtst6 libasound2 \
-  curl wget git
+  apt.sh ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
+  flameshot tumbler arandr  curl wget git \
+  gnupg libsecret-1-0 libnss3 libxtst6 libasound2;
+  
 
 # ohmybash, asbru-cm: 10.269 MB
 RUN test -z "$FULL" && exit 0;\
@@ -110,7 +107,6 @@ RUN test -z "$FULL" && exit 0;\
 COPY --from=loc /usr/share/locale1/emp${FULL} /usr/share/locale1
 
 # xrdp0914, xrdp3: v0916
-# ADD src/etc/xrdp/pulse/default.pa /etc/xrdp/pulse/default.pa
 COPY --from=bins /usr/local/appdata/xrdp /usr/local/xrdp
 COPY --from=bins /usr/local/sysdata/var/lib/xrdp-pulseaudio-installer /var/lib/xrdp-pulseaudio-installer
 # COPY --from=bins /usr/local/st/st /usr/local/st/st
@@ -123,13 +119,10 @@ RUN ln -s /usr/local/xrdp/sbin/xrdp /usr/sbin/;\
 ADD src/dot /etc/skel
 ADD src/etc /etc
 ADD src/*.sh /
-# ADD src/entry.sh /entry.sh
-# ADD src/xvnc.sh /xvnc.sh
 ADD src/xrdp.conf /etc/supervisor/conf.d/xrdp.conf
 Add src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
 
-  # stterm: TERM="xterm|vt100"
-  # L="zh_CN" \ # ${FULL} > nonFull: if locale isn't installed.(entry.sh)
+# stterm: TERM="xterm|vt100"
 ENV \
   TERM=xterm \
   SSH_PORT=10022 \
@@ -146,7 +139,7 @@ ENV \
 # +headless
 # sv_user: http://blog.chinaunix.net/uid-26817066-id-5792715.html
 # dbus-x11 fewSize 92.5Kb?, cause xvnc1,2: with two more processes. 
-# 700; chown headless: can only run with headless; dbus-daemon/dbus-launch; dbus-*: x8;
+#  700; chown headless: can only run with headless; dbus-daemon/dbus-launch; dbus-*: x8;
 RUN useradd -mp j9X2HRQvPCphA -s /bin/bash -G sudo headless \
   && echo "headless:headless" |chpasswd \
   && echo 'Cmnd_Alias SU = /bin/su' >> /etc/sudoers \

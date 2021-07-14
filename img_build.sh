@@ -11,7 +11,7 @@ echo "${DOCKER_REGISTRY_PW_infrastSubUser2}" |docker login --username=${DOCKER_R
 ns=infrastlabs
 # cache="--no-cache"
 # pull="--pull"
-ver=box05 #02: +full; 04: bins;
+ver=box06 #02: +full; 04: bins;
 
 cmd="$1"
 case "$cmd" in
