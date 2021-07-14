@@ -2,7 +2,7 @@
 
 Based on `TigerVNC/XRDP/PulseAudio` with `Fluxbox/XFCE4`, Formatting a Headless Remote Desktop Box for Developers/Operators.
 
-- Size: latest: `168.723 MB`, slim: `89.305 MB`, full: `289.230 MB`
+- Size: latest: `168.347 MB`, slim: `88.929 MB`, full: `289.581 MB`
 - User: `headless`, SSHPass: `headless`, VNCPass: `headless`
 - Ports
   - novnc 6080 > 10081
@@ -18,7 +18,7 @@ Based on `TigerVNC/XRDP/PulseAudio` with `Fluxbox/XFCE4`, Formatting a Headless 
   - `sup+down`: cycle windows
   - `sup+left`: left workspace
   - `sup+right`: right workspace
-- xrdp, dropbear
+- Entry: xrdp, novnc, dropbear
 - 命令工具：`tree htop gawk expect tmux rsync iproute2`
 - 图形工具：`sakura tint2 plank flameshot`, `gnome-system-monitor engrampa ristretto`
 - tzdata时区, ttf-wqy-microhei字体, ibus-rime输入法,
