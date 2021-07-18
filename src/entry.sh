@@ -23,9 +23,67 @@ env | grep -Ev '^(PWD|OLDPWD|HOME|USER|SHELL|TERM|([^=]*(PASSWORD|SECRET)[^=]*))
 # # Make sesman read environment variables
 # RUN printf '%s\n' 'session required pam_env.so readenv=1' >> /etc/pam.d/xrdp-sesman
 
+function setVnc0(){
+    for ((i=0; i< 1; i++)); do #0: left for headless
+        local N=$(expr $i + $VNC_OFFSET)
+        echo "setVnc_N: $N (headless)"
+
+        # # createUser
+        # #drop /etc/skel; TODO2: user recreat?
+        # echo "SKEL=/etc/skel2" >> /etc/default/useradd
+        # useradd -ms /usr/sbin/nologin xvnc$N;
+        # sed -i "s^SKEL=/etc/skel2^# SKEL=/etc/skel2^g" /etc/default/useradd
+
+        # genTpl<sv, index.html, xrdp>
+        mkdir -p /etc/novnc
+        local port=$(expr 5900 + $N)
+        echo "display$N: 127.0.0.1:$port" >> /etc/novnc/token.conf
+        echo "<li><a target=\"_blank\" href=\"/vnc.html?path=websockify/?token=display$N&password=headless\">display$N</a></li>" >> /usr/local/novnc/index.html
+        echo "<li><a target=\"_blank\" href=\"/vnc_lite.html?path=websockify/?token=display$N&password=headless\">display$N-lite</a></li>" >> /usr/local/novnc/index.html
+        echo "<li></li>" >> /usr/local/novnc/index.html
+
+        # sv
+        echo """
+[program:xvnc$N-headless]
+environment=DISPLAY=:$N,HOME=/home/headless
+priority=35
+user=headless
+command=/xvnc.sh :$N
+stdout_logfile=/dev/fd/1
+stdout_logfile_maxbytes=0
+redirect_stderr=true
+
+        """ > /etc/supervisor/conf.d/xvnc$N.conf
+
+        # xrdp
+        echo """
+[Xvnc$N-headless]
+name=Xvnc$N-headless
+lib=libvnc.so
+username=asknoUser
+password=askheadless
+ip=127.0.0.1
+port=$port
+chansrvport=DISPLAY($N)
+        """ > /tmp/xrdp-sesOne$N.conf
+
+        # $N atLast
+        local line=$(cat /etc/xrdp/xrdp.ini |grep  "^\[Local-sesman\]" -n |cut -d':' -f1)
+        echo "===line: $line=========================="
+        line=$(expr $line - 1)
+        # sed -i "${line}cchmod=0770" /etc/xrdp/xrdp.ini
+        sed -i "$line r /tmp/xrdp-sesOne$N.conf" /etc/xrdp/xrdp.ini
+    done
+
+    # xvnc0-de
+    local port2=$(expr 0 + $VNC_OFFSET)
+    sed -i "s/DISPLAY=\:0/DISPLAY=\:$port2/" /etc/supervisor/conf.d/xrdp.conf
+}
+
 function setVnc(){
     cat /usr/local/novnc/index.html.tpl > /usr/local/novnc/index.html
-    for ((i=0; i< $VNC_LIMIT; i++)); do
+    setVnc0; #headless: run with headlessUser
+    for ((i=1; i< $VNC_LIMIT; i++)); do #0: left for headless
         local N=$(expr $i + $VNC_OFFSET)
         echo "setVnc_N: $N"
 
@@ -62,7 +120,7 @@ redirect_stderr=true
 name=Xvnc$N
 lib=libvnc.so
 username=asknoUser
-password=askpasswd
+password=askheadless
 ip=127.0.0.1
 port=$port
 chansrvport=DISPLAY($N)
@@ -79,9 +137,6 @@ chansrvport=DISPLAY($N)
     rm -f /tmp/xrdp-sesOne*.conf
     cat /etc/xrdp/xrdp.ini |grep "^\[Xvnc"
 
-    # xvnc0-de
-    local port2=$(expr 0 + $VNC_OFFSET)
-    sed -i "s/DISPLAY=\:0/DISPLAY=\:$port2/" /etc/supervisor/conf.d/xrdp.conf
 }
 setVnc
 
