@@ -171,12 +171,14 @@ RUN echo "welcome! HeadlessBox." > /etc/motd \
 RUN test -z "$AUDIO" && exit 0;\
   mkdir -p /run/dbus/ && chown messagebus:messagebus /run/dbus/; \
   dbus-uuidgen > /etc/machine-id; \
-  ln -sf /etc/machine-id /var/lib/dbus/machine-id;
+  ln -sf /etc/machine-id /var/lib/dbus/machine-id; \
+  \
+  cd /home/headless/.qmmp/skins/; unzip Dark_Materia.wsz; chmod 755 -R darkmateria;
   
 
 
 ##FULL###########################
-# DCONF+IBUS env
+# IBUS+DCONF env
 #  dconf load / < dconf.ini  ##error: Cannot autolaunch D-Bus without X11 $DISPLAY
 #  ADD > COPY
 ADD src/f/dconf.ini /usr/share/dconf.ini 
@@ -191,7 +193,7 @@ RUN test -z "$FULL" && exit 0;\
   echo "export GTK_IM_MODULE=ibus" >> /etc/profile;\
   echo "export QT_IM_MODULE=ibus" >> /etc/profile;\
   \
-  # dconf: ibus, plank, engrampa
+  # dconf: ibus, plank, engrampa; dconf dump / > xx.ini
   mkdir -p /etc/dconf/db;\
   su - headless -c "dbus-launch dconf reset -f /; dbus-launch dconf load / < /usr/share/dconf.ini; ";\
   dbus-launch dconf update;
@@ -207,7 +209,7 @@ RUN test -z "$FULL" && exit 0;\
   su - headless -c "$(curl -fsSL https://gitee.com/g-system/oh-my-bash/raw/sam-custom/tools/install.sh)"; \
   rm -rf /home/headless/.oh-my-bash/.git; bash -c 'cd /home/headless/.oh-my-bash/themes; rm -rf `ls |grep -v "axin\|sh$"`'; \
   \
-  # sed -i "s^value=\"gnome\"^value=\"Papirus-Bunsen-grey\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
+  sed -i "s^value=\"gnome\"^value=\"Papirus-Bunsen-grey\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml; \
   sed -i "s^OSH_THEME=\"font\"^OSH_THEME=\"axin\"^g" /home/headless/.bashrc; \
   cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*; \
   \

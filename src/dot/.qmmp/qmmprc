@@ -52,7 +52,7 @@ group_format="%p%if(%p&%a, - %if(%y,[%y] ,),)%a"
 groups=false
 load_metadata=true
 no_advance=false
-repeate_list=false
+repeate_list=true
 repeate_track=false
 shuffle=false
 
@@ -160,7 +160,7 @@ scroller_transparency=true
 show_on_all_desktops=false
 skin_cursors=false
 skin_name=Dark_Materia.wsz
-skin_path=/home/headless/.qmmp/cache/skin
+skin_path=/home/headless/.qmmp/skins/darkmateria
 start_hidden=false
 vis_analyzer_falloff=2.2
 vis_analyzer_mode=0
