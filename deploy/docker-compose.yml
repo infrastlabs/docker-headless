@@ -1,12 +1,13 @@
 version: '2.2'
 services:
-  xserver:
-    # box04, box04-slim, box04-full
+  headless:
+    # latest, slim, full
     image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:latest
+    container_name: headless
     restart: always
     environment:
-      - VNC_RW=passwd!@#
-      - VNC_RO=passwd
+      - VNC_RW=headless
+      - VNC_RO=View123
       # - VNC_OFFSET=0
       # - VNC_LIMIT=3
       - TZ=Asia/Shanghai
@@ -14,13 +15,13 @@ services:
     volumes:
       - /_ext:/_ext
       - /opt:/opt
-    ports:
-      - "10089:10089"
-      - "10081:10081"
-      - "10022:10022"
-      # - "6000-6009:6000-6009" #VNC: offset 0, limit 10;
-      # - "4700-4709:4700-4709"
-    # network_mode: host
+    # ports:
+    #   - "10089:10089"
+    #   - "10081:10081"
+    #   - "10022:10022"
+    #   # - "6000-6009:6000-6009" #VNC: offset 0, limit 10;
+    #   # - "4700-4709:4700-4709"
+    network_mode: host
     privileged: true
     shm_size: 1g
   # de-mate:

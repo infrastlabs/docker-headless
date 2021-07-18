@@ -5,6 +5,8 @@
 source /etc/profile
 export |grep DOCKER_REG
 
+repo=docker.io
+echo "${DOCKER_REGISTRY_PW_dockerhub}" |docker login --username=${DOCKER_REGISTRY_USER_dockerhub} --password-stdin $repo
 repo=registry.cn-shenzhen.aliyuncs.com
 echo "${DOCKER_REGISTRY_PW_infrastSubUser2}" |docker login --username=${DOCKER_REGISTRY_USER_infrastSubUser2} --password-stdin $repo
 
@@ -25,6 +27,14 @@ case "$cmd" in
         img="docker-headless:$ver-slim"
         docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile .
         docker push $repo/$ns/$img
+        docker tag $repo/$ns/$img $repo/$ns/docker-headless:slim
+        docker push $repo/$ns/docker-headless:slim
+        # dockerHub
+        docker tag $repo/$ns/$img $ns/$img
+        docker push $ns/$img
+        docker tag $ns/$img $ns/docker-headless:slim
+        docker push $ns/docker-headless:slim
+
 
         # AUDIO=true
         img="docker-headless:$ver"
@@ -32,11 +42,23 @@ case "$cmd" in
         docker push $repo/$ns/$img
         docker tag $repo/$ns/$img $repo/$ns/docker-headless:latest #latest
         docker push $repo/$ns/docker-headless:latest
+        # dockerHub
+        docker tag $repo/$ns/$img $ns/$img
+        docker push $ns/$img
+        docker tag $ns/$img $ns/docker-headless:latest
+        docker push $ns/docker-headless:latest
 
         # FULL=/.. #for COPY
         img="docker-headless:$ver-full"
         docker build $cache $pull -t $repo/$ns/$img  --build-arg AUDIO=true --build-arg FULL=/.. -f src/Dockerfile .
         docker push $repo/$ns/$img
+        docker tag $repo/$ns/$img $repo/$ns/docker-headless:full
+        docker push $repo/$ns/docker-headless:full
+        # dockerHub
+        docker tag $repo/$ns/$img $ns/$img
+        docker push $ns/$img
+        docker tag $ns/$img $ns/docker-headless:full
+        docker push $ns/docker-headless:full
         ;;
 esac
 
