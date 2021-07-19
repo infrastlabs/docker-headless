@@ -6,7 +6,7 @@ body{
     background-color: #fff;
     border-radius: 20px;
     width: 300px;
-    height: 550px;
+    height: 450px;
     margin: auto;
     position: absolute;
     top: 0;
@@ -16,9 +16,9 @@ body{
 }
 </style>
 <script type="text/javascript">
-function openVnc(token){
+function openVnc(token, vnctype){
     var pass=document.getElementById('password').value;
-    window.open("/vnc.html?path=websockify/?token="+token+"&password="+pass);
+    window.open("/"+vnctype+".html?path=websockify/?token="+token+"&password="+pass);
     // console.log("/vnc.html?path=websockify/?token=display10&password=");
 }
 </script>

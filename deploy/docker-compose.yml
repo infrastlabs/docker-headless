@@ -2,7 +2,7 @@ version: '2.2'
 services:
   headless:
     # latest, slim, full
-    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:latest
+    image: infrastlabs/docker-headless:full
     container_name: headless
     restart: always
     environment:
@@ -15,6 +15,7 @@ services:
     volumes:
       - /_ext:/_ext
       - /opt:/opt
+      - /:/mnt
     # ports:
     #   - "10089:10089"
     #   - "10081:10081"
