@@ -127,7 +127,7 @@ chansrvport=DISPLAY($N)
         """ > /tmp/xrdp-sesOne$N.conf
 
         # $N atLast
-        local line=$(cat /etc/xrdp/xrdp.ini |grep  "^\[Xvnc\]" -n |cut -d':' -f1)
+        local line=$(cat /etc/xrdp/xrdp.ini |grep  "^\[Local-sesman\]" -n |cut -d':' -f1)
         echo "===line: $line=========================="
         line=$(expr $line - 1)
         # sed -i "${line}cchmod=0770" /etc/xrdp/xrdp.ini
