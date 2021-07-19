@@ -18,6 +18,13 @@
 
 ![](res/08vnc-index2.png)
 
+## Locale
+
+- locale
+- TZ
+
+![zh_CN](res/loc/zh_CN.png)
+
 ## 桌面应用
 
 - IBUS输入法(rime中文)
@@ -25,3 +32,4 @@
 - PAC终端管理器、oh-my-bash增强
 
 ![](res/06full-flameshot.png)
+
