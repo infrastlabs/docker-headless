@@ -1,18 +1,25 @@
 #!/bin/bash
 
 # Ports
+# export VNC_LIMIT=3 VNC_OFFSET=20
 echo "SSH_PORT: $SSH_PORT"     #10022 22
 echo "RDP_PORT: $RDP_PORT"     #10089 3389
-echo "VNC_PORT:  $VNC_PORT"      #10081 6081 # VNC_ENABLE
+echo "VNC_PORT: $VNC_PORT"      #10081 6081 # VNC_ENABLE
+echo "VNC_OFFSET: $VNC_OFFSET"
+echo "VNC_LIMIT: $VNC_LIMIT"
+# Loc
+echo "Lang: $L"
+echo "TZ: $TZ"
 
-sed -i "s/EFRp 22/EFRp ${SSH_PORT}/g" /etc/supervisor/conf.d/xrdp.conf #supervisor.conf +dropbear
-# ubt1804 tcp6: still open @3389
-# sed -i "s^port=3389^port=tcp://:${RDP_PORT}^g" /etc/xrdp/xrdp.ini  #port=tcp://:3389   *:3389 #only ip_v4
+#tpl replace: each revert clean;
+cat /etc/xrdp/xrdp.ini.tpl > /etc/xrdp/xrdp.ini
+cat /usr/local/novnc/index.html.tpl > /usr/local/novnc/index.html
+
+# setPorts
 sed -i "s^port=3389^port=${RDP_PORT}^g" /etc/xrdp/xrdp.ini
-
-#cat sesman.ini |grep ort #ListenPort=3350
 SES_PORT=$(echo "${RDP_PORT%??}50") #ref RDP_PORT, replace last 2 char
 sed -i "s/ListenPort=3350/ListenPort=${SES_PORT}/g" /etc/xrdp/sesman.ini
+sed -i "s/EFRp 22/EFRp ${SSH_PORT}/g" /etc/supervisor/conf.d/xrdp.conf #sv.conf +dropbear
 
 
 # Dump environment variables
@@ -38,8 +45,8 @@ function setVnc0(){
         mkdir -p /etc/novnc
         local port=$(expr 5900 + $N)
         echo "display$N: 127.0.0.1:$port" >> /etc/novnc/token.conf
-        echo "<li><a target=\"_blank\" href=\"/vnc.html?path=websockify/?token=display$N&password=headless\">display$N</a></li>" >> /usr/local/novnc/index.html
-        echo "<li><a target=\"_blank\" href=\"/vnc_lite.html?path=websockify/?token=display$N&password=headless\">display$N-lite</a></li>" >> /usr/local/novnc/index.html
+        echo "<li><a href=\"javascript:void(0);\" onclick=\"openVnc('display$N', 'vnc')\">display$N</a></li>" >> /usr/local/novnc/index.html
+        echo "<li><a href=\"javascript:void(0);\" onclick=\"openVnc('display$N', 'vnc_lite')\">display$N-lite</a></li>" >> /usr/local/novnc/index.html
         echo "<li></li>" >> /usr/local/novnc/index.html
 
         # sv
@@ -81,7 +88,6 @@ chansrvport=DISPLAY($N)
 }
 
 function setVnc(){
-    cat /usr/local/novnc/index.html.tpl > /usr/local/novnc/index.html
     setVnc0; #headless: run with headlessUser
     for ((i=1; i< $VNC_LIMIT; i++)); do #0: left for headless
         local N=$(expr $i + $VNC_OFFSET)
@@ -185,7 +191,4 @@ fi
 # VNC_PASS: ro??
 # echo "passwd" | vncpasswd -f >> /etc/xrdp/vnc_pass; chmod 600 /etc/xrdp/vnc_pass
 echo -e "$VNC_RW\n$VNC_RW\ny\n$VNC_RO\n$VNC_RO"  |vncpasswd /etc/xrdp/vnc_pass; chmod 644 /etc/xrdp/vnc_pass
-
-# rm -f /home/headless/.config/plank/dock1/launchers/*.dockitem;
-su - headless -c "mkdir -p /home/headless/.config/plank/dock1/launchers"
 exec supervisord -n

@@ -164,7 +164,9 @@ RUN echo "welcome! HeadlessBox." > /etc/motd \
     \
     printf '%s\n' 'session required pam_env.so readenv=1' >> /etc/pam.d/xrdp-sesman; \
     sed -i "s^path-exclude /usr/share/locale/\*^# path-exclude /usr/share/locale/\*^g" /etc/dpkg/dpkg.cfg.d/docker; \
-    mkdir -p  /usr/share/man/man1/;
+    mkdir -p  /usr/share/man/man1/; \
+    su - headless -c "mkdir -p /home/headless/.config/plank/dock1/launchers";
+    # rm -f /home/headless/.config/plank/dock1/launchers/*.dockitem;
 
 ##AUDIO###########################
 # Setup D-Bus; ;

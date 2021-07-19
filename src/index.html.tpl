@@ -6,7 +6,7 @@ body{
     background-color: #fff;
     border-radius: 20px;
     width: 300px;
-    height: 350px;
+    height: 550px;
     margin: auto;
     position: absolute;
     top: 0;
@@ -15,10 +15,20 @@ body{
     bottom: 0;
 }
 </style>
-    
+<script type="text/javascript">
+function openVnc(token){
+    var pass=document.getElementById('password').value;
+    window.open("/vnc.html?path=websockify/?token="+token+"&password="+pass);
+    // console.log("/vnc.html?path=websockify/?token=display10&password=");
+}
+</script>
 <body>
 <div class="main">
-    <ul>
+    <div style="margin-top: 8px; margin-left: 22px;">
+        VNC_PASS: <input type="password" id="password" maxlength="20" value="headless"/>
+    </div>
+    <ul style="margin-top: 8px;">
+        <!-- <li><a href="javascript:void(0);" onclick="openVnc('display10')">display0</a></li> -->
         <!-- <li><a target="_blank" href="/vnc.html?path=websockify/?token=display10&password=xx">display0</a></li>
         <li><a target="_blank" href="/vnc_lite.html?path=websockify/?token=display10&password=xx">display0-lite</a></li>
         <li></li>
