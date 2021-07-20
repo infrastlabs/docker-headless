@@ -104,6 +104,11 @@ RUN test -z "$FULL" && exit 0;\
   mv /opt/asbru /usr/local; rm -f /usr/bin/asbru-cm; ln -s /usr/local/asbru/asbru-cm /usr/bin/; \
   cd /usr/share/icons/hicolor/scalable/apps; rm -f asbru-cm.svg; ln -s /usr/local/asbru/res/asbru-logo.svg ./asbru-cm.svg
 
+# Extend
+# wps: libglu1-mesa 168Kb;
+RUN test -z "$FULL" && exit 0;\
+  apt.sh libglu1-mesa;
+
 # moveUp 9.214 MB
 COPY --from=loc /usr/share/locale1/emp${FULL} /usr/share/locale1
 
