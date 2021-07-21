@@ -10,7 +10,8 @@
 - ~~novnc: change_pw, readonly~~; UI:input_pass
 - ~~multi: xvnc0-de +offset;~~ pulsePort_N;
 - ~~bunsen-grey-theme: Papirus-Bunsen-grey~~
-- xrdp_disk_mount @xvnc0
+- ~~xrdp_disk_mount @xvnc0~~
+- novnc: postLogin, tls
 - novnc-audio: ffmpeg?+jsmpeg
 
 **vncpasswd**

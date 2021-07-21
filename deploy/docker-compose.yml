@@ -25,12 +25,3 @@ services:
     network_mode: host
     privileged: true
     shm_size: 1g
-  # de-mate:
-  #   image: x11docker/mate
-  #   # command: mate-session
-  #   restart: always
-  #   links:
-  #     - xserver
-  #   environment:
-  #     - DISPLAY=xserver:1
-  #     - PULSE_SERVER=xserver:47001

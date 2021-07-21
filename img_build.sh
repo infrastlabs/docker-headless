@@ -4,9 +4,6 @@
 
 source /etc/profile
 export |grep DOCKER_REG
-
-repo=docker.io
-echo "${DOCKER_REGISTRY_PW_dockerhub}" |docker login --username=${DOCKER_REGISTRY_USER_dockerhub} --password-stdin $repo
 repo=registry.cn-shenzhen.aliyuncs.com
 echo "${DOCKER_REGISTRY_PW_infrastSubUser2}" |docker login --username=${DOCKER_REGISTRY_USER_infrastSubUser2} --password-stdin $repo
 
@@ -22,6 +19,30 @@ case "$cmd" in
         docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile.compile . 
         docker push $repo/$ns/$img
         ;;
+    hub)
+        repo=docker.io
+        echo "${DOCKER_REGISTRY_PW_dockerhub}" |docker login --username=${DOCKER_REGISTRY_USER_dockerhub} --password-stdin $repo
+        # SLIM
+        img="docker-headless:$ver-slim"
+        docker tag $repo/$ns/$img $ns/$img
+        docker push $ns/$img
+        docker tag $ns/$img $ns/docker-headless:slim
+        docker push $ns/docker-headless:slim
+
+        # AUDIO=true
+        img="docker-headless:$ver"
+        docker tag $repo/$ns/$img $ns/$img
+        docker push $ns/$img
+        docker tag $ns/$img $ns/docker-headless:latest
+        docker push $ns/docker-headless:latest
+
+        # FULL=/.. #for COPY
+        img="docker-headless:$ver-full"
+        docker tag $repo/$ns/$img $ns/$img
+        docker push $ns/$img
+        docker tag $ns/$img $ns/docker-headless:full
+        docker push $ns/docker-headless:full
+        ;;        
     *)
         # SLIM
         img="docker-headless:$ver-slim"
@@ -30,11 +51,10 @@ case "$cmd" in
         docker tag $repo/$ns/$img $repo/$ns/docker-headless:slim
         docker push $repo/$ns/docker-headless:slim
         # dockerHub
-        docker tag $repo/$ns/$img $ns/$img
-        docker push $ns/$img
-        docker tag $ns/$img $ns/docker-headless:slim
-        docker push $ns/docker-headless:slim
-
+        # docker tag $repo/$ns/$img $ns/$img
+        # docker push $ns/$img
+        # docker tag $ns/$img $ns/docker-headless:slim
+        # docker push $ns/docker-headless:slim
 
         # AUDIO=true
         img="docker-headless:$ver"
@@ -43,10 +63,10 @@ case "$cmd" in
         docker tag $repo/$ns/$img $repo/$ns/docker-headless:latest #latest
         docker push $repo/$ns/docker-headless:latest
         # dockerHub
-        docker tag $repo/$ns/$img $ns/$img
-        docker push $ns/$img
-        docker tag $ns/$img $ns/docker-headless:latest
-        docker push $ns/docker-headless:latest
+        # docker tag $repo/$ns/$img $ns/$img
+        # docker push $ns/$img
+        # docker tag $ns/$img $ns/docker-headless:latest
+        # docker push $ns/docker-headless:latest
 
         # FULL=/.. #for COPY
         img="docker-headless:$ver-full"
@@ -55,10 +75,10 @@ case "$cmd" in
         docker tag $repo/$ns/$img $repo/$ns/docker-headless:full
         docker push $repo/$ns/docker-headless:full
         # dockerHub
-        docker tag $repo/$ns/$img $ns/$img
-        docker push $ns/$img
-        docker tag $ns/$img $ns/docker-headless:full
-        docker push $ns/docker-headless:full
+        # docker tag $repo/$ns/$img $ns/$img
+        # docker push $ns/$img
+        # docker tag $ns/$img $ns/docker-headless:full
+        # docker push $ns/docker-headless:full
         ;;
 esac
 
