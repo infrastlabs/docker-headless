@@ -20,24 +20,24 @@ case "$cmd" in
         docker push $repo/$ns/$img
         ;;
     hub)
-        repo=docker.io
-        echo "${DOCKER_REGISTRY_PW_dockerhub}" |docker login --username=${DOCKER_REGISTRY_USER_dockerhub} --password-stdin $repo
+        repoHub=docker.io
+        echo "${DOCKER_REGISTRY_PW_dockerhub}" |docker login --username=${DOCKER_REGISTRY_USER_dockerhub} --password-stdin $repoHub
         # SLIM
-        img="docker-headless:$ver-slim"
+        img="docker-headless:$ver-slim" && echo -e "\n\nimg: $img"
         docker tag $repo/$ns/$img $ns/$img
         docker push $ns/$img
         docker tag $ns/$img $ns/docker-headless:slim
         docker push $ns/docker-headless:slim
 
         # AUDIO=true
-        img="docker-headless:$ver"
+        img="docker-headless:$ver" && echo -e "\n\nimg: $img"
         docker tag $repo/$ns/$img $ns/$img
         docker push $ns/$img
         docker tag $ns/$img $ns/docker-headless:latest
         docker push $ns/docker-headless:latest
 
         # FULL=/.. #for COPY
-        img="docker-headless:$ver-full"
+        img="docker-headless:$ver-full" && echo -e "\n\nimg: $img"
         docker tag $repo/$ns/$img $ns/$img
         docker push $ns/$img
         docker tag $ns/$img $ns/docker-headless:full
