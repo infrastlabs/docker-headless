@@ -18,7 +18,7 @@ body{
 <script type="text/javascript">
 function openVnc(token, vnctype){
     var pass=document.getElementById('password').value;
-    window.open("/"+vnctype+".html?path=websockify/?token="+token+"&password="+pass);
+    window.open("/"+vnctype+".html?path=websockify/?token="+token+"&autoconnect=true&password="+pass);
     // console.log("/vnc.html?path=websockify/?token=display10&password=");
 }
 </script>
