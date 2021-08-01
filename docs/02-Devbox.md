@@ -30,9 +30,9 @@ EOF
 wget https://vscode.cdn.azure.cn/stable/91899dcef7b8110878ea59626991a18c8a6a1b3e/code_1.47.3-1595520028_amd64.deb
 wget https://download.jetbrains.8686c.com/idea/ideaIC-2016.3.8-no-jdk.tar.gz #run with:openjdk8
 #BROWSER|OFFICE
-sudo apt -y install firefox-esr chromium chromium-driver
 # https://blog.csdn.net/u012939880/article/details/89439647 #wps_symbol_fonts.zip
 wget https://wdl1.cache.wps.cn/wps/download/ep/Linux2019/10161/wps-office_11.1.0.10161_amd64.deb
+sudo apt -y install firefox-esr chromium #chromium-driver
 ```
 
 TODO: PIC>> vscode/idea
