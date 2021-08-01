@@ -1,12 +1,13 @@
 # Usage
 
 - [CloudDesktop](01-CloudDesktop.md)
-- [DevBox](02-DevBox.md)
-- [X11-Gateway]()
+- [Devbox](02-Devbox.md)
+- [X11-Gateway](03-Gateway.md)
 - 
+- [b0-locale](b0-locale.md)
 - [b1-rdp](b1-rdp.md)
 - [b2-vnc](b2-vnc.md)
-- [b3-locale](b3-locale.md)
+- [b3-apps](b3-apps.md)
 
 ## Detail
 
