@@ -61,10 +61,16 @@ docker container update --restart=always devbox
 
 **Refs**
 
-- https://github.com/accetto/xubuntu-vnc-novnc #276.52 MB
-- https://github.com/hectorm/docker-xubuntu #633.29 MB
-- https://github.com/ConSol/docker-headless-vnc-container
-- https://github.com/jlesage/docker-firefox
-- https://github.com/fadams/docker-gui #book
-- https://hub.fastgit.org/aerokube/selenoid
+- xubuntu
+  - https://github.com/accetto/xubuntu-vnc-novnc #276.52 MB
+  - https://github.com/hectorm/docker-xubuntu #633.29 MB
+- distros
+  - peppermint: https://peppermintos.com/guide/downloading/
+  - dtx2 https://github.com/gfk-sysenv/dxt2 https://dxt2.co.za
+  - LXLE: https://sourceforge.net/projects/lxle/ #greybird; -compact 
+- headless
+  - https://github.com/ConSol/docker-headless-vnc-container
+  - https://github.com/jlesage/docker-firefox
+  - https://hub.fastgit.org/aerokube/selenoid
+- https://github.com/fadams/docker-gui https://gitee.com/g-system/docker-gui #pdf
 - https://github.com/frxyt/docker-xrdp #DE
