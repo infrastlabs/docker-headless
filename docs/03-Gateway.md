@@ -2,3 +2,10 @@
 
 ![](res/.png)
 
+## DE
+
+- Fluxbox
+- Mate
+- Cinnamon
+- ~~Gnome~~
+- ~~KDE Plasma~~
