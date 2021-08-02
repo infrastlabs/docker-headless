@@ -10,15 +10,7 @@
 
 **Extend**: wps, chrome, firefox
 
-![](res/.png)
+![](res/02/apps-browsers.jpg)
 
-![](res/.png)
-
-![](res/.png)
-
-![](res/.png)
-
-![](res/.png)
-
-![](res/.png)
+![](res/02/apps-office-wps.jpg)
 

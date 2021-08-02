@@ -29,14 +29,25 @@ EOF
 #IDE: vscode, idea-ic
 wget https://vscode.cdn.azure.cn/stable/91899dcef7b8110878ea59626991a18c8a6a1b3e/code_1.47.3-1595520028_amd64.deb
 wget https://download.jetbrains.8686c.com/idea/ideaIC-2016.3.8-no-jdk.tar.gz #run with:openjdk8
+```
+
+![](res/02/ide2-vscode.png)
+
+![](res/02/ide1-idea.png)
+
+## BROWSER|OFFICE
+
+```bash
 #BROWSER|OFFICE
 # https://blog.csdn.net/u012939880/article/details/89439647 #wps_symbol_fonts.zip
 wget https://wdl1.cache.wps.cn/wps/download/ep/Linux2019/10161/wps-office_11.1.0.10161_amd64.deb
 sudo apt -y install firefox-esr chromium #chromium-driver
 ```
 
-TODO: PIC>> vscode/idea
-![](res/.png)
+![](res/02/apps-browsers.jpg)
+
+![](res/02/apps-office-wps.jpg)
+
 
 ## Dind
 
@@ -64,5 +75,6 @@ dcp -v
 
 ```
 
-TODO: PIC>> Dind
-![](res/.png)
+![](res/02/dind1-hostDown.png)
+
+![](res/02/dind2-headlessLinks.png)

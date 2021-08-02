@@ -1,6 +1,6 @@
 # X11-Gateway
 
-![](res/.png)
+![](res/02/x11-gw-fluxbox.png)
 
 ## DE
 
@@ -9,3 +9,9 @@
 - Cinnamon
 - ~~Gnome~~
 - ~~KDE Plasma~~
+
+![](res/.png)
+
+![](res/.png)
+
+![](res/.png)
