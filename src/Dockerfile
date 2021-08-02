@@ -105,9 +105,9 @@ RUN test -z "$FULL" && exit 0;\
   cd /usr/share/icons/hicolor/scalable/apps; rm -f asbru-cm.svg; ln -s /usr/local/asbru/res/asbru-logo.svg ./asbru-cm.svg
 
 # Extend
-# wps: libglu1-mesa 168Kb;
+# wps: libglu1-mesa 168Kb; wps_11.1.0.10161: xdg-utils 71.5 kB;
 RUN test -z "$FULL" && exit 0;\
-  apt.sh libglu1-mesa;
+  apt.sh libglu1-mesa xdg-utils;
 
 # moveUp 9.214 MB
 COPY --from=loc /usr/share/locale1/emp${FULL} /usr/share/locale1
