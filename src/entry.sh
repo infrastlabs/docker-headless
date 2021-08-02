@@ -146,7 +146,7 @@ chansrvport=DISPLAY($N)
 }
 setVnc
 
-# TZ # TZ="Asia/Shanghai"
+# TZ # TZ="Asia/Shanghai" #TZ="Etc/GMT-8"
 echo "${TZ}" >/etc/timezone
 ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime
 

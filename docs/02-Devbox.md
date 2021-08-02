@@ -1,6 +1,6 @@
 # Devbox
 
-## SDK/IDE
+## SDK|IDE
 
 ```bash
 # JAVA
@@ -8,6 +8,7 @@ sudo apt -y install openjdk-8-jdk && sudo apt -y install maven
 
 # GO/NODE
 wget https://studygolang.com/dl/golang/go1.13.15.linux-amd64.tar.gz
+tar -zxf go1.13.15.linux-amd64.tar.gz; mv go go1.13.15.linux-amd64
 wget https://npm.taobao.org/mirrors/node/v14.13.1/node-v14.13.1-linux-x64.tar.xz
 xz -d node-v14.13.1-linux-x64.tar.xz #tar.xz消失
 tar -xvf node-v14.13.1-linux-x64.tar
@@ -27,7 +28,8 @@ export GOPROXY=https://goproxy.cn
 EOF
 
 #IDE: vscode, idea-ic
-wget https://vscode.cdn.azure.cn/stable/91899dcef7b8110878ea59626991a18c8a6a1b3e/code_1.47.3-1595520028_amd64.deb
+# wget https://vscode.cdn.azure.cn/stable/91899dcef7b8110878ea59626991a18c8a6a1b3e/code_1.47.3-1595520028_amd64.deb
+wget https://vscode.cdn.azure.cn/stable/c3f126316369cd610563c75b1b1725e0679adfb3/code_1.58.2-1626302803_amd64.deb #org's down, replace domain to azure.
 wget https://download.jetbrains.8686c.com/idea/ideaIC-2016.3.8-no-jdk.tar.gz #run with:openjdk8
 ```
 
@@ -36,6 +38,8 @@ wget https://download.jetbrains.8686c.com/idea/ideaIC-2016.3.8-no-jdk.tar.gz #ru
 ![](res/02/ide1-idea.png)
 
 ## BROWSER|OFFICE
+
+wps, chrome/firefox
 
 ```bash
 #BROWSER|OFFICE

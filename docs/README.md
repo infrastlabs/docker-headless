@@ -1,13 +1,8 @@
 # Usage
 
-- [CloudDesktop](01-CloudDesktop.md)
-- [Devbox](02-Devbox.md)
-- [X11-Gateway](03-Gateway.md)
-- 
-- [b0-locale](b0-locale.md)
-- [b1-rdp](b1-rdp.md)
-- [b2-vnc](b2-vnc.md)
-- [b3-apps](b3-apps.md)
+- [CloudDesktop](01-CloudDesktop.md) RDP/VNC/LOCALE/APPS
+- [Devbox](02-Devbox.md) SDK|IDE BROWSER|OFFICE Dind
+- [X11-Gateway](03-Gateway.md) Gateway DE
 
 ## Detail
 

@@ -1,16 +1,15 @@
 # DesktopApps
 
-**Base**: ibus, flameshot, PAC
+## IBUS
 
 ![](res/05full-ibusRime.png)
 
+## Flameshot
+
 ![](res/06full-flameshot.png)
+
+## PAC
 
 ![](res/07full-pac,ohmybash2.png)
 
-**Extend**: wps, chrome, firefox
-
-![](res/02/apps-browsers.jpg)
-
-![](res/02/apps-office-wps.jpg)
 
