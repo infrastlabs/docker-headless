@@ -1,0 +1,3 @@
+FROM infrastlabs/docker-headless:latest
+RUN apt.sh fonts-wqy-zenhei;
+RUN apt update; apt -y install chromium; 
