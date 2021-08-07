@@ -193,10 +193,14 @@ if [ ! -z "$(dpkg -l |grep locales)" ]; then #if locale installed. ##which local
     test -z "$L" && setLocale_en_US || setLocale
 fi
 
-# SSH_PASS, SSH_PASS, SSH_PASS_RO
+# SSH_PASS VNC_PASS VNC_PASS_RO
 echo "headless:$SSH_PASS" |chpasswd
 # echo "passwd" | vncpasswd -f >> /etc/xrdp/vnc_pass; chmod 600 /etc/xrdp/vnc_pass
 echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |vncpasswd /etc/xrdp/vnc_pass; chmod 644 /etc/xrdp/vnc_pass
+unset SSH_PASS VNC_PASS VNC_PASS_RO #unset, not show in desktopEnv.
+# env | grep -Ev '^(.*PASS.*|PWD|OLDPWD|HOME|USER|SHELL|TERM|([^=]*(PASSWORD|SECRET)[^=]*))=' \
+#  |grep -v "LOC_\|DEBIAN_FRONTEND"
+unset LOC_XFCE LOC_APPS LOC_APPS2 DEBIAN_FRONTEND
 
 # novnc ssl-only: each restart change.
 # https://hub.fastgit.org/novnc/websockify #README

@@ -17,13 +17,13 @@ By `XRDP/NOVNC` with `XFCE4` based on `Debian`, Formatting a HeadlessBox/Cloud D
 
 **QuickStart**
 
-example1: `docker run -it --rm --shm-size 1g --net=host infrastlabs/docker-headless:full`, Caution: non-production usage!!
+example1: `docker run -it --rm --shm-size 1g --net=host infrastlabs/docker-headless`, Caution: non-production usage!!
 
 - Browser(novnc): https://localhost:10081 #VNC_PASS: `headless`, VNC_PASS_RO: `View123`
 - Mstsc(rdp): `localhost 10089` #VNC_PASS: `headless`
 - Putty(ssh): `ssh -p 10022 headless@localhost` #SSH_PASS: `headless`
 
-![](docs/res/design-MultiBox.png)
+![](https://gitee.com/infrastlabs/docker-headless/raw/dev/docs/res/design-MultiBox.png)
 
 ```bash
 # example2: SSH_PASS=ChangeMe1, VNC_PASS=ChangeMe2, VNC_PASS_RO=ChangeMe3
