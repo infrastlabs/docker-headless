@@ -45,8 +45,8 @@ function setVnc0(){
         mkdir -p /etc/novnc
         local port=$(expr 5900 + $N)
         echo "display$N: 127.0.0.1:$port" >> /etc/novnc/token.conf
-        echo "<li><a href=\"javascript:void(0);\" onclick=\"openVnc('display$N', 'vnc')\">display$N</a></li>" >> /usr/local/novnc/index.html
         echo "<li><a href=\"javascript:void(0);\" onclick=\"openVnc('display$N', 'vnc_lite')\">display$N-lite</a></li>" >> /usr/local/novnc/index.html
+        echo "<li><a href=\"javascript:void(0);\" onclick=\"openVnc('display$N', 'vnc')\">display$N-resize</a></li>" >> /usr/local/novnc/index.html
         echo "<li></li>" >> /usr/local/novnc/index.html
 
         # sv
@@ -103,8 +103,8 @@ function setVnc(){
         mkdir -p /etc/novnc
         local port=$(expr 5900 + $N)
         echo "display$N: 127.0.0.1:$port" >> /etc/novnc/token.conf
-        echo "<li><a target=\"_blank\" href=\"/vnc.html?path=websockify/?token=display$N&password=headless\">display$N</a></li>" >> /usr/local/novnc/index.html
         echo "<li><a target=\"_blank\" href=\"/vnc_lite.html?path=websockify/?token=display$N&password=headless\">display$N-lite</a></li>" >> /usr/local/novnc/index.html
+        echo "<li><a target=\"_blank\" href=\"/vnc.html?path=websockify/?token=display$N&password=headless\">display$N-resize</a></li>" >> /usr/local/novnc/index.html
         echo "<li></li>" >> /usr/local/novnc/index.html
 
         # sv
@@ -144,8 +144,10 @@ chansrvport=DISPLAY($N)
     cat /etc/xrdp/xrdp.ini |grep "^\[Xvnc"
 
     # clearPass: if not default
-    sed -i "s/password=askheadless/password=ask/g" /etc/xrdp/xrdp.ini
-    sed -i "s/value=\"headless\"/value=\"\"/g" /usr/local/novnc/index.html
+    if [ "headless" != "$VNC_PASS" ]; then
+        sed -i "s/password=askheadless/password=ask/g" /etc/xrdp/xrdp.ini
+        sed -i "s/value=\"headless\"/value=\"\"/g" /usr/local/novnc/index.html
+    fi
 }
 setVnc
 
@@ -195,6 +197,16 @@ fi
 echo "headless:$SSH_PASS" |chpasswd
 # echo "passwd" | vncpasswd -f >> /etc/xrdp/vnc_pass; chmod 600 /etc/xrdp/vnc_pass
 echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |vncpasswd /etc/xrdp/vnc_pass; chmod 644 /etc/xrdp/vnc_pass
+
+# novnc ssl-only: each restart change.
+# https://hub.fastgit.org/novnc/websockify #README
+# /bin/bash /usr/local/novnc/utils/websockify/run 10081 --web /usr/local/novnc --target-config=/etc/novnc/token.conf --cert=/etc/novnc/self.pem --ssl-only
+# openssl req -new -x509 -days 3650 -nodes -out /etc/novnc/self.pem -keyout /etc/novnc/self.pem
+# Ref: https://blog.csdn.net/silentpebble/article/details/36423753
+# openssl req -new -x509 -days 3650 -nodes -subj "/C=CA/ST=CA/L=CA/O=CA/OU=CA/CN=CA" -config cert.cnf -out webserver.pem -keyout webserver.pem
+# openssl x509 -subject -dates -fingerprint -noout -in webserver.pem
+rq=`date +%Y%m%d_%H%M%S`
+openssl req -new -x509 -days 3650 -nodes -subj "/C=CA/ST=CA2/L=CA3/O=headless@docker/OU=update@$rq/CN=headless" -out /etc/novnc/self.pem -keyout /etc/novnc/self.pem
 
 # sv
 echo -e "\n\n\nStarting..." && sleep 2
