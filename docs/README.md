@@ -9,14 +9,15 @@
 **Env**
 
 ```bash
-# ENV (default); VNC_RW=headless, VNC_RO=View123; 
+# ENV (default); SSH_PASS=headless, VNC_PASS=headless, VNC_PASS_RO=View123; 
   SSH_PORT=10022 \
   RDP_PORT=10089 \
   VNC_PORT=10081 \
+  SSH_PASS=headless \
+  VNC_PASS=headless \
+  VNC_PASS_RO=View123
   # L=zh_CN \ 
-  TZ=Asia/Shanghai \
-  VNC_RW=headless \
-  VNC_RO=View123
+  TZ=Asia/Shanghai
 ```
 
 **Apps**

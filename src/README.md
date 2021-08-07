@@ -23,4 +23,5 @@
 apt.sh tigervnc-common #66.6 kB
 echo -e "123456a\n123456a\ny\n345678\n345678"  |vncpasswd vnc_pass2
 
+# Xvnc: -BlacklistThreshold=3 -BlacklistTimeout=1
 ```

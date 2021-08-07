@@ -135,12 +135,14 @@ ENV \
   SSH_PORT=10022 \
   RDP_PORT=10089 \
   VNC_PORT=10081 \
+  # HEADLESS=headless \ #just static username.
+  SSH_PASS=headless \
+  VNC_PASS=headless \
+  VNC_PASS_RO=View123 \
   VNC_OFFSET=0 \
   VNC_LIMIT=1 \
-  # L=zh_CN
-  TZ=Asia/Shanghai \
-  VNC_RW=headless \
-  VNC_RO=View123
+  # L=zh_CN \
+  TZ=Asia/Shanghai
 
 
 # +headless

@@ -10,7 +10,7 @@ echo "${DOCKER_REGISTRY_PW_infrastSubUser2}" |docker login --username=${DOCKER_R
 ns=infrastlabs
 # cache="--no-cache"
 # pull="--pull"
-ver=box06 #02: +full; 04: bins;
+ver=box07 #02: +full; 04: bins;
 
 cmd="$1"
 case "$cmd" in
@@ -45,7 +45,7 @@ case "$cmd" in
         ;;        
     *)
         # SLIM
-        img="docker-headless:$ver-slim"
+        img="docker-headless:$ver-slim" && echo -e "\n\nimg: $img"
         docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile .
         docker push $repo/$ns/$img
         docker tag $repo/$ns/$img $repo/$ns/docker-headless:slim
@@ -57,7 +57,7 @@ case "$cmd" in
         # docker push $ns/docker-headless:slim
 
         # AUDIO=true
-        img="docker-headless:$ver"
+        img="docker-headless:$ver" && echo -e "\n\nimg: $img"
         docker build $cache $pull -t $repo/$ns/$img  --build-arg AUDIO=true -f src/Dockerfile .
         docker push $repo/$ns/$img
         docker tag $repo/$ns/$img $repo/$ns/docker-headless:latest #latest
@@ -69,7 +69,7 @@ case "$cmd" in
         # docker push $ns/docker-headless:latest
 
         # FULL=/.. #for COPY
-        img="docker-headless:$ver-full"
+        img="docker-headless:$ver-full" && echo -e "\n\nimg: $img"
         docker build $cache $pull -t $repo/$ns/$img  --build-arg AUDIO=true --build-arg FULL=/.. -f src/Dockerfile .
         docker push $repo/$ns/$img
         docker tag $repo/$ns/$img $repo/$ns/docker-headless:full

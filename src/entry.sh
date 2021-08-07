@@ -25,7 +25,7 @@ sed -i "s/EFRp 22/EFRp ${SSH_PORT}/g" /etc/supervisor/conf.d/xrdp.conf #sv.conf 
 # Dump environment variables
 # https://hub.fastgit.org/hectorm/docker-xubuntu/blob/master/scripts/bin/container-init
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-env | grep -Ev '^(PWD|OLDPWD|HOME|USER|SHELL|TERM|([^=]*(PASSWORD|SECRET)[^=]*))=' \
+env | grep -Ev '^(.*PASS.*|PWD|OLDPWD|HOME|USER|SHELL|TERM|([^=]*(PASSWORD|SECRET)[^=]*))=' \
  |grep -v "LOC_\|DEBIAN_FRONTEND" | sort > /etc/environment
 # # Make sesman read environment variables
 # RUN printf '%s\n' 'session required pam_env.so readenv=1' >> /etc/pam.d/xrdp-sesman
@@ -143,6 +143,9 @@ chansrvport=DISPLAY($N)
     rm -f /tmp/xrdp-sesOne*.conf
     cat /etc/xrdp/xrdp.ini |grep "^\[Xvnc"
 
+    # clearPass: if not default
+    sed -i "s/password=askheadless/password=ask/g" /etc/xrdp/xrdp.ini
+    sed -i "s/value=\"headless\"/value=\"\"/g" /usr/local/novnc/index.html
 }
 setVnc
 
@@ -188,7 +191,11 @@ if [ ! -z "$(dpkg -l |grep locales)" ]; then #if locale installed. ##which local
     test -z "$L" && setLocale_en_US || setLocale
 fi
 
-# VNC_PASS: ro??
+# SSH_PASS, SSH_PASS, SSH_PASS_RO
+echo "headless:$SSH_PASS" |chpasswd
 # echo "passwd" | vncpasswd -f >> /etc/xrdp/vnc_pass; chmod 600 /etc/xrdp/vnc_pass
-echo -e "$VNC_RW\n$VNC_RW\ny\n$VNC_RO\n$VNC_RO"  |vncpasswd /etc/xrdp/vnc_pass; chmod 644 /etc/xrdp/vnc_pass
+echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |vncpasswd /etc/xrdp/vnc_pass; chmod 644 /etc/xrdp/vnc_pass
+
+# sv
+echo -e "\n\n\nStarting..." && sleep 2
 exec supervisord -n

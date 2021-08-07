@@ -26,18 +26,17 @@ By `XRDP/NOVNC` with `XFCE4` based on `Debian`, Formatting a HeadlessBox/Cloud D
 **QuickStart**
 
 ```bash
-# example1: quickStart
+# example1: quickStart, default: SSH_PASS=headless, VNC_PASS=headless, VNC_PASS_RO=View123
 docker run -it --rm --shm-size 1g --net=host infrastlabs/docker-headless:full
 
-# example2: VNC_RW=ChangeMe, VNC_RO=View123
-# Caution: Please change the SSHPass when the Box started!!!
+# example2: SSH_PASS=ChangeMe1, VNC_PASS=ChangeMe2, VNC_PASS_RO=ChangeMe3
 vols="""
 -v /_ext:/_ext 
 -v /opt:/opt 
 -v /var/run/docker.sock:/var/run/docker.sock
 """
 docker run -d --name=devbox --privileged --shm-size 1g --net=host \
- -e L=zh_CN -e VNC_RW=ChangeMe -e VNC_RO=View123 $vols infrastlabs/docker-headless:full
+ -e L=zh_CN -e SSH_PASS=ChangeMe1 -e VNC_PASS=ChangeMe2 -e VNC_PASS_RO=ChangeMe3 $vols infrastlabs/docker-headless:full
 
 # 290.545 MB
 docker container update --restart=always devbox
@@ -46,7 +45,7 @@ docker container update --restart=always devbox
 **Detail**
 
 - Size: latest: `168.347 MB`, slim: `88.929 MB`, full: `289.581 MB`
-- User: `headless`, SSHPass: `headless`, VNCPass: `headless`
+- User: `headless`, SSHPass: `headless`, VNCPass: `headless`, VNCPassReadOnly: `View123`
 - Ports
   - novnc 6080 > 10081
   - xrdp  3389 > 10089

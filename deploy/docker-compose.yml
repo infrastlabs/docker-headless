@@ -6,8 +6,9 @@ services:
     container_name: headless
     restart: always
     environment:
-      - VNC_RW=headless
-      - VNC_RO=View123
+      - SSH_PASS=headless
+      - VNC_PASS=headless
+      - VNC_PASS_RO=View123
       # - VNC_OFFSET=0
       # - VNC_LIMIT=3
       - TZ=Asia/Shanghai
