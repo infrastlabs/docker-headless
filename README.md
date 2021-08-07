@@ -15,15 +15,15 @@ By `XRDP/NOVNC` with `XFCE4` based on `Debian`, Formatting a HeadlessBox/Cloud D
 - Locale/TZ support.
 - Desktop apps: ibus-rime, flameshot, PAC.
 
-![](https://gitee.com/infrastlabs/docker-headless/raw/dev/docs/res/01rdp-double-screen.png)
-
 **QuickStart**
 
-example1: `docker run -it --rm --shm-size 1g --net=host infrastlabs/docker-headless:full`
+example1: `docker run -it --rm --shm-size 1g --net=host infrastlabs/docker-headless:full`, Caution: non-production usage!!
 
-- browser(noVnc): https://localhost:10081 #VNC_PASS: `headless`, VNC_PASS_RO: `View123`
-- mstsc(rdp): `localhost 10089` #VNC_PASS: `headless`
-- ssh: `ssh -p 10022 headless@localhost` #SSH_PASS: `headless`
+- Browser(novnc): https://localhost:10081 #VNC_PASS: `headless`, VNC_PASS_RO: `View123`
+- Mstsc(rdp): `localhost 10089` #VNC_PASS: `headless`
+- Putty(ssh): `ssh -p 10022 headless@localhost` #SSH_PASS: `headless`
+
+![](docs/res/design-MultiBox.png)
 
 ```bash
 # example2: SSH_PASS=ChangeMe1, VNC_PASS=ChangeMe2, VNC_PASS_RO=ChangeMe3
@@ -38,6 +38,8 @@ docker run -d --name=devbox --privileged --shm-size 1g --net=host \
 # 290.545 MB
 docker container update --restart=always devbox
 ```
+
+![](https://gitee.com/infrastlabs/docker-headless/raw/dev/docs/res/01rdp-double-screen.png)
 
 **Usage**
 
