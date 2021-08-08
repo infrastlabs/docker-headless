@@ -30,17 +30,19 @@ env | grep -Ev '^(.*PASS.*|PWD|OLDPWD|HOME|USER|SHELL|TERM|([^=]*(PASSWORD|SECRE
 # # Make sesman read environment variables
 # RUN printf '%s\n' 'session required pam_env.so readenv=1' >> /etc/pam.d/xrdp-sesman
 
-function setVnc0(){
-    for ((i=0; i< 1; i++)); do #0: left for headless
+function setVnc(){
+    for ((i=0; i< $VNC_LIMIT; i++)); do #0: left for headless
+        test "$i" == "0" && name1="-headless" || name1=""
         local N=$(expr $i + $VNC_OFFSET)
-        echo "setVnc_N: $N (headless)"
+        echo "setVnc_N: $N$name1"
 
-        # # createUser
-        # #drop /etc/skel; TODO2: user recreat?
-        # echo "SKEL=/etc/skel2" >> /etc/default/useradd
-        # useradd -ms /usr/sbin/nologin xvnc$N;
-        # sed -i "s^SKEL=/etc/skel2^# SKEL=/etc/skel2^g" /etc/default/useradd
-
+        # createUser
+        if [ "$i" != "0" ]; then
+            #drop /etc/skel; TODO2: user recreat?
+            echo "SKEL=/etc/skel2" >> /etc/default/useradd
+            useradd -ms /usr/sbin/nologin xvnc$N;
+            sed -i "s^SKEL=/etc/skel2^# SKEL=/etc/skel2^g" /etc/default/useradd
+        fi
         # genTpl<sv, index.html, xrdp>
         mkdir -p /etc/novnc
         local port=$(expr 5900 + $N)
@@ -50,22 +52,22 @@ function setVnc0(){
         echo "<li></li>" >> /usr/local/novnc/index.html
 
         # sv
+        test "$i" == "0" && user1=headless || user1=xvnc$N
         echo """
-[program:xvnc$N-headless]
-environment=DISPLAY=:$N,HOME=/home/headless
+[program:xvnc$N$name1]
+environment=DISPLAY=:$N,HOME=/home/$user1
 priority=35
-user=headless
+user=$user1
 command=/xvnc.sh :$N
 stdout_logfile=/dev/fd/1
 stdout_logfile_maxbytes=0
 redirect_stderr=true
-
         """ > /etc/supervisor/conf.d/xvnc$N.conf
 
         # xrdp
         echo """
-[Xvnc$N-headless]
-name=Xvnc$N-headless
+[Xvnc$N$name1]
+name=Xvnc$N$name1
 lib=libvnc.so
 username=asknoUser
 password=askheadless
@@ -73,65 +75,6 @@ ip=127.0.0.1
 port=$port
 chansrvport=DISPLAY($N)
         """ > /tmp/xrdp-sesOne$N.conf
-
-        # $N atLast
-        local line=$(cat /etc/xrdp/xrdp.ini |grep  "^\[Local-sesman\]" -n |cut -d':' -f1)
-        echo "===line: $line=========================="
-        line=$(expr $line - 1)
-        # sed -i "${line}cchmod=0770" /etc/xrdp/xrdp.ini
-        sed -i "$line r /tmp/xrdp-sesOne$N.conf" /etc/xrdp/xrdp.ini
-    done
-
-    # xvnc0-de
-    local port2=$(expr 0 + $VNC_OFFSET)
-    sed -i "s/DISPLAY=\:0/DISPLAY=\:$port2/" /etc/supervisor/conf.d/xrdp.conf
-}
-
-function setVnc(){
-    setVnc0; #headless: run with headlessUser
-    for ((i=1; i< $VNC_LIMIT; i++)); do #0: left for headless
-        local N=$(expr $i + $VNC_OFFSET)
-        echo "setVnc_N: $N"
-
-        # createUser
-        #drop /etc/skel; TODO2: user recreat?
-        echo "SKEL=/etc/skel2" >> /etc/default/useradd
-        useradd -ms /usr/sbin/nologin xvnc$N;
-        sed -i "s^SKEL=/etc/skel2^# SKEL=/etc/skel2^g" /etc/default/useradd
-
-        # genTpl<sv, index.html, xrdp>
-        mkdir -p /etc/novnc
-        local port=$(expr 5900 + $N)
-        echo "display$N: 127.0.0.1:$port" >> /etc/novnc/token.conf
-        echo "<li><a target=\"_blank\" href=\"/vnc_lite.html?path=websockify/?token=display$N&password=headless\">display$N-lite</a></li>" >> /usr/local/novnc/index.html
-        echo "<li><a target=\"_blank\" href=\"/vnc.html?path=websockify/?token=display$N&password=headless\">display$N-resize</a></li>" >> /usr/local/novnc/index.html
-        echo "<li></li>" >> /usr/local/novnc/index.html
-
-        # sv
-        echo """
-[program:xvnc$N]
-environment=DISPLAY=:$N,HOME=/home/xvnc$N
-priority=35
-user=xvnc$N
-command=/xvnc.sh :$N
-stdout_logfile=/dev/fd/1
-stdout_logfile_maxbytes=0
-redirect_stderr=true
-
-        """ > /etc/supervisor/conf.d/xvnc$N.conf
-
-        # xrdp
-        echo """
-[Xvnc$N]
-name=Xvnc$N
-lib=libvnc.so
-username=asknoUser
-password=askheadless
-ip=127.0.0.1
-port=$port
-chansrvport=DISPLAY($N)
-        """ > /tmp/xrdp-sesOne$N.conf
-
         # $N atLast
         local line=$(cat /etc/xrdp/xrdp.ini |grep  "^\[Local-sesman\]" -n |cut -d':' -f1)
         echo "===line: $line=========================="
@@ -143,6 +86,10 @@ chansrvport=DISPLAY($N)
     rm -f /tmp/xrdp-sesOne*.conf
     cat /etc/xrdp/xrdp.ini |grep "^\[Xvnc"
 
+    # xvnc0-de
+    local port2=$(expr 0 + $VNC_OFFSET)
+    sed -i "s/DISPLAY=\:0/DISPLAY=\:$port2/" /etc/supervisor/conf.d/xrdp.conf
+    
     # clearPass: if not default
     if [ "headless" != "$VNC_PASS" ]; then
         sed -i "s/password=askheadless/password=ask/g" /etc/xrdp/xrdp.ini
@@ -151,16 +98,16 @@ chansrvport=DISPLAY($N)
 }
 setVnc
 
-# TZ # TZ="Asia/Shanghai" #TZ="Etc/GMT-8"
-echo "${TZ}" >/etc/timezone
-ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime
-
 function setLocale(){
-    env |grep "TZ\|^L="
     # L="zh_CN" ##${L##*.} > zh_CN
     # LANG="zh_CN.UTF-8" #lang_area.charset
-    charset=${L##*.}; test "$charset" == "$L" && charset="UTF-8" || echo "charset: $charset"
-    lang_area=${L%%.*}
+    if [ -z "$L" ]; then
+        charset="UTF-8"
+        lang_area="en_US"
+    else
+        charset=${L##*.}; test "$charset" == "$L" && charset="UTF-8" || echo "charset: $charset"
+        lang_area=${L%%.*}
+    fi
     export LANG=${lang_area}.${charset}
     export LANGUAGE=${lang_area}:en #default> en
     echo "====LANG: $LANG, LANGUAGE: $LANGUAGE=========================="
@@ -171,46 +118,38 @@ function setLocale(){
     sed -i -e "s/# ${LANG} ${charset}/${LANG} ${charset}/" /etc/locale.gen
     locale-gen ${LANG}
     update-locale LANG=${LANG} LANGUAGE=${LANGUAGE}
-    # echo "# " > /etc/default/locale;
 
     echo "==[locale -a]===================================="
     locale -a
     cat /etc/default/locale
     # sleep 2
 }
-function setLocale_en_US(){
-    charset="UTF-8"
-    lang_area="en_US"
-    export LANG=${lang_area}.${charset}
-    export LANGUAGE=${lang_area}:en #default> en
-
-    # LOCALE
-    sed -i -e "s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
-    locale-gen ${LANG}
-    update-locale LANG=${LANG} LANGUAGE=${LANGUAGE}
-}
+# TZ # TZ="Asia/Shanghai" #TZ="Etc/GMT-8"
+env |grep "TZ\|^L="
+echo "${TZ}" >/etc/timezone
+ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime
 if [ ! -z "$(dpkg -l |grep locales)" ]; then #if locale installed. ##which locale exist.
-    test -z "$L" && setLocale_en_US || setLocale
+    setLocale
 fi
 
 # SSH_PASS VNC_PASS VNC_PASS_RO
 echo "headless:$SSH_PASS" |chpasswd
-# echo "passwd" | vncpasswd -f >> /etc/xrdp/vnc_pass; chmod 600 /etc/xrdp/vnc_pass
 echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |vncpasswd /etc/xrdp/vnc_pass; chmod 644 /etc/xrdp/vnc_pass
+echo "" #newLine
 unset SSH_PASS VNC_PASS VNC_PASS_RO #unset, not show in desktopEnv.
-# env | grep -Ev '^(.*PASS.*|PWD|OLDPWD|HOME|USER|SHELL|TERM|([^=]*(PASSWORD|SECRET)[^=]*))=' \
-#  |grep -v "LOC_\|DEBIAN_FRONTEND"
 unset LOC_XFCE LOC_APPS LOC_APPS2 DEBIAN_FRONTEND
 
 # novnc ssl-only: each restart change.
-# https://hub.fastgit.org/novnc/websockify #README
 # /bin/bash /usr/local/novnc/utils/websockify/run 10081 --web /usr/local/novnc --target-config=/etc/novnc/token.conf --cert=/etc/novnc/self.pem --ssl-only
-# openssl req -new -x509 -days 3650 -nodes -out /etc/novnc/self.pem -keyout /etc/novnc/self.pem
-# Ref: https://blog.csdn.net/silentpebble/article/details/36423753
-# openssl req -new -x509 -days 3650 -nodes -subj "/C=CA/ST=CA/L=CA/O=CA/OU=CA/CN=CA" -config cert.cnf -out webserver.pem -keyout webserver.pem
-# openssl x509 -subject -dates -fingerprint -noout -in webserver.pem
-rq=`date +%Y%m%d_%H%M%S`
-openssl req -new -x509 -days 3650 -nodes -subj "/C=CA/ST=CA2/L=CA3/O=headless@docker/OU=update@$rq/CN=headless" -out /etc/novnc/self.pem -keyout /etc/novnc/self.pem
+# Ref1: https://hub.fastgit.org/novnc/websockify #README
+# Ref2: https://blog.csdn.net/silentpebble/article/details/36423753
+if [ -z "$VNC_CERT" ]; then
+    rq=`date +%Y%m%d_%H%M%S`
+    openssl req -new -x509 -days 3650 -nodes -subj "/C=CA/ST=CA2/L=CA3/O=headless@docker/OU=update@$rq/CN=headless" -out /etc/novnc/self.pem -keyout /etc/novnc/self.pem
+else
+    echo "use special cert: $VNC_CERT"
+    test -f "$VNC_CERT" && cat "$VNC_CERT" > /etc/novnc/self.pem || echo "WARN: cert not exist, skip(use the image's default cert)"
+fi
 
 # sv
 echo -e "\n\n\nStarting..." && sleep 2

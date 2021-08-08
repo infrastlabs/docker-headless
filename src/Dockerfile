@@ -140,6 +140,7 @@ ENV \
   SSH_PASS=headless \
   VNC_PASS=headless \
   VNC_PASS_RO=View123 \
+  VNC_CERT= \
   VNC_OFFSET=0 \
   VNC_LIMIT=1 \
   # L=zh_CN \
@@ -161,7 +162,9 @@ RUN useradd -mp j9X2HRQvPCphA -s /bin/bash -G sudo headless \
   \
   line=$(cat /etc/supervisor/supervisord.conf |grep  "^chmod=0700" -n |cut -d':' -f1); \
   sed -i "${line}cchmod=0770" /etc/supervisor/supervisord.conf; \
-  sed -i "${line}achown=headless:headless" /etc/supervisor/supervisord.conf; 
+  sed -i "${line}achown=headless:headless" /etc/supervisor/supervisord.conf; \
+  mkdir -p /etc/novnc; rq=`date +%Y%m%d_%H%M%S`; openssl req -new -x509 -days 3650 -nodes -subj "/C=CA/ST=CA2/L=CA3/O=headless@docker/OU=update@image_$rq/CN=headless" -out /etc/novnc/self.pem -keyout /etc/novnc/self.pem;
+
 # +002
 # Make sesman read environment variables
 # locale>xx.mo: dpkg conf, use debian's tpl.

@@ -44,7 +44,7 @@ docker container update --restart=always devbox
 **Usage**
 
 - [CloudDesktop](docs/01-CloudDesktop.md) RDP/VNC/LOCALE/APPS
-- [Devbox](docs/02-Devbox.md) SDK|IDE BROWSER|OFFICE Dind
+- [Devbox](docs/02-Devbox.md) ENV/IDE BROWSER/OFFICE Dind
 - [X11-Gateway](docs/03-Gateway.md) Gateway DE
 
 **Detail**
@@ -52,7 +52,7 @@ docker container update --restart=always devbox
 - Size: latest: `168.347 MB`, slim: `88.929 MB`, full: `289.581 MB`
 - User: `headless`, SSHPass: `headless`, VNCPass: `headless`, VNCPassReadOnly: `View123`
 - Ports
-  - novnc 6080 > 10081 (https)
+  - novnc 6080 > 10081 (http+https)
   - xrdp  3389 > 10089
   - sshd  22   > 10022
 - HotKeys `super: Alt`

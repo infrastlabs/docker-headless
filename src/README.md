@@ -11,7 +11,8 @@
 - ~~multi: xvnc0-de +offset;~~ pulsePort_N;
 - ~~bunsen-grey-theme: Papirus-Bunsen-grey~~
 - ~~xrdp_disk_mount @xvnc0~~
-- novnc: postLogin, ~~tls~~
+- ~~novnc: postLogin(curPage not support), tls~~
+- multi pulse; 4713 > 4701, 02, 03..
 - novnc-audio: ffmpeg?+jsmpeg
 
 **vncpasswd**
@@ -24,4 +25,5 @@ apt.sh tigervnc-common #66.6 kB
 echo -e "123456a\n123456a\ny\n345678\n345678"  |vncpasswd vnc_pass2
 
 # Xvnc: -BlacklistThreshold=3 -BlacklistTimeout=1
+# xrdp-disk-mount: --privileged; or: moprobe fuse err.
 ```

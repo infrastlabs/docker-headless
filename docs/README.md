@@ -16,6 +16,7 @@
   SSH_PASS=headless \
   VNC_PASS=headless \
   VNC_PASS_RO=View123
+  VNC_CERT= \
   # L=zh_CN \ 
   TZ=Asia/Shanghai
 ```
