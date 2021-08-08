@@ -38,6 +38,7 @@ RUN apt.sh \
   bash -c "rm -rf /usr/share/fluxbox{nls,styles}";
 
 # NOVNC +1.352 MB; clear: 6.5M > 5.4M
+# TODO +package.json: ui.js >> packageInfo.version
 RUN export NO_VNC_HOME="/usr/local/novnc"; \
   mkdir -p ${NO_VNC_HOME}/utils/websockify \ 
   && wget -qO- https://github.com.cnpmjs.org/novnc/noVNC/archive/v1.2.0.tar.gz | tar xz --strip 1 -C ${NO_VNC_HOME} \
@@ -126,7 +127,7 @@ ADD src/dot /etc/skel
 ADD src/etc /etc
 ADD src/*.sh /
 ADD src/xrdp.conf /etc/supervisor/conf.d/xrdp.conf
-ADD src/index.html.tpl /usr/local/novnc/index.html.tpl
+ADD src/index.tpl.html /usr/local/novnc/index.tpl.html
 Add src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
 
 # stterm: TERM="xterm|vt100"

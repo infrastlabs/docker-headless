@@ -13,7 +13,7 @@ echo "TZ: $TZ"
 
 #tpl replace: each revert clean;
 cat /etc/xrdp/xrdp.ini.tpl > /etc/xrdp/xrdp.ini
-cat /usr/local/novnc/index.html.tpl > /usr/local/novnc/index.html
+cat /usr/local/novnc/index.tpl.html > /usr/local/novnc/index.html
 
 # setPorts
 sed -i "s^port=3389^port=${RDP_PORT}^g" /etc/xrdp/xrdp.ini
