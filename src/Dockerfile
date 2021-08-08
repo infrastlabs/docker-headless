@@ -183,7 +183,8 @@ RUN test -z "$AUDIO" && exit 0;\
   dbus-uuidgen > /etc/machine-id; \
   ln -sf /etc/machine-id /var/lib/dbus/machine-id; \
   \
-  cd /home/headless/.qmmp/skins/; unzip Dark_Materia.wsz; chmod 755 -R darkmateria;
+  cd /home/headless/.qmmp/skins/; unzip Dark_Materia.wsz; chmod 755 -R darkmateria; \
+  wget -qO /usr/share/backgrounds/xfce/xfce-teal.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/deploy/assets/bg-debian-litegrey.png;
   
 
 
