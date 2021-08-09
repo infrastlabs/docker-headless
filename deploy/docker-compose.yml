@@ -18,12 +18,12 @@ services:
       - /_ext:/_ext
       - /opt:/opt
       - /:/mnt
+    privileged: true
+    shm_size: 1g
+    network_mode: host
     # ports:
     #   - "10089:10089"
     #   - "10081:10081"
     #   - "10022:10022"
     #   # - "6000-6009:6000-6009" #VNC: offset 0, limit 10;
     #   # - "4700-4709:4700-4709"
-    network_mode: host
-    privileged: true
-    shm_size: 1g

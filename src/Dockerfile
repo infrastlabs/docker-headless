@@ -140,6 +140,8 @@ ENV \
   SSH_PASS=headless \
   VNC_PASS=headless \
   VNC_PASS_RO=View123 \
+  # 
+  VNC_SSL_ONLY=false \
   VNC_CERT= \
   VNC_OFFSET=0 \
   VNC_LIMIT=1 \

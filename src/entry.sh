@@ -1,15 +1,9 @@
 #!/bin/bash
 
-# Ports
 # export VNC_LIMIT=3 VNC_OFFSET=20
-echo "SSH_PORT: $SSH_PORT"     #10022 22
-echo "RDP_PORT: $RDP_PORT"     #10089 3389
-echo "VNC_PORT: $VNC_PORT"      #10081 6081 # VNC_ENABLE
-echo "VNC_OFFSET: $VNC_OFFSET"
-echo "VNC_LIMIT: $VNC_LIMIT"
-# Loc
-echo "Lang: $L"
-echo "TZ: $TZ"
+# HeadInfo:
+env |grep "_PORT"
+env |grep -v "PASS\|_PORT" |grep "^VNC\|^L=\|^TZ" |sort -nr
 
 #tpl replace: each revert clean;
 cat /etc/xrdp/xrdp.ini.tpl > /etc/xrdp/xrdp.ini
@@ -149,6 +143,13 @@ if [ -z "$VNC_CERT" ]; then
 else
     echo "use special cert: $VNC_CERT"
     test -f "$VNC_CERT" && cat "$VNC_CERT" > /etc/novnc/self.pem || echo "WARN: cert not exist, skip(use the image's default cert)"
+fi
+
+cmd1="command=/bin/bash /usr/local/novnc/utils/websockify/run $VNC_PORT --web /usr/local/novnc --target-config=/etc/novnc/token.conf --cert=/etc/novnc/self.pem"
+if [ "true" == "$VNC_SSL_ONLY" ]; then
+    sed -i "s^$cmd1.*^$cmd1 --ssl-only^g" /etc/supervisor/conf.d/xrdp.conf
+else
+    sed -i "s^$cmd1.*^$cmd1^g" /etc/supervisor/conf.d/xrdp.conf
 fi
 
 # sv

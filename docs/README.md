@@ -15,7 +15,8 @@
   VNC_PORT=10081 \
   SSH_PASS=headless \
   VNC_PASS=headless \
-  VNC_PASS_RO=View123
+  VNC_PASS_RO=View123 \
+  VNC_SSL_ONLY=false \
   VNC_CERT= \
   # L=zh_CN \ 
   TZ=Asia/Shanghai

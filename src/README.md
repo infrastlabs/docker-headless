@@ -12,7 +12,7 @@
 - ~~bunsen-grey-theme: Papirus-Bunsen-grey~~
 - ~~xrdp_disk_mount @xvnc0~~
 - ~~novnc: postLogin(curPage not support), tls~~
-- multi pulse; 4713 > 4701, 02, 03..
+- multi pulse; 4713 > 4701, 02, 03..(/etc/pulse/default.pa > /home/xxx/.config/pulse/...)
 - novnc-audio: ffmpeg?+jsmpeg
 
 **vncpasswd**
