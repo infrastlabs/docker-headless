@@ -9,30 +9,30 @@ services:
       - SSH_PASS=headless
       - VNC_PASS=headless
       - VNC_PASS_RO=View123
+      - VNC_SSL_ONLY=true
       - VNC_CERT=
-      # - VNC_OFFSET=0
-      # - VNC_LIMIT=3
+      - VNC_OFFSET=20
+      - VNC_LIMIT=3
       - TZ=Asia/Shanghai
       - L=zh_CN
     volumes:
       - /_ext:/_ext
       - /opt:/opt
       - /:/mnt
-    ports:
-      - "10089:10089"
-      - "10081:10081"
-      - "10022:10022"
-      # - "6000-6009:6000-6009" #VNC: offset 0, limit 10;
-      # - "4700-4709:4700-4709"
-    # network_mode: host
     privileged: true
     shm_size: 1g
-  de-mate:
-    image: x11docker/mate
+    network_mode: host
+    # ports:
+    #   - "10089:10089"
+    #   - "10081:10081"
+    #   - "10022:10022"
+    #   # - "6000-6009:6000-6009" #VNC: offset 0, limit 10;
+    #   # - "4700-4709:4700-4709"
+  de1:
+    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:xfce-deb11-v1
     # command: mate-session
     restart: always
-    links:
-      - xserver
+    network_mode: host
     environment:
-      - DISPLAY=xserver:1
-      - PULSE_SERVER=xserver:47001
+      - DISPLAY=:21
+      - PULSE_SERVER=:47021

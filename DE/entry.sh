@@ -35,4 +35,9 @@ function setLocale(){
 }
 test -z "$L" || setLocale
 
+# DISPLAY= ##just use env.
+# local port2=$(expr 0 + $VNC_OFFSET)
+# sed -i "s/DISPLAY=\:0/DISPLAY=\:$port2/" /etc/supervisor/conf.d/xrdp.conf
+
+# start sv
 exec supervisord -n

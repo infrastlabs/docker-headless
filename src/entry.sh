@@ -149,11 +149,12 @@ else
     test -f "$VNC_CERT" && cat "$VNC_CERT" > /etc/novnc/self.pem || echo "WARN: cert not exist, skip(use the image's default cert)"
 fi
 
-cmd1="command=/bin/bash /usr/local/novnc/utils/websockify/run $VNC_PORT --web /usr/local/novnc --target-config=/etc/novnc/token.conf --cert=/etc/novnc/self.pem"
+cmd1="command=/bin/bash /usr/local/novnc/utils/websockify/run.*"
+cmd2="command=/bin/bash /usr/local/novnc/utils/websockify/run $VNC_PORT --web /usr/local/novnc --target-config=/etc/novnc/token.conf --cert=/etc/novnc/self.pem"
 if [ "true" == "$VNC_SSL_ONLY" ]; then
-    sed -i "s^$cmd1.*^$cmd1 --ssl-only^g" /etc/supervisor/conf.d/xrdp.conf
+    sed -i "s^$cmd1.*^$cmd2 --ssl-only^g" /etc/supervisor/conf.d/xrdp.conf
 else
-    sed -i "s^$cmd1.*^$cmd1^g" /etc/supervisor/conf.d/xrdp.conf
+    sed -i "s^$cmd1.*^$cmd2^g" /etc/supervisor/conf.d/xrdp.conf
 fi
 
 # sv

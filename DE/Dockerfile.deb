@@ -1,8 +1,6 @@
 ARG VER_DISTRO="stretch"
 FROM debian:${VER_DISTRO}-slim
-#FROM debian:buster-slim
-
-#env
+#FROM debian:stretch/buster/bullseye-slim
 ARG VER_DISTRO="stretch"
 ENV \
     DEBIAN_FRONTEND="noninteractive" \
@@ -12,61 +10,54 @@ ENV \
     LOC_APPS2="gnome-system-monitor engrampa ristretto" \
     LOC_XFCE="xfce4-settings xfce4-session xfwm4 xfdesktop4"
 
-
-# ADD ./box.sh /usr/bin/box
-# RUN box
 RUN \
   echo "deb http://${DOMAIN}/debian/ ${VER_DISTRO} main contrib non-free" > /etc/apt/sources.list \
   && echo "deb http://${DOMAIN}/debian/ ${VER_DISTRO}-updates main contrib non-free">> /etc/apt/sources.list \
-  && echo "deb http://${DOMAIN}/debian/ ${VER_DISTRO}-backports main non-free contrib">> /etc/apt/sources.list \
-  && echo "deb http://${DOMAIN}/debian-security/ ${VER_DISTRO}/updates main non-free contrib">> /etc/apt/sources.list;
-RUN echo 'apt update -qq && apt install -yq --no-install-recommends $@ && apt-get clean && rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
+  && echo "deb http://${DOMAIN}/debian/ ${VER_DISTRO}-backports main non-free contrib">> /etc/apt/sources.list; \
+  test "bullseye" != "${VER_DISTRO}" && echo "deb http://${DOMAIN}/debian-security/ ${VER_DISTRO}/updates main non-free contrib">> /etc/apt/sources.list || echo "bullseye-skipd"; \
+  \
+  echo 'apt update -qq && apt install -yq --no-install-recommends $@ && apt-get clean && rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
     && chmod +x /usr/local/bin/apt.sh
 
 # BASE: 35.254 MB
 RUN apt.sh \
   htop rsync tree tmux lrzsz psmisc fuse net-tools iputils-ping procps sudo iproute2 iptables \
-  zip unzip xz-utils vim-tiny
-# UTILES: 17.964 MB
-# dbus-user-session(systemd) > dbus-x11
-RUN apt.sh supervisor dbus-x11 at-spi2-core
-
+  zip unzip xz-utils vim-tiny; \
+  # UTILES: 17.964 MB
+  apt.sh supervisor dbus-x11 at-spi2-core
 
 # locale>xx.mo: dpkg conf, use debian's tpl.
-RUN sed -i "s^path-exclude /usr/share/locale/\*^# path-exclude /usr/share/locale/\*^g" /etc/dpkg/dpkg.cfg.d/docker;
-
-# APPS: 33.493 MB; remove rofi v131(not support text/launcher.sh)
-RUN apt.sh ${LOC_APPS}; apt -y remove rofi
-# XFCE4: 3.968 MB > 13.932 MB
-RUN apt.sh ${LOC_XFCE} greybird-gtk-theme gnome-icon-theme; 
-# APPS2 6.767 MB
-RUN apt.sh ${LOC_APPS2} 
+RUN sed -i "s^path-exclude /usr/share/locale/\*^# path-exclude /usr/share/locale/\*^g" /etc/dpkg/dpkg.cfg.d/docker; \
+  # APPS: 33.493 MB; remove rofi v131(not support text/launcher.sh)
+  apt.sh ${LOC_APPS}; apt -y remove rofi; \
+  # XFCE4: 3.968 MB > 13.932 MB
+  apt.sh ${LOC_XFCE} greybird-gtk-theme gnome-icon-theme; \
+  # APPS2 6.767 MB
+  apt.sh ${LOC_APPS2} 
 
 #LOCALE 20.485 MB --language-pack-gnome-zh-hans 
-RUN apt.sh \
-    dconf-cli locales tzdata apt-utils \
-    fonts-wqy-zenhei
-#AUDIO pavucontrol:2,363 kB pnmixer:815 kB;  +qmmp:28.7 MB
-# pulseaudio: needed by pnmixer
-# volti: py? startErr. no sound card.
-RUN apt.sh pavucontrol pnmixer pulseaudio
-# notifyd 234 kB; clipit 336 kB;
-# gtk2-engines-pixbuf 58.9 kB; ##Gtk-WARNING **: 11:29:10.844: 无法在模块路径中找到主题引擎：“pixmap”，
-RUN apt.sh \
-  xfce4-notifyd clipit gtk2-engines-pixbuf && apt -y remove dunst
-RUN du -sh /usr/share/locale/; find /usr/share/locale/ |grep ".*\.mo$" |wc
+RUN apt.sh dconf-cli locales tzdata apt-utils fonts-wqy-zenhei; \
+  #AUDIO pavucontrol:2,363 kB pnmixer:815 kB;  +qmmp:28.7 MB
+  apt.sh pavucontrol pnmixer pulseaudio; \
+  # notifyd 234 kB; clipit 336 kB;
+  apt.sh xfce4-notifyd clipit gtk2-engines-pixbuf && apt -y remove dunst
 
-# https://hub.fastgit.org/joserprieto/docker-debian-i18n/blob/master/Dockerfile
-# LOCALE TZ #1.786 MB
+# +papirus theme
+RUN apt.sh wget papirus-icon-theme;
 
-# ADD box.sh /usr/bin/box
+# locale1/emp: for box03-nonFull's empty copy
+ENV LOC1="ar  de  en_CA  es_AR  fr_CA  ja  pt     ru  vi     zh_HK"\
+    LOC2="cs  en  es     fr     it     ko  nl     pt_BR  tr  zh_CN  zh_TW"
+RUN test "stretch" != "${VER_DISTRO}" && exit 0;\
+  du -sh /usr/share/locale/; find /usr/share/locale/ |grep ".*\.mo$" |wc; \
+  bash -c "mkdir -p /usr/share/locale1/emp; cd /usr/share/locale; arr=(\$LOC1 \$LOC2); for ONE in \${arr[@]}; do mv \$ONE ../locale1; ln -s ../locale1/\$ONE . ; done";
+
 ADD entry.sh /entry.sh
 ADD supervisor.conf /etc/supervisor/conf.d/xfce4.conf
-COPY clear3d.theme /usr/share/plank/themes/Default/dock.theme
+ADD dconf.ini /usr/share/dconf.ini 
+ADD clear3d.theme /usr/share/plank/themes/Default/dock.theme
 COPY --chown=root:root ./dot/ /etc/skel/
-
 # HEADLESS
-# RUN box userInit headless
 RUN \
   user=headless; \
   useradd -mp j9X2HRQvPCphA -s /bin/bash -G sudo $user \
@@ -74,16 +65,13 @@ RUN \
   && echo 'Cmnd_Alias SU = /bin/su' >> /etc/sudoers \
   && echo "$user ALL=(root) NOPASSWD: ALL" >> /etc/sudoers \
   \
-  && chmod +x /entry.sh \
+  && chmod +x /*.sh \
   && echo "welcome! HeadlessBox." > /etc/motd \
   && ln -s /usr/bin/vim.tiny /usr/bin/vt \
   && rm -f /bin/sh && ln -s /bin/bash /bin/sh \
   && echo "alias ll='ls -lF'; alias la='ls -A'; alias l='ls -CF';" >> /home/$user/.bashrc
-    
-
 
 # DCONF+IBUS env
-ADD ./dconf.ini /usr/share/dconf.ini 
 # ADD ./dot/.config/ibus/rime/default.yaml /home/headless/.config/ibus/rime/
 RUN ln -s /usr/share/rime-data/wubi_pinyin.schema.yaml /home/headless/.config/ibus/rime/; \
   chown -R headless:headless /home/headless/.config/ibus; \
@@ -94,40 +82,26 @@ RUN ln -s /usr/share/rime-data/wubi_pinyin.schema.yaml /home/headless/.config/ib
   # dconf: ibus, plank, engrampa
   mkdir -p /etc/dconf/db;\
   su - headless -c "dbus-launch dconf reset -f /; dbus-launch dconf load / < /usr/share/dconf.ini; ";\
-  dbus-launch dconf update;  mkdir -p /var/run/dbus;
+  dbus-launch dconf update;  mkdir -p /var/run/dbus; \
+  # Setup D-Bus
+  mkdir -p /run/dbus/ && chown messagebus:messagebus /run/dbus/; \
+  dbus-uuidgen > /etc/machine-id; \
+  ln -sf /etc/machine-id /var/lib/dbus/machine-id
 
-
-# PS1
-# # \[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\u@\h:\w\$
-# RUN PS1='\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\u@\h|'${VER_DISTRO}':\w\$ ' \
-#   && echo "PS1='$PS1'" >> /home/headless/.bashrc
-
-#dbg: docker-headless:xfce-ubt2004-v1
-# Setup D-Bus
-RUN mkdir -p /run/dbus/ && chown messagebus:messagebus /run/dbus/; \
- dbus-uuidgen > /etc/machine-id; \
- ln -sf /etc/machine-id /var/lib/dbus/machine-id
-
-#ref: lazy
-# ARG APP_LARGER=""
-# RUN box largerApps
-
-# RUN echo "arr=(aa bb); for ONE in \${arr[@]}; do mkdir -p /usr/share/locale/\$ONE/LC_MESSAGES; done" |bash -; find /usr/share/locale/
-# RUN echo "aa=aa1; mkdir -p /tmp/\${aa}/{\${aa},bb,cc}" |bash -; find /tmp
-
-# locale1/emp: for box03-nonFull's empty copy
-# Administrator@sam-pincun MINGW64 /d/UserData/Desktop/loc_anay/loc_select
-# $ dir
-# _ex   ar  de  en_CA  es_AR  fr_CA  ja  ko_KR  pt     ru  vi     zh_HK
-# _ex2  cs  en  es     fr     it     ko  nl     pt_BR  tr  zh_CN  zh_TW
-ENV LOC1="ar  de  en_CA  es_AR  fr_CA  ja  pt     ru  vi     zh_HK"\
-    LOC2="cs  en  es     fr     it     ko  nl     pt_BR  tr  zh_CN  zh_TW"
-RUN bash -c "mkdir -p /usr/share/locale1/emp; cd /usr/share/locale; arr=(\$LOC1 \$LOC2); for ONE in \${arr[@]}; do mv \$ONE ../locale1; ln -s ../locale1/\$ONE . ; done";
+RUN \
+  # cd /home/headless/.qmmp/skins/; unzip Dark_Materia.wsz; chmod 755 -R darkmateria; \
+  wget -qO /usr/share/backgrounds/xfce/pure-blue.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/deploy/assets/pure-blue.jpg; \
+  wget -qO /usr/share/backgrounds/xfce/xfce-teal.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/deploy/assets/bg-debian-litegrey.png; \
+  \
+  wget http://asia.pkg.bunsenlabs.org/debian/pool/main/b/bunsen-papirus-icon-theme/bunsen-papirus-icon-theme_10.3-2_all.deb; \
+  dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb; \
+  sed -i "s^value=\"gnome\"^value=\"Papirus-Bunsen-grey\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml;
 
 ENV \
   L="zh_CN" \
   TZ="Asia/Shanghai"
 
-CMD ["bash", "/entry.sh"]
 # EXPOSE 10089 10022
 # CMD ["supervisord", "-n"]
+CMD ["bash", "/entry.sh"]
+# CMD ["/entry.sh"]

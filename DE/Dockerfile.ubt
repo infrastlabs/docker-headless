@@ -62,6 +62,7 @@ RUN apt.sh \
 # LOCALE TZ #1.786 MB
 
 # ADD box.sh /usr/bin/box
+ADD entry.sh /entry.sh
 ADD supervisor.conf /etc/supervisor/conf.d/xfce4.conf
 COPY clear3d.theme /usr/share/plank/themes/Default/dock.theme
 COPY --chown=root:root ./dot/ /etc/skel/
@@ -75,6 +76,7 @@ RUN \
   && echo 'Cmnd_Alias SU = /bin/su' >> /etc/sudoers \
   && echo "$user ALL=(root) NOPASSWD: ALL" >> /etc/sudoers \
   \
+  && chmod +x /*.sh \
   && echo "welcome! HeadlessBox." > /etc/motd \
   && ln -s /usr/bin/vim.tiny /usr/bin/vt \
   && rm -f /bin/sh && ln -s /bin/bash /bin/sh \
@@ -118,4 +120,5 @@ ENV \
 
 # CMD ["/entry.sh"]
 # EXPOSE 10089 10022
-CMD ["supervisord", "-n"]
+# CMD ["supervisord", "-n"]
+CMD ["/entry.sh"]
