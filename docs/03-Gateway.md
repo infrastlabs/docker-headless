@@ -4,12 +4,6 @@
 
 ## DE
 
-- Fluxbox
-- Mate
-- Cinnamon
-- ~~Gnome~~
-- ~~KDE Plasma~~
-
 ![](res/.png)
 
 ![](res/.png)

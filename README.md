@@ -17,26 +17,24 @@ By `XRDP/NOVNC` with `XFCE4` based on `Debian`, Formatting a HeadlessBox/Cloud D
 
 **QuickStart**
 
-example1: `docker run -it --rm --shm-size 1g --net=host infrastlabs/docker-headless`, Caution: non-production usage!!
+example1: `docker run -it --rm --shm-size 1g --net=host infrastlabs/docker-headless`, **Caution**: non-production usage with default password!!
 
-- Browser(novnc): https://localhost:10081 #VNC_PASS: `headless`, VNC_PASS_RO: `View123`
-- Mstsc(rdp): `localhost 10089` #VNC_PASS: `headless`
-- Putty(ssh): `ssh -p 10022 headless@localhost` #SSH_PASS: `headless`
+- noVnc: https://localhost:10081 #VNC_PASS: `headless`, VNC_PASS_RO: `View123`
+- RDP: `localhost:10089` #VNC_PASS: `headless`
+- SSH: `ssh -p 10022 headless@localhost` #SSH_PASS: `headless`
 
 ![](https://gitee.com/infrastlabs/docker-headless/raw/dev/docs/res/design-MultiBox.png)
 
+example2: `(ProductionMode) SSH_PASS=ChangeMe1, VNC_PASS=ChangeMe2, VNC_PASS_RO=ChangeMe3`
+
 ```bash
-# example2: SSH_PASS=ChangeMe1, VNC_PASS=ChangeMe2, VNC_PASS_RO=ChangeMe3
 vols="""
 -v /_ext:/_ext 
 -v /opt:/opt 
 -v /var/run/docker.sock:/var/run/docker.sock
 """
-docker run -d --name=devbox --privileged --shm-size 1g --net=host \
+docker run -d --name=devbox --privileged --shm-size 1g --net=host --restart=always \
  -e L=zh_CN -e SSH_PASS=ChangeMe1 -e VNC_PASS=ChangeMe2 -e VNC_PASS_RO=ChangeMe3 $vols infrastlabs/docker-headless:full
-
-# 290.545 MB
-docker container update --restart=always devbox
 ```
 
 ![](https://gitee.com/infrastlabs/docker-headless/raw/dev/docs/res/01rdp-double-screen.png)
