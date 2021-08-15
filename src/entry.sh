@@ -127,9 +127,13 @@ if [ ! -z "$(dpkg -l |grep locales)" ]; then #if locale installed. ##which local
 fi
 
 # SSH_PASS VNC_PASS VNC_PASS_RO
-echo "headless:$SSH_PASS" |chpasswd
-echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |vncpasswd /etc/xrdp/vnc_pass; chmod 644 /etc/xrdp/vnc_pass
-echo "" #newLine
+lock=/.init_pass.lock
+if [ ! -f "$lock" ]; then
+    echo "headless:$SSH_PASS" |chpasswd
+    echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |vncpasswd /etc/xrdp/vnc_pass; chmod 644 /etc/xrdp/vnc_pass
+    echo "" #newLine
+    touch $lock
+fi
 unset SSH_PASS VNC_PASS VNC_PASS_RO #unset, not show in desktopEnv.
 unset LOC_XFCE LOC_APPS LOC_APPS2 DEBIAN_FRONTEND
 

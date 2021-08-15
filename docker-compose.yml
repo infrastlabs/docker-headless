@@ -4,7 +4,7 @@ services:
     # latest, slim, full
     image: infrastlabs/docker-headless:full
     container_name: headless
-    restart: always
+    restart: unless-stopped
     environment:
       - SSH_PASS=headless
       - VNC_PASS=headless
