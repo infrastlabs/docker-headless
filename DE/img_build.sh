@@ -16,17 +16,17 @@ ver=v2 #v2 mergeLine;
 cmd="$1"
 case "$cmd" in
     deb)    #174.945 MB
-        # img="docker-headless:xfce-deb9-$ver"
-        # docker build $cache $pull -t $repo/$ns/$img -f Dockerfile.deb . 
-        # docker push $repo/$ns/$img
+        img="docker-headless:xfce-deb9-$ver"
+        docker build $cache $pull -t $repo/$ns/$img -f Dockerfile.deb . 
+        docker push $repo/$ns/$img
         # 
         # img="docker-headless:xfce-deb10-$ver"
         # docker build $cache $pull -t $repo/$ns/$img --build-arg VER_DISTRO=buster -f Dockerfile.deb . 
         # docker push $repo/$ns/$img
         # 
-        img="docker-headless:xfce-deb11-$ver"
-        docker build $cache $pull -t $repo/$ns/$img --build-arg VER_DISTRO=bullseye -f Dockerfile.deb . 
-        docker push $repo/$ns/$img
+        # img="docker-headless:xfce-deb11-$ver"
+        # docker build $cache $pull -t $repo/$ns/$img --build-arg VER_DISTRO=bullseye -f Dockerfile.deb . 
+        # docker push $repo/$ns/$img
 
         ;;
     ubt) #178.678 MB
