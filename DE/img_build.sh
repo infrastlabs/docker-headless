@@ -15,6 +15,11 @@ ver=v2 #v2 mergeLine;
 
 cmd="$1"
 case "$cmd" in
+    deb11)    #174.945 MB
+        img="docker-headless:xfce-deb11-$ver"
+        docker build $cache $pull -t $repo/$ns/$img -f Dockerfile.deb11 . 
+        docker push $repo/$ns/$img
+        ;;
     deb)    #174.945 MB
         img="docker-headless:xfce-deb9-$ver"
         docker build $cache $pull -t $repo/$ns/$img -f Dockerfile.deb . 

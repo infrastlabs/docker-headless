@@ -9,7 +9,7 @@ services:
       - SSH_PASS=headless
       - VNC_PASS=headless
       - VNC_PASS_RO=View123
-      - VNC_SSL_ONLY=true
+      - VNC_SSL_ONLY=false
       - VNC_CERT=
       - VNC_OFFSET=20
       - VNC_LIMIT=3
@@ -29,7 +29,7 @@ services:
     #   # - "6000-6009:6000-6009" #VNC: offset 0, limit 10;
     #   # - "4700-4709:4700-4709"
   de1:
-    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:xfce-deb11-v1
+    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:xfce-deb11-v2
     # command: mate-session
     restart: always
     network_mode: host
