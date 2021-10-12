@@ -9,28 +9,29 @@
 
 By `XRDP/NOVNC` with `XFCE4` based on `Debian`, Formatting a HeadlessBox/Cloud Desktop.
 
-**(1)QuickStart**
+## QuickStart
 
 `docker run -it --rm --shm-size 1g --net=host infrastlabs/docker-headless`
 
-- noVnc: https://localhost:10081 #VNC_PASS: `headless`, VNC_PASS_RO: `View123`
-- RDP: `localhost:10089` #VNC_PASS: `headless`
-- SSH: `ssh -p 10022 headless@localhost` #SSH_PASS: `headless`
+ -- | Conn | PASS | ReadOnly 
+--- | ---  | ---  | ---
+noVnc | https://192.168.0.x:10081 | VNC_PASS: `headless` | VNC_PASS_RO: `View123` 
+RDP | 192.168.0.x:10089 | VNC_PASS: `headless` | - 
+SSH | ssh -p 10022 headless@192.168.0.x | SSH_PASS: `headless` | - 
 
 **Caution**: non-production usage with default password!!
 
 ```bash
-# SSH_PASS VNC_PASS VNC_PASS_RO
-SSH_PASS=xxx
-VNC_PASS=xxx
-VNC_PASS_RO=xxx
-echo "headless:$SSH_PASS" |chpasswd
-echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |vncpasswd /etc/xrdp/vnc_pass; chmod 644 /etc/xrdp/vnc_pass
+SSH_PASS=xxx  VNC_PASS=xxx2  VNC_PASS_RO=xxx3
+echo "headless:$SSH_PASS" |sudo chpasswd
+echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /etc/xrdp/vnc_pass; sudo chmod 644 /etc/xrdp/vnc_pass
 ```
 
 ![](https://gitee.com/infrastlabs/docker-headless/raw/dev/docs/res/01rdp-double-screen.png)
 
-**(2)Development**
+## UseCase
+
+**(1)Development**
 
 ```bash
 # JAVA
@@ -59,7 +60,8 @@ EOF
 
 #IDE: vscode, ideaIC
 # wget https://vscode.cdn.azure.cn/stable/91899dcef7b8110878ea59626991a18c8a6a1b3e/code_1.47.3-1595520028_amd64.deb
-wget https://vscode.cdn.azure.cn/stable/c3f126316369cd610563c75b1b1725e0679adfb3/code_1.58.2-1626302803_amd64.deb
+# wget https://vscode.cdn.azure.cn/stable/c3f126316369cd610563c75b1b1725e0679adfb3/code_1.58.2-1626302803_amd64.deb
+wget https://vscode.cdn.azure.cn/stable/6cba118ac49a1b88332f312a8f67186f7f3c1643/code_1.61.2-1634656828_amd64.deb
 wget https://download.jetbrains.8686c.com/idea/ideaIC-2016.3.8-no-jdk.tar.gz
 ```
 
@@ -67,7 +69,7 @@ wget https://download.jetbrains.8686c.com/idea/ideaIC-2016.3.8-no-jdk.tar.gz
 
 ![](docs/res/02/ide1-idea.png2)
 
-**(3)Office**
+**(2)Office**
 
 wps, chrome/firefox
 
@@ -84,7 +86,7 @@ sudo apt -y install firefox-esr chromium #chromium-driver
 ![](docs/res/02/apps-office-wps.jpg)
 
 
-**(4)Docker Dind**
+**(3)Docker Dind**
 
 ```bash
 # docker,dcp: run@host

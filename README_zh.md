@@ -7,30 +7,38 @@
 [![Last commit](https://img.shields.io/github/last-commit/infrastlabs/docker-headless.svg)](https://www.github.com/infrastlabs/docker-headless)
 [![GitHub issues](https://img.shields.io/github/issues/infrastlabs/docker-headless.svg)](https://www.github.com/infrastlabs/docker-headless/issues)
 
-基于Docker的远程开发/办公运维的桌面环境，(Debian+XRDP/NOVNC+XFCE4)
+开源Docker的远程开发/办公运维的桌面环境 (Debian+XRDP/NOVNC+XFCE4)
 
-**(1)QuickStart**
+- 支持双屏，支持声音
+- SSH,RDP,noVnc三路连接
+- 本地化，输入法(五笔/拼音)
+- 桌面：Xfce4, Mate, Fluxbox, ..
+- 发行版：Debian9/10/11, Ubuntu1804/2004, ..
+- 精简小巧 `丐版: 97M`, `豪华版: 179M(默认)`, `旗舰版: 306M`
+
+## 快速开始
 
 `docker run -it --rm --shm-size 1g --net=host infrastlabs/docker-headless`
 
-- noVnc: https://localhost:10081 #VNC_PASS: `headless`, VNC_PASS_RO: `View123`
-- RDP: `localhost:10089` #VNC_PASS: `headless`
-- SSH: `ssh -p 10022 headless@localhost` #SSH_PASS: `headless`
+ -- | 连接 | 密码 | 只读密码 
+--- | ---  | ---  | ---
+noVnc | http://192.168.0.x:10081 (http/https) | VNC_PASS: `headless` | VNC_PASS_RO: `View123` 
+RDP | 192.168.0.x:10089 (任意User) | VNC_PASS: `headless` | - 
+SSH | ssh -p 10022 headless@192.168.0.x | SSH_PASS: `headless` | - 
 
-**Caution**: 生成禁用默认密码，初始后请修改!!
+**Caution**: 生产禁用默认密码，初始后请修改!!
 
 ```bash
-# SSH_PASS VNC_PASS VNC_PASS_RO
-SSH_PASS=xxx
-VNC_PASS=xxx
-VNC_PASS_RO=xxx
-echo "headless:$SSH_PASS" |chpasswd
-echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |vncpasswd /etc/xrdp/vnc_pass; chmod 644 /etc/xrdp/vnc_pass
+SSH_PASS=xxx  VNC_PASS=xxx2  VNC_PASS_RO=xxx3
+echo "headless:$SSH_PASS" |sudo chpasswd
+echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /etc/xrdp/vnc_pass; sudo chmod 644 /etc/xrdp/vnc_pass
 ```
 
 ![](https://gitee.com/infrastlabs/docker-headless/raw/dev/docs/res/01rdp-double-screen.png)
 
-**(2)Dev 远程开发**
+## 使用示例
+
+**(1)Dev 远程开发**
 
 ```bash
 # JAVA
@@ -59,7 +67,8 @@ EOF
 
 #IDE: vscode, ideaIC
 # wget https://vscode.cdn.azure.cn/stable/91899dcef7b8110878ea59626991a18c8a6a1b3e/code_1.47.3-1595520028_amd64.deb
-wget https://vscode.cdn.azure.cn/stable/c3f126316369cd610563c75b1b1725e0679adfb3/code_1.58.2-1626302803_amd64.deb
+# wget https://vscode.cdn.azure.cn/stable/c3f126316369cd610563c75b1b1725e0679adfb3/code_1.58.2-1626302803_amd64.deb
+wget https://vscode.cdn.azure.cn/stable/6cba118ac49a1b88332f312a8f67186f7f3c1643/code_1.61.2-1634656828_amd64.deb
 wget https://download.jetbrains.8686c.com/idea/ideaIC-2016.3.8-no-jdk.tar.gz
 ```
 
@@ -67,7 +76,7 @@ wget https://download.jetbrains.8686c.com/idea/ideaIC-2016.3.8-no-jdk.tar.gz
 
 ![](docs/res/02/ide1-idea.png2)
 
-**(3)Office远程办公**
+**(2)Office远程办公**
 
 wps, chrome/firefox
 
@@ -84,7 +93,7 @@ sudo apt -y install firefox-esr chromium #chromium-driver
 ![](docs/res/02/apps-office-wps.jpg)
 
 
-**(4)Docker Dind模式**
+**(3)Docker Dind模式**
 
 ```bash
 # docker,dcp: run@host
