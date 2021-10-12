@@ -29,7 +29,8 @@ services:
     #   # - "6000-6009:6000-6009" #VNC: offset 0, limit 10;
     #   # - "4700-4709:4700-4709"
   de1:
-    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:xfce-deb11-v2
+    # xfce-deb11-v2 xfce-ubt2004-v2
+    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:xfce-ubt2004-v2
     # command: mate-session
     restart: always
     network_mode: host

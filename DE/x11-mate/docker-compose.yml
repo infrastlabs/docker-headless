@@ -1,0 +1,18 @@
+version: '2.2'
+services:
+  x11:
+    image: infrastlabs/docker-headless:slim
+    restart: unless-stopped
+    environment:
+      - SSH_PASS=headless
+      - VNC_PASS=headless
+      - VNC_PASS_RO=View123
+    network_mode: host
+  de-mate:
+    image: x11docker/mate
+    # command: mate-session
+    restart: unless-stopped
+    environment:
+      - DISPLAY=:1
+      - PULSE_SERVER=:47001
+    network_mode: host
