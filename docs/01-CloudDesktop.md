@@ -1,39 +1,46 @@
 # CloudDesktop
 
-## RDP
+支持SSH,RDP,WEB浏览器3种访问管理方式, 镜像有3个版本，tag标签最新为`box07`。
 
-- [双屏支持](b1-rdp.md#双屏连接)
-- [声音支持](b1-rdp.md#RDP音频)
-- [双向剪切板(文本、文件)](b1-rdp.md#剪切板)
-- [本地磁盘挂载](b1-rdp.md#磁盘映射)
+- [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/slim)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)`slim`&nbsp;&nbsp;迷你版: ，fluxbox+stterm 只适合做vnc桌面网关
+- [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/latest)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)`latest`豪华版: , xfce+Audio **内置Qmmp音乐播放器**
+- [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/full)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)`full`&nbsp;&nbsp;&nbsp;旗舰版: , **本土化**、**输入法**、**截屏软件**、**SSH软件**
+
+## 一、RDP客户端访问
+
+- 双屏显示
+- 远程声音
+- 双向剪切板(文本、文件)
+- 本地磁盘挂载
 
 ![](res/01rdp-double-screen.png)
 
-## VNC
+## 二、WEB浏览器远程访问
 
-- [noVnc精简版+完整版](b2-vnc.md)
-- 多实例支持
+- HTTP/HTTPS双协议
+- lite/full两种模式
+- 多实例支持(vnc_server)
 - 与rdp桌面共享
 - 双密码：可操控+只读
 
 ![](res/08vnc-index2.png)
 
-## Locale
+## 三、多语言本地化支持
 
-- [LOCALE](b0-locale.md)
+- LOCALE 多语言
   - pt_PT es_ES fr_FR de_DE ru_RU it_IT nl_NL cs_CZ tr_TR ar_EG
   - zh_CN zh_HK zh_TW ko_KR ja_JP 
-- TZ
+- TZ 时区设置
   - Asia/Shanghai (default)
   - Etc/GMT-8 #东八区
 
 ![zh_CN](res/loc/zh_CN.png)
 
-## 桌面应用
+## 四、远程桌面应用
 
-- [IBUS输入法(rime中文)](b3-apps.md#IBUS)
-- [Flameshot截图](b3-apps.md#Flameshot)
-- [PAC终端管理器、oh-my-bash增强](b3-apps.md#PAC)
+- IBUS输入法(rime中文)
+- Flameshot截图软件
+- PAC终端管理器、oh-my-bash增强
 
 ![](res/06full-flameshot.png)
 

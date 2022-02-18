@@ -9,17 +9,23 @@
 
 By `XRDP/NOVNC` with `XFCE4` based on `Debian`, Formatting a HeadlessBox/Cloud Desktop.
 
+- Screen shared with both RDP/noVnc. (ReadWrite/ReadOnly)
+- MultiScreen support. (mstsc+xrdp+tigervnc)
+- Audio support. (xrdp+pulseaudio)
+- Locale/TZ support.
+- Desktop apps: ibus-rime, flameshot, PAC.
+
 ## QuickStart
 
 `docker run -it --rm --shm-size 1g --net=host infrastlabs/docker-headless`
 
  -- | Conn | PASS | ReadOnly 
 --- | ---  | ---  | ---
-noVnc | https://192.168.0.x:10081 | VNC_PASS: `headless` | VNC_PASS_RO: `View123` 
-RDP | 192.168.0.x:10089 | VNC_PASS: `headless` | - 
-SSH | ssh -p 10022 headless@192.168.0.x | SSH_PASS: `headless` | - 
+noVnc | https://192.168.0.x:10081 | `headless` | `View123` 
+RDP | 192.168.0.x:10089 | `headless` | - 
+SSH | ssh -p 10022 headless@192.168.0.x | `headless` | - 
 
-**Caution**: non-production usage with default password!!
+**(1)resetPass**: non-production usage with default password!!
 
 ```bash
 SSH_PASS=xxx  VNC_PASS=xxx2  VNC_PASS_RO=xxx3
@@ -27,11 +33,29 @@ echo "headless:$SSH_PASS" |sudo chpasswd
 echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /etc/xrdp/vnc_pass; sudo chmod 644 /etc/xrdp/vnc_pass
 ```
 
+**(2)UserManual**: 
+
+- [CloudDesktop Introduce](./docs/01-CloudDesktop.md)
+- [1.How to set Locale?](./docs/b0-locale.md)
+- [2.Usage of Double-Screen, ClipBoard, Audio?](./docs/b1-rdp.md)
+- [3.WEB entry of desktop?](./docs/b2-vnc.md)
+- [4.Usage of IBUS/Flameshot](./docs/b3-apps.md)
+- [Details](./detail.md) （Hotkeys, Envs, SysApps）
+
+
 ![](https://gitee.com/infrastlabs/docker-headless/raw/dev/docs/res/01rdp-double-screen.png)
+
+**(3)Producttion-Deployment**: 
+
+- [Windows-VM Deployment：](./deploy/virtualbox/README.md) With `barge-os` mini-container system, `--net=host` Use the VM's IP 
+- [Linux-Server Deployment：](./deploy/fat-docker/README.md) Use `macvlan`'s network，with special IP，sugest with lxcfs installed.
+- [Kubernetes Deployment：](./deploy/kubernetes/README.md) StatefulSet(TODO)
 
 ## UseCase
 
-**(1)Development**
+Quick start with Locale: `docker run -it --rm --shm-size 1g -e VNC_OFFSET=20 -e L=zh_CN --net=host infrastlabs/docker-headless:full`, Prefer [docker-compose.yml](./docker-compose.yml)
+
+**(1)Development** (java, golang, nodejs)
 
 ```bash
 # JAVA
@@ -67,47 +91,33 @@ wget https://download.jetbrains.8686c.com/idea/ideaIC-2016.3.8-no-jdk.tar.gz
 
 ![](docs/res/02/ide2-vscode.png)
 
-![](docs/res/02/ide1-idea.png2)
-
 **(2)Office**
 
 wps, chrome/firefox
 
 ```bash
-# WPS
+# firefox, chromium
+sudo apt -y install firefox-esr chromium #chromium-driver
+# WPS Office
 # https://blog.csdn.net/u012939880/article/details/89439647 #wps_symbol_fonts.zip
 wget https://wdl1.cache.wps.cn/wps/download/ep/Linux2019/10161/wps-office_11.1.0.10161_amd64.deb
-# Browser
-sudo apt -y install firefox-esr chromium #chromium-driver
 ```
-
-![](docs/res/02/apps-browsers.jpg2)
 
 ![](docs/res/02/apps-office-wps.jpg)
 
 
 **(3)Docker Dind**
 
+![](docs/res/02/dind2-headlessLinks.png)
+
 ```bash
-# docker,dcp: run@host
+# exec@host: docker,dcp
 img=docker:18.09.8 #18.09.3
 docker run -v /_ext:/mnt $img sh -c "cp /usr/local/bin/docker /mnt; ls -lh /mnt |grep docker"
 img=registry.cn-shenzhen.aliyuncs.com/k-bin/sync-kube:kube-att
 docker run --rm -v /_ext:/mnt $img sh -c 'cp -a /down/docker-compose /mnt/; ls -lh /mnt |grep docker'
 
-# links: @HeadlessBox
-ls /_ext/ |grep docker
-sudo ln -s /_ext/docker /bin/
-sudo ln -s /_ext/docker-compose /usr/bin/dcp
-# sock
-sudo ln -s /mnt/var/run/docker.sock /var/run/
-sudo chmod 777 /var/run/docker.sock
-
-# check
-docker version
-dcp -v
+# links@HeadlessBox: docker, socket
+sudo bash -c "ln -s /_ext/docker /bin/; ln -s /_ext/docker-compose /usr/bin/dcp"
+sudo bash -c "ln -s /mnt/var/run/docker.sock /var/run/; chmod 777 /var/run/docker.sock"
 ```
-
-![](docs/res/02/dind1-hostDown.png2)
-
-![](docs/res/02/dind2-headlessLinks.png)

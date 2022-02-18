@@ -9,12 +9,12 @@
 
 开源Docker的远程开发/办公运维的桌面环境 (Debian+XRDP/NOVNC+XFCE4)
 
-- 支持双屏，支持声音
-- SSH,RDP,noVnc三路连接
-- 本地化，输入法(五笔/拼音)
-- 桌面：Xfce4, Mate, Fluxbox, ..
-- 发行版：Debian9/10/11, Ubuntu1804/2004, ..
-- 精简小巧 `丐版: 97M`, `豪华版: 179M(默认)`, `旗舰版: 306M`
+- 支持双屏显示，远程声音
+- SSH连接,RDP远程,WEB浏览器访问(novnc)
+- 多语言本土化，中文输入法(五笔/拼音)
+- 桌面：Xfce4, Mate, Fluxbox, ..（默认: xfce4）
+- 发行版：Debian9/10/11, Ubuntu1804/2004, .. （默认: debian9）
+- 精简小巧 `丐版: 97M(无声音)`, `豪华版: 179M(latest默认,无本土化)`, `旗舰版: 306M`
 
 ## 快速开始
 
@@ -22,23 +22,42 @@
 
  -- | 连接 | 密码 | 只读密码 
 --- | ---  | ---  | ---
-noVnc | http://192.168.0.x:10081 (http/https) | VNC_PASS: `headless` | VNC_PASS_RO: `View123` 
-RDP | 192.168.0.x:10089 (任意User) | VNC_PASS: `headless` | - 
-SSH | ssh -p 10022 headless@192.168.0.x | SSH_PASS: `headless` | - 
+noVnc | http://192.168.0.x:10081 | `headless` | `View123` 
+RDP | 192.168.0.x:10089 | `headless` | - 
+SSH | ssh -p 10022 headless@192.168.0.x | `headless` | - 
 
-**Caution**: 生产禁用默认密码，初始后请修改!!
+**(1)密码修改**: 生产禁用默认密码，初始后请修改!!
 
 ```bash
+# 动态修改密码：
 SSH_PASS=xxx  VNC_PASS=xxx2  VNC_PASS_RO=xxx3
 echo "headless:$SSH_PASS" |sudo chpasswd
 echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /etc/xrdp/vnc_pass; sudo chmod 644 /etc/xrdp/vnc_pass
 ```
 
+**(2)使用帮助**: 
+
+- [云桌面功能简介](./docs/01-CloudDesktop.md)
+- [1.如何设置为中文或其它语言？](./docs/b0-locale.md)
+- [2.双屏连接，远程剪切板、音频如何使用？](./docs/b1-rdp.md)
+- [3.如何WEB访问远程桌面？](./docs/b2-vnc.md)
+- [4.中文输入法、截图软件的使用说明](./docs/b3-apps.md)
+- [Detail明细说明](./detail.md) （快捷键、环境变量、系统应用）
+
+
 ![](https://gitee.com/infrastlabs/docker-headless/raw/dev/docs/res/01rdp-double-screen.png)
+
+**(3)生产部署指引**: 
+
+- [Windows虚拟机部署：](./deploy/virtualbox/README.md) 采用barge-os迷你容器系统, --net=host 采用虚机IP 
+- [Linux服务器部署：](./deploy/fat-docker/README.md) 容器使用macvlan网络，分配专用IP，建议安装lxcfs
+- [K8S内部署：](./deploy/kubernetes/README.md) StatefulSet(TODO)
 
 ## 使用示例
 
-**(1)Dev 远程开发**
+中文版快速体验: `docker run -it --rm --shm-size 1g -e VNC_OFFSET=20 -e L=zh_CN --net=host infrastlabs/docker-headless:full`, 推荐[docker-compose.yml](./docker-compose.yml)
+
+**(1)Dev开发环境搭建** (java, golang, nodejs)
 
 ```bash
 # JAVA
@@ -74,47 +93,36 @@ wget https://download.jetbrains.8686c.com/idea/ideaIC-2016.3.8-no-jdk.tar.gz
 
 ![](docs/res/02/ide2-vscode.png)
 
-![](docs/res/02/ide1-idea.png2)
-
-**(2)Office远程办公**
+**(2)浏览器、Office办公**
 
 wps, chrome/firefox
 
 ```bash
-# WPS
+# 火狐/谷歌浏览器
+sudo apt -y install firefox-esr chromium #chromium-driver
+# WPS三件套
 # https://blog.csdn.net/u012939880/article/details/89439647 #wps_symbol_fonts.zip
 wget https://wdl1.cache.wps.cn/wps/download/ep/Linux2019/10161/wps-office_11.1.0.10161_amd64.deb
-# Browser
-sudo apt -y install firefox-esr chromium #chromium-driver
 ```
-
-![](docs/res/02/apps-browsers.jpg2)
 
 ![](docs/res/02/apps-office-wps.jpg)
 
 
 **(3)Docker Dind模式**
 
+支持在容器内调用宿主机的dockerd，用于dockerfile构建、容器控制等场景。
+
+![](docs/res/02/dind2-headlessLinks.png)
+
 ```bash
-# docker,dcp: run@host
+# 宿主机运行：获取docker,docker-compose文件:
 img=docker:18.09.8 #18.09.3
 docker run -v /_ext:/mnt $img sh -c "cp /usr/local/bin/docker /mnt; ls -lh /mnt |grep docker"
 img=registry.cn-shenzhen.aliyuncs.com/k-bin/sync-kube:kube-att
 docker run --rm -v /_ext:/mnt $img sh -c 'cp -a /down/docker-compose /mnt/; ls -lh /mnt |grep docker'
 
-# links: @HeadlessBox
+# 软链接: docker, socket
 ls /_ext/ |grep docker
-sudo ln -s /_ext/docker /bin/
-sudo ln -s /_ext/docker-compose /usr/bin/dcp
-# sock
-sudo ln -s /mnt/var/run/docker.sock /var/run/
-sudo chmod 777 /var/run/docker.sock
-
-# check
-docker version
-dcp -v
+sudo bash -c "ln -s /_ext/docker /bin/; ln -s /_ext/docker-compose /usr/bin/dcp"
+sudo bash -c "ln -s /mnt/var/run/docker.sock /var/run/; chmod 777 /var/run/docker.sock"
 ```
-
-![](docs/res/02/dind1-hostDown.png2)
-
-![](docs/res/02/dind2-headlessLinks.png)
