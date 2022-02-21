@@ -22,8 +22,9 @@ By `XRDP/NOVNC` with `XFCE4` based on `Debian`, Formatting a HeadlessBox/Cloud D
  -- | Conn | PASS | ReadOnly 
 --- | ---  | ---  | ---
 noVnc | https://192.168.0.x:10081 | `headless` | `View123` 
-RDP | 192.168.0.x:10089 | `headless` | - 
-SSH | ssh -p 10022 headless@192.168.0.x | `headless` | - 
+Audio | http://192.168.0.x:10082  |     -      | - 
+RDP   | 192.168.0.x:10089         | `headless` | - 
+SSH   | ssh -p 10022 headless@192.168.0.x | `headless` | - 
 
 **(1)resetPass**: non-production usage with default password!!
 
@@ -47,9 +48,9 @@ echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /
 
 **(3)Producttion-Deployment**: 
 
-- [Windows-VM Deployment：](./deploy/virtualbox/README.md) With `barge-os` mini-container system, `--net=host` Use the VM's IP 
+- [Windows-VM Deployment：](./deploy/win-vbox/README.md) With `barge-os` mini-container system, `--net=host` Use the VM's IP 
 - [Linux-Server Deployment：](./deploy/fat-docker/README.md) Use `macvlan`'s network，with special IP，sugest with lxcfs installed.
-- [Kubernetes Deployment：](./deploy/kubernetes/README.md) StatefulSet(TODO)
+- [Kubernetes Deployment：](./deploy/k8s-headless/README.md) Deployment+Service
 
 ## UseCase
 

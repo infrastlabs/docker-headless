@@ -14,7 +14,7 @@
 - 多语言本土化，中文输入法(五笔/拼音)
 - 桌面：Xfce4, Mate, Fluxbox, ..（默认: xfce4）
 - 发行版：Debian9/10/11, Ubuntu1804/2004, .. （默认: debian9）
-- 精简小巧 `丐版: 97M(无声音)`, `豪华版: 179M(latest默认,无本土化)`, `旗舰版: 306M`
+- 精简小巧 `丐版: 95M(无UI音频管理)`, `豪华版: 167M(latest默认,无本土化)`, `旗舰版: 287M`
 
 ## 快速开始
 
@@ -23,8 +23,9 @@
  -- | 连接 | 密码 | 只读密码 
 --- | ---  | ---  | ---
 noVnc | http://192.168.0.x:10081 | `headless` | `View123` 
-RDP | 192.168.0.x:10089 | `headless` | - 
-SSH | ssh -p 10022 headless@192.168.0.x | `headless` | - 
+Audio | http://192.168.0.x:10082 |     -      | - 
+RDP   | 192.168.0.x:10089        | `headless` | - 
+SSH   | ssh -p 10022 headless@192.168.0.x | `headless` | - 
 
 **(1)密码修改**: 生产禁用默认密码，初始后请修改!!
 
@@ -42,6 +43,7 @@ echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /
 - [2.双屏连接，远程剪切板、音频如何使用？](./docs/b1-rdp.md)
 - [3.如何WEB访问远程桌面？](./docs/b2-vnc.md)
 - [4.中文输入法、截图软件的使用说明](./docs/b3-apps.md)
+- [5.音乐播放器及远程音频相关说明](./docs/b4-audio.md)
 - [Detail明细说明](./detail.md) （快捷键、环境变量、系统应用）
 
 
@@ -49,9 +51,9 @@ echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /
 
 **(3)生产部署指引**: 
 
-- [Windows虚拟机部署：](./deploy/virtualbox/README.md) 采用barge-os迷你容器系统, --net=host 采用虚机IP 
+- [Windows虚拟机部署：](./deploy/win-vbox/README.md) 采用barge-os迷你容器系统, --net=host 采用虚机IP 
 - [Linux服务器部署：](./deploy/fat-docker/README.md) 容器使用macvlan网络，分配专用IP，建议安装lxcfs
-- [K8S内部署：](./deploy/kubernetes/README.md) StatefulSet(TODO)
+- [K8S内部署：](./deploy/k8s-headless/README.md) Deployment+Service
 
 ## 使用示例
 

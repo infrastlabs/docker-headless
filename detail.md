@@ -5,8 +5,12 @@
 - User: `headless`, SSHPass: `headless`, VNCPass: `headless`, VNCPassReadOnly: `View123`
 - Ports
   - novnc 6080 > 10081 (http+https)
+  - bcs   9222 > 10082 #pulseaudio broadcast to web-mp3 stream
   - xrdp  3389 > 10089
   - sshd  22   > 10022
+  - 
+  - vnc: 6000/tcp 
+  - pulse: 4713/tcp
 - Entry: xrdp, novnc, dropbear
 - 命令工具：`tree htop gawk expect tmux rsync iproute2`
 - 图形工具：`sakura tint2 plank flameshot`, `gnome-system-monitor engrampa ristretto`
@@ -46,6 +50,7 @@ ENV \
   SSH_PORT=10022 \
   RDP_PORT=10089 \
   VNC_PORT=10081 \
+  BCS_PORT=10082 \
   # 
   SSH_PASS=headless \
   VNC_PASS=headless \
