@@ -1,5 +1,6 @@
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:xfce-deb9-v1 as loc
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile-v1 as bins
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/novnc-audio:bcs as bcs
 FROM debian:stretch-slim
 ENV \
   DEBIAN_FRONTEND=noninteractive \
@@ -136,6 +137,7 @@ ENV \
   SSH_PORT=10022 \
   RDP_PORT=10089 \
   VNC_PORT=10081 \
+  BCS_PORT=10082 \
   # HEADLESS=headless \ #just static username.
   SSH_PASS=headless \
   VNC_PASS=headless \
@@ -198,6 +200,7 @@ RUN test -z "$AUDIO" && exit 0;\
 # IBUS+DCONF env
 #  dconf load / < dconf.ini  ##error: Cannot autolaunch D-Bus without X11 $DISPLAY
 #  ADD > COPY
+# ${FULL}=/..
 ADD src/f/dconf.ini /usr/share/dconf.ini 
 COPY src/f/.config/emp${FULL} /home/headless/.config/
 RUN test -z "$FULL" && exit 0;\
@@ -235,6 +238,11 @@ RUN test -z "$FULL" && exit 0;\
   wget https://gitee.com/infrastlabs/docker-headless/raw/dev/deploy/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
   dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb; 
 
+RUN apt.sh curl lame sox libsox-fmt-mp3; \
+  wget https://m3.8js.net//20210522/tashanhe-shiqishune.mp3
+COPY --from=bcs /app/broadcast-server /usr/local/novnc-audio/broadcast-server
+# COPY conf/vnc_lite.html /usr/local/novnc/
+# COPY conf/index.tpl.html /usr/local/novnc/
 
 WORKDIR /home/headless
 # EXPOSE 3389/tcp 6080/tcp 22/tcp 6000/tcp 4713/tcp

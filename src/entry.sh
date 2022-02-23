@@ -157,6 +157,10 @@ else
     sed -i "s^$cmd1.*^$cmd2^g" /etc/supervisor/conf.d/xrdp.conf
 fi
 
+# bcs
+# sed -i "s^broadcast-server -port .* &^broadcast-server -port $BCS_PORT &^g" /xvnc.sh
+sed -i "s^9222^$BCS_PORT^g" /usr/local/novnc/index.html #each from tpl
+
 # sv
 echo -e "\n\n\nStarting..." && sleep 2
 exec supervisord -n
