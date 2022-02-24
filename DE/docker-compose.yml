@@ -1,39 +1,26 @@
-version: '2.2'
+version: '2.4'
 services:
   xserver:
     # latest, slim, full
     image: infrastlabs/docker-headless:slim
     container_name: xserver
-    restart: always
+    restart: unless-stopped
     environment:
       - SSH_PASS=headless
       - VNC_PASS=headless
       - VNC_PASS_RO=View123
-      - VNC_SSL_ONLY=false
-      - VNC_CERT=
       - VNC_OFFSET=20
       - VNC_LIMIT=3
-      - TZ=Asia/Shanghai
-      - L=zh_CN
+    network_mode: host
+  de1:
+    # xfce-deb11-v2 xfce-ubt2004-v2
+    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:xfce-ubt2004-v2
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - DISPLAY=:21
+      - PULSE_SERVER=tcp:localhost:47021
     volumes:
       - /_ext:/_ext
       - /opt:/opt
       - /:/mnt
-    privileged: true
-    shm_size: 1g
-    network_mode: host
-    # ports:
-    #   - "10089:10089"
-    #   - "10081:10081"
-    #   - "10022:10022"
-    #   # - "6000-6009:6000-6009" #VNC: offset 0, limit 10;
-    #   # - "4700-4709:4700-4709"
-  de1:
-    # xfce-deb11-v2 xfce-ubt2004-v2
-    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:xfce-ubt2004-v2
-    # command: mate-session
-    restart: always
-    network_mode: host
-    environment:
-      - DISPLAY=:21
-      - PULSE_SERVER=:47021

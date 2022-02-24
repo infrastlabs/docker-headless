@@ -1,29 +1,27 @@
-version: '2.2'
+version: '2.4'
 services:
   headless:
-    # latest, slim, full
     image: infrastlabs/docker-headless:full
     container_name: headless
     restart: unless-stopped
+    # https://docs.docker.com/compose/compose-file/compose-file-v2/#healthcheck
+    healthcheck:
+      test: ["CMD", "bash", "-c", "supervisorctl status |grep -v 'RUNNING' && exit 1 || exit 0 "]
+      interval: 5s
+      timeout: 3s 
+      retries: 3
+      start_period: 5s
+    # initPass, Locale
     environment:
       - SSH_PASS=headless
       - VNC_PASS=headless
       - VNC_PASS_RO=View123
-      - VNC_CERT=
-      # - VNC_OFFSET=0
-      # - VNC_LIMIT=3
-      - TZ=Asia/Shanghai
       - L=zh_CN
+    network_mode: host
+    privileged: true
+    shm_size: 1g
+    # Persist Data
     volumes:
       - /_ext:/_ext
       - /opt:/opt
       - /:/mnt
-    privileged: true
-    shm_size: 1g
-    network_mode: host
-    # ports:
-    #   - "10089:10089"
-    #   - "10081:10081"
-    #   - "10022:10022"
-    #   # - "6000-6009:6000-6009" #VNC: offset 0, limit 10;
-    #   # - "4700-4709:4700-4709"
