@@ -2,6 +2,8 @@
 AUDIO=$(echo $1|sed "s/param|//g")
 FULL=$(echo $2|sed "s/param|//g")
 # RUN=
+echo -e "AUDIO=$AUDIO\nFULL=$FULL"
+rm -f /xconf.sh #del first, then execute?: avoid nonFULL's exit.
 
 # xrdp-link
 $RUN export xrdp=/usr/local/xrdp; \
@@ -23,8 +25,8 @@ $RUN useradd -mp j9X2HRQvPCphA -s /bin/bash -G sudo headless \
   sed -i "${line}cchmod=0770" /etc/supervisor/supervisord.conf; \
   sed -i "${line}achown=headless:headless" /etc/supervisor/supervisord.conf; \
   mkdir -p /etc/novnc; rq=`date +%Y%m%d_%H%M%S`; openssl req -new -x509 -days 3650 -nodes -subj "/C=CA/ST=CA2/L=CA3/O=headless@docker/OU=update@image_$rq/CN=headless" -out /etc/novnc/self.pem -keyout /etc/novnc/self.pem;
-# /home/headless/.config权限..
-COPY --chown=headless:headless src/f/.config/emp${FULL} /home/headless/.config/
+# # /home/headless/.config权限..
+# COPY --chown=headless:headless src/f/.config/emp${FULL} /home/headless/.config/
 
 # +002
 #Make sesman read environment variables #locale>xx.mo: dpkg conf, use debian's tpl.
@@ -59,6 +61,7 @@ $RUN test -z "$AUDIO" && exit 0;\
 # IBUS+DCONF env
 $RUN test -z "$FULL" && exit 0;\
   find /home/headless/.config |wc; \
+  mkdir -p /home/headless/.config/ibus/rime/; \
   ln -s /usr/share/rime-data/wubi_pinyin.schema.yaml /home/headless/.config/ibus/rime/; \
   chown -R headless:headless /home/headless/.config; \
   \
@@ -75,7 +78,7 @@ $RUN test -z "$FULL" && exit 0;\
 # LOCALE, OHMYBASH, SETTINGS
 # ref: /usr/share/locale1/emp${FULL} #theme set; bgset;
 $RUN test -z "$FULL" && exit 0;\
-  bash -c "arr=\"$(cd /usr/share/locale1; ls)\"; for ONE in \${arr[@]}; do rm -rf /usr/share/locale/\$ONE ; ln -s /usr/share/locale1/\$ONE /usr/share/locale/ ; done"; \
+  # bash -c "arr=\"$(cd /usr/share/locale1; ls)\"; for ONE in \${arr[@]}; do rm -rf /usr/share/locale/\$ONE ; ln -s /usr/share/locale1/\$ONE /usr/share/locale/ ; done"; \
   \
   # ohmybash
   su - headless -c "$(curl -fsSL https://gitee.com/g-system/oh-my-bash/raw/sam-custom/tools/install.sh)"; \
@@ -83,7 +86,7 @@ $RUN test -z "$FULL" && exit 0;\
   \
   sed -i "s^value=\"gnome\"^value=\"Papirus-Bunsen-grey\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml; \
   sed -i "s^OSH_THEME=\"font\"^OSH_THEME=\"axin\"^g" /home/headless/.bashrc; \
-  cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*; \
+  # cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*; \
   \
   wget -qO /usr/share/backgrounds/xfce/xfce-teal.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/deploy/assets/bg-blue-linestar.jpg; \
   # wget http://asia.pkg.bunsenlabs.org/debian/pool/main/b/bunsen-papirus-icon-theme/bunsen-papirus-icon-theme_10.3-2_all.deb; \

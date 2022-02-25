@@ -5,6 +5,7 @@ FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:box07-slim as
 
 # ==DO: 用1个空镜像，再转一层： x5+6+2=13 > 1层;
 FROM scratch as files
+  ARG FULL=""
   # NOVNC +1.352 MB; clear: 6.5M > 5.4M
   COPY --from=box07 /usr/local/novnc /usr/local/novnc
   # locale 9.214 MB
@@ -22,6 +23,7 @@ FROM scratch as files
   ADD src/index.tpl.html /usr/local/novnc/index.tpl.html
   Add src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
   COPY src/f/dconf.ini /usr/share/dconf.ini 
+  # RUN bash xxx ##TODO single file bash: goBash?? > xrdp-link; qmmp unpack;
 
 FROM debian:stretch-slim
 ENV \
@@ -128,6 +130,13 @@ ENV \
 
 COPY --from=files / /
 RUN bash /xconf.sh "param|${AUDIO}" "param|${FULL}"
+# /home/headless/.config权限..
+COPY --chown=headless:headless src/f/.config/emp${FULL} /home/headless/.config/
+RUN test -z "$AUDIO" && exit 0;\ 
+  cd /home/headless/.qmmp/skins/; unzip Dark_Materia.wsz; chmod 755 -R darkmateria; \
+  test -z "$FULL" && exit 0;\ 
+  # cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*; \
+  bash -c "arr=\"$(cd /usr/share/locale1; ls)\"; for ONE in \${arr[@]}; do rm -rf /usr/share/locale/\$ONE ; ln -s /usr/share/locale1/\$ONE /usr/share/locale/ ; done";
 
 WORKDIR /home/headless
 EXPOSE 10089/tcp 10081/tcp 10022/tcp

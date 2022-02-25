@@ -1,7 +1,7 @@
 #!/bin/bash
 limitIdx=$1
-# N=$(expr $limitIdx + $VNC_OFFSET)
-# echo "setVnc_N: $N$name1"
+N=$(expr $limitIdx + $VNC_OFFSET)
+echo "setVnc_N: display$N"
 
 # PULSE#################################################
 # touch /var/run/dbus/system_bus_socket && chmod 777 /var/run/dbus/system_bus_socket; #>>pulse: conn dbus err.
@@ -12,7 +12,7 @@ pulseaudio --exit-idle-time=-1 & #limitIdx in default.pa
 /usr/local/novnc-audio/broadcast-server -port $BCS_PORT & 
 
 # go:recordmp3> go:record+lame > just parec+lame
-url="localhost:$BCS_PORT/pulse-novnc.mp3?stream=true&advertise=true"
+url="localhost:$BCS_PORT/display$N-audio.mp3?stream=true&advertise=true"
 parec --format=s16le -d xrdp-sink.monitor |lame -r -ab 52 - - \
   | curl -k -H "Transfer-Encoding: chunked" -X POST -T -  "$url" &
 
