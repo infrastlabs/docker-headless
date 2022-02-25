@@ -1,5 +1,5 @@
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:xfce-deb9-v1 as loc
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile-v1 as bins
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile-v1 as xrdpbin
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/novnc-audio:bcs as bcs
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:box07-slim as box07
 FROM debian:stretch-slim
@@ -14,28 +14,24 @@ RUN domain="mirrors.aliyun.com" \
   && echo "deb http://$domain/debian/ stretch-updates main contrib non-free">> /etc/apt/sources.list; \
   \
   echo 'apt update -qq && apt install -yq --no-install-recommends $@ && apt-get clean && rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
-  && chmod +x /usr/local/bin/apt.sh
-
-# XRDP 26.673 MB
-RUN apt.sh \
+  && chmod +x /usr/local/bin/apt.sh; \
+  \
+  # XRDP 26.673 MB
   # \18.0 MB
-  tigervnc-standalone-server tigervnc-common xrdp; \
-  mkdir -p /etc/xrdp && xrdp-keygen xrdp auto && apt -y remove xrdp; \
+  apt.sh tigervnc-standalone-server tigervnc-common xrdp; \
+    mkdir -p /etc/xrdp && xrdp-keygen xrdp auto && apt -y remove xrdp; \
   # \23.4 MB
   apt.sh libfdk-aac1 pulseaudio supervisor; \
   # \5984 kB
   apt.sh wget ca-certificates python-numpy; \
+  # \
+  apt.sh curl lame sox libsox-fmt-mp3; \
   # \5868 kB
   apt.sh htop rsync tree tmux lrzsz psmisc fuse net-tools iputils-ping procps sudo iproute2 iptables \
   zip unzip xz-utils vim-tiny; \
   # \6248 kB
-  apt.sh fluxbox stterm hsetroot xcompmgr  openssh-sftp-server lftp jq; \
+  apt.sh fluxbox stterm hsetroot xcompmgr  dropbear-bin dropbear-run openssh-sftp-server lftp jq; \
   bash -c "rm -rf /usr/share/fluxbox{nls,styles}";
-# dropbear : Depends: dropbear-initramfs (>= 2015.68-1) but it is not going to be installed
-RUN apt.sh dropbear-bin dropbear-run
-
-# NOVNC +1.352 MB; clear: 6.5M > 5.4M
-COPY --from=box07 /usr/local/novnc /usr/local/novnc
 
 # --build-arg AUDIO=true
 ARG AUDIO=""
@@ -60,22 +56,23 @@ ARG FULL=""
 RUN test -z "$FULL" && exit 0;\
   domain="mirrors.aliyun.com" \
   && echo "deb http://$domain/debian/ stretch-backports main non-free contrib">> /etc/apt/sources.list \
-  && echo "deb http://$domain/debian-security/ stretch/updates main non-free contrib">> /etc/apt/sources.list;
-
-#19.642 MB; #APPS2 5.6 MB #LOCALE 13.4 MB
-RUN test -z "$FULL" && exit 0;\
+  && echo "deb http://$domain/debian-security/ stretch/updates main non-free contrib">> /etc/apt/sources.list; \
+  \
+  #19.642 MB; #APPS2 5.6 MB #LOCALE 13.4 MB
   apt.sh at-spi2-core  geany rofi papirus-icon-theme; \
   \
   apt.sh ${LOC_APPS2}; \
   \
-  apt.sh dconf-cli locales tzdata fonts-wqy-zenhei;
-
-#######largerApps 63.789 MB
-#IBUS: 26.5 MB #PIC: flameshot 10M, tumbler 6666kB(image cache); git 12.4 MB; 
-RUN test -z "$FULL" && exit 0;\
+  apt.sh dconf-cli locales tzdata fonts-wqy-zenhei; \
+  \
+  ##largerApps 63.789 MB  #IBUS: 26.5 MB #PIC: flameshot 10M, tumbler 6666kB(image cache); git 12.4 MB; 
   apt.sh ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
-  flameshot tumbler arandr  curl wget git \
-  gnupg libsecret-1-0 libnss3 libxtst6 libasound2;
+  \
+  apt.sh flameshot tumbler arandr \
+  \
+  apt.sh curl wget git \
+  \
+  apt.sh gnupg libsecret-1-0 libnss3 libxtst6 libasound2 libglu1-mesa xdg-utils;
   
 # ohmybash, asbru-cm: 10.269 MB
 RUN test -z "$FULL" && exit 0;\
@@ -84,20 +81,16 @@ RUN test -z "$FULL" && exit 0;\
   mv /opt/asbru /usr/local; rm -f /usr/bin/asbru-cm; ln -s /usr/local/asbru/asbru-cm /usr/bin/; \
   cd /usr/share/icons/hicolor/scalable/apps; rm -f asbru-cm.svg; ln -s /usr/local/asbru/res/asbru-logo.svg ./asbru-cm.svg
 
-RUN test -z "$FULL" && exit 0;\
-  apt.sh libglu1-mesa xdg-utils;
 
-# moveUp 9.214 MB
+# ==TODO: 用1个空镜像，再转一层： x5+6+2=13 > 1层;
+# NOVNC +1.352 MB; clear: 6.5M > 5.4M
+COPY --from=box07 /usr/local/novnc /usr/local/novnc
+# locale 9.214 MB
 COPY --from=loc /usr/share/locale1/emp${FULL} /usr/share/locale1
-
 # xrdp0914, xrdp3: v0916
-COPY --from=bins /usr/local/appdata/xrdp /usr/local/xrdp
-COPY --from=bins /usr/local/sysdata/var/lib/xrdp-pulseaudio-installer /var/lib/xrdp-pulseaudio-installer
-# COPY --from=bins /usr/local/st/st /usr/local/st/st
-RUN ln -s /usr/local/xrdp/sbin/xrdp /usr/sbin/;\
-  ln -s /usr/local/xrdp/sbin/xrdp-sesman /usr/sbin/;\
-  ln -s /usr/local/xrdp/sbin/xrdp-chansrv /usr/sbin/;\
-  ln -s /usr/local/xrdp/bin/xrdp-keygen /usr/bin/;
+COPY --from=xrdpbin /usr/local/appdata/xrdp /usr/local/xrdp
+COPY --from=xrdpbin /usr/local/sysdata/var/lib/xrdp-pulseaudio-installer /var/lib/xrdp-pulseaudio-installer
+COPY --from=bcs /app/broadcast-server /usr/local/novnc-audio/broadcast-server
 
 # COPY --chown=root:root ./src
 ADD src/dot /etc/skel
@@ -106,6 +99,10 @@ ADD src/*.sh /
 ADD src/xrdp.conf /etc/supervisor/conf.d/xrdp.conf
 ADD src/index.tpl.html /usr/local/novnc/index.tpl.html
 Add src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
+
+COPY src/f/dconf.ini /usr/share/dconf.ini 
+COPY src/f/.config/emp${FULL} /home/headless/.config/
+
 
 # stterm: TERM="xterm|vt100"
 ENV \
@@ -126,6 +123,12 @@ ENV \
   # L=zh_CN \
   TZ=Asia/Shanghai
 
+
+# xrdp-link
+RUN ln -s /usr/local/xrdp/sbin/xrdp /usr/sbin/;\
+  ln -s /usr/local/xrdp/sbin/xrdp-sesman /usr/sbin/;\
+  ln -s /usr/local/xrdp/sbin/xrdp-chansrv /usr/sbin/;\
+  ln -s /usr/local/xrdp/bin/xrdp-keygen /usr/bin/;
 
 # +headless
 # sv_user: http://blog.chinaunix.net/uid-26817066-id-5792715.html
@@ -153,8 +156,9 @@ RUN echo "welcome! HeadlessBox." > /etc/motd \
     printf '%s\n' 'session required pam_env.so readenv=1' >> /etc/pam.d/xrdp-sesman; \
     sed -i "s^path-exclude /usr/share/locale/\*^# path-exclude /usr/share/locale/\*^g" /etc/dpkg/dpkg.cfg.d/docker; \
     mkdir -p  /usr/share/man/man1/; \
-    su - headless -c "mkdir -p /home/headless/.config/plank/dock1/launchers";
+    su - headless -c "mkdir -p /home/headless/.config/plank/dock1/launchers"; \
     # rm -f /home/headless/.config/plank/dock1/launchers/*.dockitem;
+    cd /tmp/; wget https://m3.8js.net//20210522/tashanhe-shiqishune.mp3;
 
 ##AUDIO###########################
 # Setup D-Bus; ;
@@ -171,8 +175,6 @@ RUN test -z "$AUDIO" && exit 0;\
 
 ##FULL###########################
 # IBUS+DCONF env
-ADD src/f/dconf.ini /usr/share/dconf.ini 
-COPY src/f/.config/emp${FULL} /home/headless/.config/
 RUN test -z "$FULL" && exit 0;\
   find /home/headless/.config |wc; \
   ln -s /usr/share/rime-data/wubi_pinyin.schema.yaml /home/headless/.config/ibus/rime/; \
@@ -205,10 +207,6 @@ RUN test -z "$FULL" && exit 0;\
   # wget http://asia.pkg.bunsenlabs.org/debian/pool/main/b/bunsen-papirus-icon-theme/bunsen-papirus-icon-theme_10.3-2_all.deb; \
   wget https://gitee.com/infrastlabs/docker-headless/raw/dev/deploy/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
   dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb; 
-
-RUN apt.sh curl lame sox libsox-fmt-mp3; \
-  cd /tmp/; wget https://m3.8js.net//20210522/tashanhe-shiqishune.mp3
-COPY --from=bcs /app/broadcast-server /usr/local/novnc-audio/broadcast-server
 
 WORKDIR /home/headless
 EXPOSE 10089/tcp 10081/tcp 10022/tcp
