@@ -101,6 +101,9 @@ sudo apt -y install firefox-esr chromium #chromium-driver
 # WPS Office
 # https://blog.csdn.net/u012939880/article/details/89439647 #wps_symbol_fonts.zip
 wget https://wdl1.cache.wps.cn/wps/download/ep/Linux2019/10161/wps-office_11.1.0.10161_amd64.deb
+# ibus support with wps
+sed -i "1a export XMODIFIERS=@im=ibus" /usr/bin/wps /usr/bin/wpp /usr/bin/et
+sed -i "2a export QT_IM_MODULE=ibus" /usr/bin/wps /usr/bin/wpp /usr/bin/et
 ```
 
 ![](docs/res/02/apps-office-wps.jpg)
