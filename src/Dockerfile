@@ -17,14 +17,6 @@ RUN domain="mirrors.aliyun.com" \
   && chmod +x /usr/local/bin/apt.sh
 
 # XRDP 26.673 MB
-#  vncpasswd: tigervnc-common #66.6 kB;
-# AUDIO 19.893 MB; pavucontrol:2,363 kB pnmixer:815 kB;  +pulseaudio:14.6 MB/ubt:2805kB; +qmmp:28.7 MB
-#  chansrv: libfdk-aac.so.1
-#  mkdir -p /var/run/dbus #E: [pulseaudio] core-util.c: Failed to connect to system bus: Failed to connect to socket /var/run/dbus/system_bus_socket: 没有那个文件或目录
-# noVnc 9.793 MB 
-#  python-numpy 4643 kB #warnings.warn("no 'numpy' module, HyBi protocol will be slower")
-# BASE 4.279 MB
-# FLUX 6.932 MB #dropbear 2M? #openssh-sftp-server 39.5 kB
 RUN apt.sh \
   # \18.0 MB
   tigervnc-standalone-server tigervnc-common xrdp; \
@@ -43,24 +35,11 @@ RUN apt.sh \
 RUN apt.sh dropbear-bin dropbear-run
 
 # NOVNC +1.352 MB; clear: 6.5M > 5.4M
-# TODO +package.json: ui.js >> packageInfo.version
-# RUN export NO_VNC_HOME="/usr/local/novnc"; \
-#   mkdir -p ${NO_VNC_HOME}/utils/websockify \ 
-#   && wget -qO- https://github.com.cnpmjs.org/novnc/noVNC/archive/v1.2.0.tar.gz | tar xz --strip 1 -C ${NO_VNC_HOME} \
-#   && wget -qO- https://github.com.cnpmjs.org/novnc/websockify/archive/v0.9.0.tar.gz | tar xz --strip 1 -C ${NO_VNC_HOME}/utils/websockify; \
-#   bash -c "cd /usr/local/novnc; rm -rf .github package.json README.md .gitignore .eslint* .gitmodules tests docs; rm -rf ./utils/websockify/{tests,Windows,docs}; ";
 COPY --from=box07 /usr/local/novnc /usr/local/novnc
-#
+
 # --build-arg AUDIO=true
 ARG AUDIO=""
-# XFCE 36.596 MB; greybird.svg: 2.0M
-# APP1 19.746 MB
-# MP3 23.872 MB
-# FluxEx: 735.819 KB; lxappearance ##xfce4-appearance-settings: no use in box.
-# NOTIFY 864.768 KB; notifyd 234 kB; clipit 336 kB;
-#  gtk2-engines-pixbuf 58.9 kB; ##Gtk-WARNING **: 11:29:10.844: 无法在模块路径中找到主题引擎：“pixmap”，
-# Attach1: 684.210 KB  st.libharfbuzz0b 3447 kB 
-#  apt.sh libharfbuzz0b; ln -s /usr/local/st/st /bin/stterm;
+#XFCE 36.596 MB; #APP1 19.746 MB; #MP3 23.872 MB
 RUN test -z "$AUDIO" && exit 0;\
     # \40.1 MB
     apt.sh ${LOC_XFCE} greybird-gtk-theme; \
@@ -75,7 +54,6 @@ RUN test -z "$AUDIO" && exit 0;\
     apt.sh xfce4-notifyd clipit gtk2-engines-pixbuf; \
     \
     apt -y remove stterm; 
-# RUN apt -y remove stterm ##removed??: err non-install by dropbear.
 
 # --build-arg FULL=/..
 ARG FULL=""
@@ -84,9 +62,7 @@ RUN test -z "$FULL" && exit 0;\
   && echo "deb http://$domain/debian/ stretch-backports main non-free contrib">> /etc/apt/sources.list \
   && echo "deb http://$domain/debian-security/ stretch/updates main non-free contrib">> /etc/apt/sources.list;
 
-# 19.642 MB; papirus-icon-theme:  backports?@deb9
-# APPS2 5.624 MB gnome-system-monitor engrampa ristretto
-# LOCALE 13.450 MB --language-pack-gnome-zh-hans 
+#19.642 MB; #APPS2 5.6 MB #LOCALE 13.4 MB
 RUN test -z "$FULL" && exit 0;\
   apt.sh at-spi2-core  geany rofi papirus-icon-theme; \
   \
@@ -95,17 +71,12 @@ RUN test -z "$FULL" && exit 0;\
   apt.sh dconf-cli locales tzdata fonts-wqy-zenhei;
 
 #######largerApps 63.789 MB
-# IBUS: 26.5 MB
-# PIC: flameshot 10M, tumbler 6666kB(image cache) 10.5 MB (xrandr: x11-xserver-utils)
-# AUDIO: mpv 36M;
-# DEV: vscode 5.453 MB
-# SHELL: git 12.4 MB; on-my-bash; asbru-cm 11.3M
+#IBUS: 26.5 MB #PIC: flameshot 10M, tumbler 6666kB(image cache); git 12.4 MB; 
 RUN test -z "$FULL" && exit 0;\
   apt.sh ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
   flameshot tumbler arandr  curl wget git \
   gnupg libsecret-1-0 libnss3 libxtst6 libasound2;
   
-
 # ohmybash, asbru-cm: 10.269 MB
 RUN test -z "$FULL" && exit 0;\
   curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash; \
@@ -113,8 +84,6 @@ RUN test -z "$FULL" && exit 0;\
   mv /opt/asbru /usr/local; rm -f /usr/bin/asbru-cm; ln -s /usr/local/asbru/asbru-cm /usr/bin/; \
   cd /usr/share/icons/hicolor/scalable/apps; rm -f asbru-cm.svg; ln -s /usr/local/asbru/res/asbru-logo.svg ./asbru-cm.svg
 
-# Extend
-# wps: libglu1-mesa 168Kb; wps_11.1.0.10161: xdg-utils 71.5 kB;
 RUN test -z "$FULL" && exit 0;\
   apt.sh libglu1-mesa xdg-utils;
 
@@ -160,8 +129,6 @@ ENV \
 
 # +headless
 # sv_user: http://blog.chinaunix.net/uid-26817066-id-5792715.html
-# dbus-x11 fewSize 92.5Kb?, cause xvnc1,2: with two more processes. 
-#  700; chown headless: can only run with headless; dbus-daemon/dbus-launch; dbus-*: x8;
 RUN useradd -mp j9X2HRQvPCphA -s /bin/bash -G sudo headless \
   && echo "headless:headless" |chpasswd \
   && echo 'Cmnd_Alias SU = /bin/su' >> /etc/sudoers \
@@ -177,8 +144,7 @@ RUN useradd -mp j9X2HRQvPCphA -s /bin/bash -G sudo headless \
   mkdir -p /etc/novnc; rq=`date +%Y%m%d_%H%M%S`; openssl req -new -x509 -days 3650 -nodes -subj "/C=CA/ST=CA2/L=CA3/O=headless@docker/OU=update@image_$rq/CN=headless" -out /etc/novnc/self.pem -keyout /etc/novnc/self.pem;
 
 # +002
-# Make sesman read environment variables
-# locale>xx.mo: dpkg conf, use debian's tpl.
+#Make sesman read environment variables #locale>xx.mo: dpkg conf, use debian's tpl.
 RUN echo "welcome! HeadlessBox." > /etc/motd \
     && ln -s /usr/bin/vim.tiny /usr/bin/vt \
     && rm -f /bin/sh && ln -s /bin/bash /bin/sh \
@@ -205,9 +171,6 @@ RUN test -z "$AUDIO" && exit 0;\
 
 ##FULL###########################
 # IBUS+DCONF env
-#  dconf load / < dconf.ini  ##error: Cannot autolaunch D-Bus without X11 $DISPLAY
-#  ADD > COPY
-# ${FULL}=/..
 ADD src/f/dconf.ini /usr/share/dconf.ini 
 COPY src/f/.config/emp${FULL} /home/headless/.config/
 RUN test -z "$FULL" && exit 0;\
@@ -226,9 +189,7 @@ RUN test -z "$FULL" && exit 0;\
   dbus-launch dconf update;
 
 # LOCALE, OHMYBASH, SETTINGS
-# ref: mkdir /usr/share/locale1/emp/
-# COPY --from=loc /usr/share/locale1/emp${FULL} /usr/share/locale1
-# theme <property name="IconThemeName" type="string" value="gnome"/>
+# ref: /usr/share/locale1/emp${FULL} #theme set; bgset;
 RUN test -z "$FULL" && exit 0;\
   bash -c "arr=\"$(cd /usr/share/locale1; ls)\"; for ONE in \${arr[@]}; do rm -rf /usr/share/locale/\$ONE ; ln -s /usr/share/locale1/\$ONE /usr/share/locale/ ; done"; \
   \
@@ -246,13 +207,9 @@ RUN test -z "$FULL" && exit 0;\
   dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb; 
 
 RUN apt.sh curl lame sox libsox-fmt-mp3; \
-  wget https://m3.8js.net//20210522/tashanhe-shiqishune.mp3
+  cd /tmp/; wget https://m3.8js.net//20210522/tashanhe-shiqishune.mp3
 COPY --from=bcs /app/broadcast-server /usr/local/novnc-audio/broadcast-server
-# COPY conf/vnc_lite.html /usr/local/novnc/
-# COPY conf/index.tpl.html /usr/local/novnc/
 
 WORKDIR /home/headless
-# EXPOSE 3389/tcp 6080/tcp 22/tcp 6000/tcp 4713/tcp
-# CMD ["supervisord", "-n"]
 EXPOSE 10089/tcp 10081/tcp 10022/tcp
 CMD ["/entry.sh"]
