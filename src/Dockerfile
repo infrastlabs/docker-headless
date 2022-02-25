@@ -1,14 +1,15 @@
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:xfce-deb9-v1 as loc
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile-v1 as bins
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/novnc-audio:bcs as bcs
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:box07-slim as box07
 FROM debian:stretch-slim
 ENV \
   DEBIAN_FRONTEND=noninteractive \
-  LOC_APPS="tint2 plank thunar sakura geany rofi dunst" \
+  # LOC_APPS="tint2 plank thunar sakura geany rofi dunst" \
   LOC_APPS2="gnome-system-monitor engrampa ristretto" \
   LOC_XFCE="xfce4-settings xfce4-session xfwm4 xfdesktop4"
 
-RUN domain="mirrors.163.com" \
+RUN domain="mirrors.aliyun.com" \
   && echo "deb http://$domain/debian/ stretch main contrib non-free" > /etc/apt/sources.list \
   && echo "deb http://$domain/debian/ stretch-updates main contrib non-free">> /etc/apt/sources.list; \
   \
@@ -25,27 +26,31 @@ RUN domain="mirrors.163.com" \
 # BASE 4.279 MB
 # FLUX 6.932 MB #dropbear 2M? #openssh-sftp-server 39.5 kB
 RUN apt.sh \
+  # \18.0 MB
   tigervnc-standalone-server tigervnc-common xrdp; \
   mkdir -p /etc/xrdp && xrdp-keygen xrdp auto && apt -y remove xrdp; \
-  \
+  # \23.4 MB
   apt.sh libfdk-aac1 pulseaudio supervisor; \
-  \
+  # \5984 kB
   apt.sh wget ca-certificates python-numpy; \
-  \
+  # \5868 kB
   apt.sh htop rsync tree tmux lrzsz psmisc fuse net-tools iputils-ping procps sudo iproute2 iptables \
   zip unzip xz-utils vim-tiny; \
-  \
-  apt.sh fluxbox stterm hsetroot xcompmgr  dropbear openssh-sftp-server lftp jq; \
+  # \6248 kB
+  apt.sh fluxbox stterm hsetroot xcompmgr  openssh-sftp-server lftp jq; \
   bash -c "rm -rf /usr/share/fluxbox{nls,styles}";
+# dropbear : Depends: dropbear-initramfs (>= 2015.68-1) but it is not going to be installed
+RUN apt.sh dropbear-bin dropbear-run
 
 # NOVNC +1.352 MB; clear: 6.5M > 5.4M
 # TODO +package.json: ui.js >> packageInfo.version
-RUN export NO_VNC_HOME="/usr/local/novnc"; \
-  mkdir -p ${NO_VNC_HOME}/utils/websockify \ 
-  && wget -qO- https://github.com.cnpmjs.org/novnc/noVNC/archive/v1.2.0.tar.gz | tar xz --strip 1 -C ${NO_VNC_HOME} \
-  && wget -qO- https://github.com.cnpmjs.org/novnc/websockify/archive/v0.9.0.tar.gz | tar xz --strip 1 -C ${NO_VNC_HOME}/utils/websockify; \
-  bash -c "cd /usr/local/novnc; rm -rf .github package.json README.md .gitignore .eslint* .gitmodules tests docs; rm -rf ./utils/websockify/{tests,Windows,docs}; ";
-
+# RUN export NO_VNC_HOME="/usr/local/novnc"; \
+#   mkdir -p ${NO_VNC_HOME}/utils/websockify \ 
+#   && wget -qO- https://github.com.cnpmjs.org/novnc/noVNC/archive/v1.2.0.tar.gz | tar xz --strip 1 -C ${NO_VNC_HOME} \
+#   && wget -qO- https://github.com.cnpmjs.org/novnc/websockify/archive/v0.9.0.tar.gz | tar xz --strip 1 -C ${NO_VNC_HOME}/utils/websockify; \
+#   bash -c "cd /usr/local/novnc; rm -rf .github package.json README.md .gitignore .eslint* .gitmodules tests docs; rm -rf ./utils/websockify/{tests,Windows,docs}; ";
+COPY --from=box07 /usr/local/novnc /usr/local/novnc
+#
 # --build-arg AUDIO=true
 ARG AUDIO=""
 # XFCE 36.596 MB; greybird.svg: 2.0M
@@ -57,23 +62,25 @@ ARG AUDIO=""
 # Attach1: 684.210 KB  st.libharfbuzz0b 3447 kB 
 #  apt.sh libharfbuzz0b; ln -s /usr/local/st/st /bin/stterm;
 RUN test -z "$AUDIO" && exit 0;\
+    # \40.1 MB
     apt.sh ${LOC_XFCE} greybird-gtk-theme; \
     rm -f /usr/share/backgrounds/greybird.svg; \
-    \
-    apt.sh tint2 plank thunar sakura dunst; \
-    \
+    # \24.4 MB
+    apt.sh tint2 plank thunar sakura; \
+    # \18.8 MB
     apt.sh pavucontrol pnmixer qmmp; \
-    \
+    # \82.0 kB
     apt.sh lxappearance dbus-x11; \
-    \
-    apt.sh xfce4-notifyd clipit gtk2-engines-pixbuf && apt -y remove dunst; \
+    # \615 kB 
+    apt.sh xfce4-notifyd clipit gtk2-engines-pixbuf; \
     \
     apt -y remove stterm; 
+# RUN apt -y remove stterm ##removed??: err non-install by dropbear.
 
 # --build-arg FULL=/..
 ARG FULL=""
 RUN test -z "$FULL" && exit 0;\
-  domain="mirrors.163.com" \
+  domain="mirrors.aliyun.com" \
   && echo "deb http://$domain/debian/ stretch-backports main non-free contrib">> /etc/apt/sources.list \
   && echo "deb http://$domain/debian-security/ stretch/updates main non-free contrib">> /etc/apt/sources.list;
 
@@ -85,7 +92,7 @@ RUN test -z "$FULL" && exit 0;\
   \
   apt.sh ${LOC_APPS2}; \
   \
-  apt.sh dconf-cli locales tzdata fonts-wqy-zenhei; \
+  apt.sh dconf-cli locales tzdata fonts-wqy-zenhei;
 
 #######largerApps 63.789 MB
 # IBUS: 26.5 MB
