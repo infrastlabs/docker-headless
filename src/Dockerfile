@@ -5,7 +5,7 @@ FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:box07-slim as
 FROM debian:stretch-slim
 ENV \
   DEBIAN_FRONTEND=noninteractive \
-  # LOC_APPS="tint2 plank thunar sakura geany rofi dunst" \
+  LOC_APPS="tint2 plank thunar sakura" \
   LOC_APPS2="gnome-system-monitor engrampa ristretto" \
   LOC_XFCE="xfce4-settings xfce4-session xfwm4 xfdesktop4"
 
@@ -33,7 +33,10 @@ RUN domain="mirrors.aliyun.com" \
   apt.sh fluxbox stterm hsetroot xcompmgr  dropbear-bin dropbear-run openssh-sftp-server lftp jq; \
   bash -c "rm -rf /usr/share/fluxbox{nls,styles}";
 
-# --build-arg AUDIO=true
+# --build-arg AUDIO=true --build-arg FULL=/..
+# ARG \
+#   AUDIO="" \
+#   FULL=""
 ARG AUDIO=""
 #XFCE 36.596 MB; #APP1 19.746 MB; #MP3 23.872 MB
 RUN test -z "$AUDIO" && exit 0;\
@@ -41,7 +44,7 @@ RUN test -z "$AUDIO" && exit 0;\
     apt.sh ${LOC_XFCE} greybird-gtk-theme; \
     rm -f /usr/share/backgrounds/greybird.svg; \
     # \24.4 MB
-    apt.sh tint2 plank thunar sakura; \
+    apt.sh ${LOC_APPS}; \
     # \18.8 MB
     apt.sh pavucontrol pnmixer qmmp; \
     # \82.0 kB
@@ -59,22 +62,24 @@ RUN test -z "$FULL" && exit 0;\
   && echo "deb http://$domain/debian-security/ stretch/updates main non-free contrib">> /etc/apt/sources.list; \
   \
   #19.642 MB; #APPS2 5.6 MB #LOCALE 13.4 MB
+  # \14.8 MB
   apt.sh at-spi2-core  geany rofi papirus-icon-theme; \
-  \
+  # \5729 kB
   apt.sh ${LOC_APPS2}; \
-  \
+  # \11.6 MB
   apt.sh dconf-cli locales tzdata fonts-wqy-zenhei; \
   \
   ##largerApps 63.789 MB  #IBUS: 26.5 MB #PIC: flameshot 10M, tumbler 6666kB(image cache); git 12.4 MB; 
-  apt.sh ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
-  \
-  apt.sh flameshot tumbler arandr \
-  \
-  apt.sh curl wget git \
-  \
+  # \24.8 MB
+  apt.sh ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi; \
+  # \18.4 MB
+  apt.sh flameshot tumbler arandr; \
+  # \6160 kB
+  apt.sh git; \
+  # \2249 kB
   apt.sh gnupg libsecret-1-0 libnss3 libxtst6 libasound2 libglu1-mesa xdg-utils;
   
-# ohmybash, asbru-cm: 10.269 MB
+# asbru-cm: 10.5 MB
 RUN test -z "$FULL" && exit 0;\
   curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash; \
   apt.sh asbru-cm; rm -f /etc/apt/sources.list.d/asbru-cm-release.list; \
@@ -101,7 +106,8 @@ ADD src/index.tpl.html /usr/local/novnc/index.tpl.html
 Add src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
 
 COPY src/f/dconf.ini /usr/share/dconf.ini 
-COPY src/f/.config/emp${FULL} /home/headless/.config/
+# /home/headless/.config权限..
+# COPY src/f/.config/emp${FULL} /home/headless/.config/
 
 
 # stterm: TERM="xterm|vt100"
@@ -145,9 +151,12 @@ RUN useradd -mp j9X2HRQvPCphA -s /bin/bash -G sudo headless \
   sed -i "${line}cchmod=0770" /etc/supervisor/supervisord.conf; \
   sed -i "${line}achown=headless:headless" /etc/supervisor/supervisord.conf; \
   mkdir -p /etc/novnc; rq=`date +%Y%m%d_%H%M%S`; openssl req -new -x509 -days 3650 -nodes -subj "/C=CA/ST=CA2/L=CA3/O=headless@docker/OU=update@image_$rq/CN=headless" -out /etc/novnc/self.pem -keyout /etc/novnc/self.pem;
+# /home/headless/.config权限..
+COPY --chown=headless:headless src/f/.config/emp${FULL} /home/headless/.config/
 
 # +002
 #Make sesman read environment variables #locale>xx.mo: dpkg conf, use debian's tpl.
+# mkdir: cannot create directory '/home/headless/.config/plank': Permission denied
 RUN echo "welcome! HeadlessBox." > /etc/motd \
     && ln -s /usr/bin/vim.tiny /usr/bin/vt \
     && rm -f /bin/sh && ln -s /bin/bash /bin/sh \
@@ -162,12 +171,13 @@ RUN echo "welcome! HeadlessBox." > /etc/motd \
 
 ##AUDIO###########################
 # Setup D-Bus; ;
+# cd: /home/headless/.qmmp/skins/: No such file or directory
 RUN test -z "$AUDIO" && exit 0;\
   mkdir -p /run/dbus/ && chown messagebus:messagebus /run/dbus/; \
   dbus-uuidgen > /etc/machine-id; \
   ln -sf /etc/machine-id /var/lib/dbus/machine-id; \
   \
-  cd /home/headless/.qmmp/skins/; unzip Dark_Materia.wsz; chmod 755 -R darkmateria; \
+  # cd /home/headless/.qmmp/skins/; unzip Dark_Materia.wsz; chmod 755 -R darkmateria; \
   wget -qO /usr/share/backgrounds/xfce/pure-blue.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/deploy/assets/pure-blue.jpg; \
   wget -qO /usr/share/backgrounds/xfce/xfce-teal.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/deploy/assets/bg-debian-litegrey.png;
   
