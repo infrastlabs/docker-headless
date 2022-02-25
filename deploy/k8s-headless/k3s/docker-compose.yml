@@ -1,0 +1,61 @@
+# to run define K3S_TOKEN, K3S_VERSION is optional, eg:
+#   K3S_TOKEN=${RANDOM}${RANDOM}${RANDOM} docker-compose up
+
+version: '3'
+networks:
+  k3snet:
+    ipam:
+      config:
+      - subnet: 3.4.5.0/24
+services:
+  server:
+    # https://rancher.com/docs/k3s/latest/en/installation/install-options/server-config/
+    # server --disable-agent --cluster-cidr=7.0.0.0/16 #default: “10.42.0.0/16”
+    # --service-cidr=6.7.8.0/23 #default: “10.43.0.0/16”
+    # --cluster-domain=t1.k3s #default: “cluster.local”
+    # --tls-san=172.17.0.210 
+    # --kube-apiserver-arg="log-file=/tmp/kubeapi.log" 
+    # --kube-apiserver-arg="bind-address=0.0.0.0" 
+    # --no-deploy=traefik --no-deploy=coredns
+    image: "registry.cn-shenzhen.aliyuncs.com/infrastlabs/k3s:${K3S_VERSION:-latest}"
+    command: server --kube-apiserver-arg="service-node-port-range=30000-30050"
+    tmpfs:
+    - /run
+    - /var/run
+    # hostname: k3-server
+    # network_mode: "host"
+    privileged: true
+    environment:
+    - K3S_TOKEN=${K3S_TOKEN:?err}
+    - K3S_KUBECONFIG_OUTPUT=/output/kubeconfig.yaml
+    - K3S_KUBECONFIG_MODE=666
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    # This is just so that we get the kubeconfig file out
+    - .kube:/output #may cause data1_server mount fail?
+    - ./k3s-server:/var/lib/rancher/k3s
+    - ./data1_server:/data1
+    ports:
+    - 6443:6443
+    - "30000-30050:30000-30050"
+    # - "49152-65535:49152-65535/udp"
+    networks:
+    - k3snet  
+
+  agent:
+    image: "registry.cn-shenzhen.aliyuncs.com/infrastlabs/k3s:${K3S_VERSION:-latest}"
+    tmpfs:
+    - /run
+    - /var/run
+    privileged: true
+    environment:
+    - K3S_URL=https://server:6443
+    - K3S_TOKEN=${K3S_TOKEN:?err}
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ./data1_agent:/data1
+    networks:
+    - k3snet    
+      
+# volumes:
+#   k3s-server: {}

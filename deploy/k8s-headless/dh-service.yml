@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: headless
+  namespace: default
+  labels:
+    app: headless
+spec:
+  ports:
+    - port: 10022
+      name: ssh
+      targetPort: 10022
+    - port: 10081
+      name: novnc
+      targetPort: 10081
+    - port: 10089
+      name: rdp
+      targetPort: 10089
+  selector:
+    app: "headless"
+  type: NodePort

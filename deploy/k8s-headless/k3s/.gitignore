@@ -1,0 +1,5 @@
+.env
+.kube
+kubeconfig.yaml
+
+k3s-server

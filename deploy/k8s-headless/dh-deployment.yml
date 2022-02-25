@@ -1,0 +1,32 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: headless
+  namespace: default
+  labels:
+    app: headless
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: headless
+  template:
+    metadata:
+      labels:
+        app: headless
+    spec:
+      #imagePullSecrets:
+      #- name: regsecret
+      containers:
+      - name: headless
+        image: infrastlabs/docker-headless:full
+        imagePullPolicy: Always
+        # command: ['sh', '-c']
+        # args:
+        # - tail -f /dev/null
+        ports:
+        - containerPort: 10022
+        - containerPort: 10081
+        - containerPort: 10089
+      restartPolicy: Always
