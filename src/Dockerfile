@@ -2,6 +2,27 @@ FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:xfce-deb9-v1 
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile-v1 as xrdpbin
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/novnc-audio:bcs as bcs
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:box07-slim as box07
+
+# ==DO: 用1个空镜像，再转一层： x5+6+2=13 > 1层;
+FROM scratch as files
+  # NOVNC +1.352 MB; clear: 6.5M > 5.4M
+  COPY --from=box07 /usr/local/novnc /usr/local/novnc
+  # locale 9.214 MB
+  COPY --from=loc /usr/share/locale1/emp${FULL} /usr/share/locale1
+  # xrdp0914, xrdp3: v0916
+  COPY --from=xrdpbin /usr/local/appdata/xrdp /usr/local/xrdp
+  COPY --from=xrdpbin /usr/local/sysdata/var/lib/xrdp-pulseaudio-installer /var/lib/xrdp-pulseaudio-installer
+  COPY --from=bcs /app/broadcast-server /usr/local/novnc-audio/broadcast-server
+
+  # COPY --chown=root:root ./src
+  ADD src/dot /etc/skel
+  ADD src/etc /etc
+  ADD src/*.sh /
+  ADD src/xrdp.conf /etc/supervisor/conf.d/xrdp.conf
+  ADD src/index.tpl.html /usr/local/novnc/index.tpl.html
+  Add src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
+  COPY src/f/dconf.ini /usr/share/dconf.ini 
+
 FROM debian:stretch-slim
 ENV \
   DEBIAN_FRONTEND=noninteractive \
@@ -86,29 +107,11 @@ RUN test -z "$FULL" && exit 0;\
   mv /opt/asbru /usr/local; rm -f /usr/bin/asbru-cm; ln -s /usr/local/asbru/asbru-cm /usr/bin/; \
   cd /usr/share/icons/hicolor/scalable/apps; rm -f asbru-cm.svg; ln -s /usr/local/asbru/res/asbru-logo.svg ./asbru-cm.svg
 
-
-# ==TODO: 用1个空镜像，再转一层： x5+6+2=13 > 1层;
-# NOVNC +1.352 MB; clear: 6.5M > 5.4M
-COPY --from=box07 /usr/local/novnc /usr/local/novnc
-# locale 9.214 MB
-COPY --from=loc /usr/share/locale1/emp${FULL} /usr/share/locale1
-# xrdp0914, xrdp3: v0916
-COPY --from=xrdpbin /usr/local/appdata/xrdp /usr/local/xrdp
-COPY --from=xrdpbin /usr/local/sysdata/var/lib/xrdp-pulseaudio-installer /var/lib/xrdp-pulseaudio-installer
-COPY --from=bcs /app/broadcast-server /usr/local/novnc-audio/broadcast-server
-
-# COPY --chown=root:root ./src
-ADD src/dot /etc/skel
-ADD src/etc /etc
-ADD src/*.sh /
-ADD src/xrdp.conf /etc/supervisor/conf.d/xrdp.conf
-ADD src/index.tpl.html /usr/local/novnc/index.tpl.html
-Add src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
-
-COPY src/f/dconf.ini /usr/share/dconf.ini 
-# /home/headless/.config权限..
-# COPY src/f/.config/emp${FULL} /home/headless/.config/
-
+COPY --from=files / /
+# xrdp-link
+RUN export xrdp=/usr/local/xrdp; \
+  ln -s $xrdp/sbin/xrdp /usr/sbin/; ln -s $xrdp/sbin/xrdp-sesman /usr/sbin/;\
+  ln -s $xrdp/sbin/xrdp-chansrv /usr/sbin/; ln -s $xrdp/bin/xrdp-keygen /usr/bin/;
 
 # stterm: TERM="xterm|vt100"
 ENV \
@@ -129,12 +132,6 @@ ENV \
   # L=zh_CN \
   TZ=Asia/Shanghai
 
-
-# xrdp-link
-RUN ln -s /usr/local/xrdp/sbin/xrdp /usr/sbin/;\
-  ln -s /usr/local/xrdp/sbin/xrdp-sesman /usr/sbin/;\
-  ln -s /usr/local/xrdp/sbin/xrdp-chansrv /usr/sbin/;\
-  ln -s /usr/local/xrdp/bin/xrdp-keygen /usr/bin/;
 
 # +headless
 # sv_user: http://blog.chinaunix.net/uid-26817066-id-5792715.html
