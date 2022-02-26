@@ -14,7 +14,7 @@
 - 多语言本土化，中文输入法(五笔/拼音)
 - 桌面：Xfce4, Mate, Fluxbox, ..（默认: xfce4）
 - 发行版：Debian9/10/11, Ubuntu1804/2004, .. （默认: debian9）
-- 精简小巧 `丐版: 95M(无UI音频管理)`, `豪华版: 167M(latest默认,无本土化)`, `旗舰版: 287M`
+- 精简小巧 `丐版: 95M(无音频面板)`, `豪华版: 167M(latest默认,无本土化)`, `旗舰版: 287M`
 
 ## 快速开始
 
@@ -39,11 +39,12 @@ echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /
 **(2)使用帮助**: 
 
 - [云桌面功能简介](./docs/01-CloudDesktop.md)
-- [1.如何设置为中文或其它语言？](./docs/b0-locale.md)
-- [2.双屏连接，远程剪切板、音频如何使用？](./docs/b1-rdp.md)
-- [3.如何WEB访问远程桌面？](./docs/b2-vnc.md)
-- [4.中文输入法、截图软件的使用说明](./docs/b3-apps.md)
-- [5.音乐播放器及远程音频相关说明](./docs/b4-audio.md)
+- [1.如何设置为中文或其它语言？](./docs/b1-locale.md)
+- [2.双屏连接，远程剪切板、音频如何使用？](./docs/b2-rdp.md)
+- [3.如何WEB访问远程桌面？](./docs/b3-vnc.md)
+- [4.中文输入法、截图软件使用说明](./docs/b4-apps.md)
+- [5.音乐播放器及远程音频相关说明](./docs/b5-audio.md)
+- [6.如何使用Ubuntu, Mate等其它桌面](./docs/b6-desktop.md) TODO
 - [Detail明细说明](./detail.md) （快捷键、环境变量、系统应用）
 
 

@@ -23,7 +23,7 @@
 
 ```bash
 export DISPLAY=192.168.0.x:21 #远程图像显示
-export PULSE_SERVER=192.168.0.x:47013 #远程声音
+export PULSE_SERVER=tcp:192.168.0.x:4721 #远程声音
 # ./xx 启动图形化应用
 ```
 
