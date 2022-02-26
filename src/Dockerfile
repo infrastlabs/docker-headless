@@ -57,9 +57,6 @@ RUN domain="mirrors.aliyun.com" \
   bash -c "rm -rf /usr/share/fluxbox{nls,styles}";
 
 # --build-arg AUDIO=true --build-arg FULL=/..
-# ARG \
-#   AUDIO="" \
-#   FULL=""
 ARG AUDIO=""
 #XFCE 36.596 MB; #APP1 19.746 MB; #MP3 23.872 MB
 RUN test -z "$AUDIO" && exit 0;\
@@ -133,9 +130,12 @@ RUN bash /xconf.sh "param|${AUDIO}" "param|${FULL}"
 # /home/headless/.config权限..
 COPY --chown=headless:headless src/f/.config/emp${FULL} /home/headless/.config/
 RUN test -z "$AUDIO" && exit 0;\ 
+  test -z "$FULL" && apt.sh gnome-system-monitor; \
   cd /home/headless/.qmmp/skins/; unzip Dark_Materia.wsz; chmod 755 -R darkmateria; \
   test -z "$FULL" && exit 0;\ 
-  # cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*; \
+  # replace bg with: xfce-blue.jpg
+  cat /usr/share/backgrounds/xfce/xfce-blue.jpg > /usr/share/backgrounds/xfce/xfce-teal.jpg; \
+  cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*; \
   bash -c "arr=\"$(cd /usr/share/locale1; ls)\"; for ONE in \${arr[@]}; do rm -rf /usr/share/locale/\$ONE ; ln -s /usr/share/locale1/\$ONE /usr/share/locale/ ; done";
 
 WORKDIR /home/headless
