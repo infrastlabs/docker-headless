@@ -50,11 +50,6 @@ case "$cmd" in
         docker push $repo/$ns/$img
         docker tag $repo/$ns/$img $repo/$ns/docker-headless:slim
         docker push $repo/$ns/docker-headless:slim
-        # dockerHub
-        # docker tag $repo/$ns/$img $ns/$img
-        # docker push $ns/$img
-        # docker tag $ns/$img $ns/docker-headless:slim
-        # docker push $ns/docker-headless:slim
 
         # AUDIO=true
         img="docker-headless:$ver" && echo -e "\n\nimg: $img"
@@ -62,11 +57,6 @@ case "$cmd" in
         docker push $repo/$ns/$img
         docker tag $repo/$ns/$img $repo/$ns/docker-headless:latest #latest
         docker push $repo/$ns/docker-headless:latest
-        # dockerHub
-        # docker tag $repo/$ns/$img $ns/$img
-        # docker push $ns/$img
-        # docker tag $ns/$img $ns/docker-headless:latest
-        # docker push $ns/docker-headless:latest
 
         # FULL=/.. #for COPY
         img="docker-headless:$ver-full" && echo -e "\n\nimg: $img"
@@ -74,11 +64,6 @@ case "$cmd" in
         docker push $repo/$ns/$img
         docker tag $repo/$ns/$img $repo/$ns/docker-headless:full
         docker push $repo/$ns/docker-headless:full
-        # dockerHub
-        # docker tag $repo/$ns/$img $ns/$img
-        # docker push $ns/$img
-        # docker tag $ns/$img $ns/docker-headless:full
-        # docker push $ns/docker-headless:full
         ;;
 esac
 
