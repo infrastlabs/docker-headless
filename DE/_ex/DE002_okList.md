@@ -17,6 +17,8 @@ apt-get install -y tigervnc-common tigervnc-scraping-server tigervnc-standalone-
 
 ## KDE: @ubt1804-bionic
 
+- https://github.com/ms-jpq/kde-in-docker
+
 ```bash
 # https://github.com/ms-jpq/kde-in-docker/tree/daddy/base/bionic
 docker run -p 8080:8080 -p 5900:5900 msjpq/kde-vnc:bionic  #KDE on 18.04 lts. 620MB   >>docker run -p 8080:8080 -p 5908:5900 jobinbasani/kde_vnc_docker_desktop #kubuntu, plasma;

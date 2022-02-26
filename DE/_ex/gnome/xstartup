@@ -1,0 +1,16 @@
+#!/bin/sh
+
+export XDG_SESSION_TYPE=x11
+export XKL_XMODMAP_DISABLE=1
+unset SESSION_MANAGER
+unset DBUS_SESSION_BUS_ADDRESS
+
+# [ -x /etc/vnc/xstartup ] && exec /etc/vnc/xstartup
+[ -r $HOME/.Xresources ] && xrdb $HOME/.Xresources
+# vncconfig -nowin &
+
+export DISPLAY=:31
+dbus-launch --exit-with-session gnome-session
+# default@host-21-62:~$ dbus-launch --exit-with-session gnome-session
+# gnome-session-is-accelerated: No hardware 3D support.
+# gnome-session-check-accelerated: GL Helper exited with code 256

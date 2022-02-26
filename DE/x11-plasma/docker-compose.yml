@@ -1,0 +1,20 @@
+version: '2.4'
+services:
+  x11:
+    image: infrastlabs/docker-headless:slim
+    restart: unless-stopped
+    environment:
+      - SSH_PASS=headless
+      - VNC_PASS=headless
+      - VNC_PASS_RO=View123
+      - VNC_OFFSET=30
+      - VNC_LIMIT=3
+    network_mode: host
+  de-plasma:
+    image: msjpq/kde-vnc:bionic
+    #command: tail -f /dev/null
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - DISPLAY=:31
+      - PULSE_SERVER=tcp:localhost:4731      

@@ -16,4 +16,4 @@ services:
     network_mode: host
     environment:
       - DISPLAY=:21
-      - PULSE_SERVER=:47021
+      - PULSE_SERVER=tcp:localhost:4721

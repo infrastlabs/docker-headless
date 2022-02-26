@@ -19,7 +19,7 @@ services:
     network_mode: host
     environment:
       - DISPLAY=:21
-      - PULSE_SERVER=tcp:localhost:47021
+      - PULSE_SERVER=tcp:localhost:4721
     volumes:
       - /_ext:/_ext
       - /opt:/opt
