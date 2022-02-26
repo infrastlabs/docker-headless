@@ -11,6 +11,9 @@ spec:
     - port: 10022
       name: ssh
       targetPort: 10022
+    - port: 10082
+      name: audio
+      targetPort: 10082
     - port: 10081
       name: novnc
       targetPort: 10081

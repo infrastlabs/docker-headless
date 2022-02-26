@@ -28,5 +28,6 @@ spec:
         ports:
         - containerPort: 10022
         - containerPort: 10081
+        - containerPort: 10082
         - containerPort: 10089
       restartPolicy: Always
