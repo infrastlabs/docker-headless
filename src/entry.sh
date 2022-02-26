@@ -52,7 +52,7 @@ function setVnc(){
 environment=DISPLAY=:$N,HOME=/home/$user1
 priority=35
 user=$user1
-command=/xvnc.sh :$N
+command=/xvnc.sh $N
 stdout_logfile=/dev/fd/1
 stdout_logfile_maxbytes=0
 redirect_stderr=true
