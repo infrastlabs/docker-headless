@@ -13,7 +13,7 @@ services:
       retries: 3
       start_period: 5s
     network_mode: bridge #when network_mode!=host, change the mapping to avoid port-confilct.
-    privileged: true
+    # privileged: true
     shm_size: 1g
     ports:
       - "10089:10089"
@@ -28,7 +28,7 @@ services:
       - VNC_PASS_RO=View123
       - VNC_SSL_ONLY=false
       - VNC_CERT=      #when empty: random generate each restart.
-      # - VNC_OFFSET=0 #network_mode: host, aviod port-conflict
+      - VNC_OFFSET=10  #network_mode: host, aviod port-conflict
       # - VNC_LIMIT=3  #GatewayMode: for multi vnc instances.
       - TZ=Asia/Shanghai
       - L=zh_CN

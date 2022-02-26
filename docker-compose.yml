@@ -16,9 +16,9 @@ services:
       - SSH_PASS=headless
       - VNC_PASS=headless
       - VNC_PASS_RO=View123
+      - VNC_OFFSET=10  #Aviod port-conflict
       - L=zh_CN
     network_mode: host
-    privileged: true
     shm_size: 1g
     # Persist Data
     volumes:
