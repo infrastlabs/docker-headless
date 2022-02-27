@@ -20,7 +20,10 @@ services:
       - /:/mnt
 
   de-mate:
-    image: x11docker/mate
+    image: infrastlabs/docker-headless
+    command: xfce4-session
+    user: headless
+    # image: x11docker/mate
     restart: unless-stopped
     depends_on:
       - x11
@@ -51,6 +54,21 @@ services:
     environment:
       - DISPLAY=x11:33
       - PULSE_SERVER=tcp:x11:4733
+    volumes:
+      - /_ext:/_ext
+      - /:/mnt
+
+  de-headless:
+    image: infrastlabs/docker-headless
+    #command: startxfce4
+    command: xfce4-session
+    user: headless
+    restart: unless-stopped
+    depends_on:
+      - x11
+    environment:
+      - DISPLAY=x11:34
+      - PULSE_SERVER=tcp:x11:4734
     volumes:
       - /_ext:/_ext
       - /:/mnt
