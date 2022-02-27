@@ -44,7 +44,7 @@ echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /
 - [3.如何WEB访问远程桌面？](./docs/b3-vnc.md)
 - [4.中文输入法、截图软件使用说明](./docs/b4-apps.md)
 - [5.音乐播放器及远程音频相关说明](./docs/b5-audio.md)
-- [6.如何使用Ubuntu, Mate等其它桌面](./docs/b6-desktop.md) TODO
+- [6.如何使用Ubuntu, Mate，KDE等其它桌面](./docs/b6-desktop.md) (多桌面,网关模式)
 - [Detail明细说明](./detail.md) （快捷键、环境变量、系统应用）
 
 
