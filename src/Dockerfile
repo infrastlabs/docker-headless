@@ -2,6 +2,7 @@ FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:xfce-deb9-v1 
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile-v1 as xrdpbin
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/novnc-audio:bcs as bcs
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:box07-slim as box07
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-ubuntu-desktop-vnc:x11 as Xvnc
 
 # ==DO: 用1个空镜像，再转一层： x5+6+2=13 > 1层;
 FROM scratch as files
@@ -14,6 +15,10 @@ FROM scratch as files
   COPY --from=xrdpbin /usr/local/appdata/xrdp /usr/local/xrdp
   COPY --from=xrdpbin /usr/local/sysdata/var/lib/xrdp-pulseaudio-installer /var/lib/xrdp-pulseaudio-installer
   COPY --from=bcs /app/broadcast-server /usr/local/novnc-audio/broadcast-server
+  # up tigervnc: v1.10.1 for gnome, cinnamon
+  COPY --from=Xvnc /usr/bin/Xvnc /usr/bin/Xvnc
+  COPY --from=Xvnc /usr/lib64/swrast_dri.so /usr/lib64/swrast_dri.so
+  COPY --from=Xvnc /usr/lib64/xorg/protocol.txt /usr/lib64/xorg/protocol.txt
 
   # COPY --chown=root:root ./src
   ADD src/dot /etc/skel
