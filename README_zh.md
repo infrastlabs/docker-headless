@@ -39,6 +39,7 @@ echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /
 **(2)使用帮助**: 
 
 - [云桌面功能简介](./docs/01-CloudDesktop.md)
+- [Next TODO](./docs/b0-todo.md)
 - [1.如何设置为中文或其它语言？](./docs/b1-locale.md)
 - [2.双屏连接，远程剪切板、音频如何使用？](./docs/b2-rdp.md)
 - [3.如何WEB访问远程桌面？](./docs/b3-vnc.md)

@@ -37,6 +37,7 @@ echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /
 **(2)UserManual**: 
 
 - [CloudDesktop Introduce](./docs/01-CloudDesktop.md)
+- [Next TODO](./docs/b0-todo.md)
 - [1.How to set Locale?](./docs/b1-locale.md)
 - [2.Usage of Double-Screen, ClipBoard, Audio?](./docs/b2-rdp.md)
 - [3.Web entry of desktop?](./docs/b3-vnc.md)
