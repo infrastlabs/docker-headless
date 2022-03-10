@@ -37,3 +37,5 @@ services:
       - /_ext:/_ext
       - /opt:/opt
       - /:/mnt
+    cap_add:
+      - SYS_ADMIN    #xrdp remote volume mount
