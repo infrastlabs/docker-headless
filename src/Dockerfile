@@ -3,6 +3,7 @@ FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile-v1 as
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/novnc-audio:bcs as bcs
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:box07-slim as box07
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-ubuntu-desktop-vnc:x11 as Xvnc
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-ubuntu-desktop-vnc:compile31 as bin2
 
 # ==DO: 用1个空镜像，再转一层： x5+6+2=13 > 1层;
 FROM scratch as files
@@ -19,6 +20,8 @@ FROM scratch as files
   COPY --from=Xvnc /usr/bin/Xvnc /usr/bin/Xvnc
   COPY --from=Xvnc /usr/lib64/swrast_dri.so /usr/lib64/swrast_dri.so
   COPY --from=Xvnc /usr/lib64/xorg/protocol.txt /usr/lib64/xorg/protocol.txt
+  COPY --from=bin2 /src/webhookd /usr/local/webhook/webhookd
+  
 
   # COPY --chown=root:root ./src
   ADD src/dot /etc/skel
@@ -28,6 +31,7 @@ FROM scratch as files
   ADD src/index.tpl.html /usr/local/novnc/index.tpl.html
   Add src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
   COPY src/f/dconf.ini /usr/share/dconf.ini 
+  ADD src/xname.sh /usr/local/webhook/scripts/
   # RUN bash xxx ##TODO single file bash: goBash?? > xrdp-link; qmmp unpack;
 
 FROM debian:stretch-slim
