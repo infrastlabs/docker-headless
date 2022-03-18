@@ -31,7 +31,7 @@ FROM scratch as files
   ADD src/index.tpl.html /usr/local/novnc/index.tpl.html
   Add src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
   COPY src/f/dconf.ini /usr/share/dconf.ini 
-  ADD src/xname.sh /usr/local/webhook/scripts/
+  ADD src/xdict.* /usr/local/webhook/scripts/
   # RUN bash xxx ##TODO single file bash: goBash?? > xrdp-link; qmmp unpack;
 
 FROM debian:stretch-slim
@@ -129,8 +129,11 @@ ENV \
   # 
   VNC_SSL_ONLY=false \
   VNC_CERT= \
+  # TODO: setRange; 再由客户端自行指定所要的端口;
   VNC_OFFSET=0 \
   VNC_LIMIT=1 \
+  VNC_INIT="23=mate,25=xfce,26=flux" \
+  # VNC_INIT="21=gnome,22=plama,23=mate,24=cinna,25=xfce,26=flux" \
   # L=zh_CN \
   TZ=Asia/Shanghai
 

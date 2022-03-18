@@ -1,0 +1,7 @@
+#id|name|pass|json
+#31|gnome
+#32|kde
+#53|mate
+#54|cinna
+#55|xfce
+#56|flux
