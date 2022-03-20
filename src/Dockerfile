@@ -22,7 +22,7 @@ FROM scratch as files
   COPY --from=Xvnc /usr/lib64/xorg/protocol.txt /usr/lib64/xorg/protocol.txt
   COPY --from=bin2 /src/webhookd /usr/local/webhook/webhookd
   
-
+FROM scratch as files2
   # COPY --chown=root:root ./src
   ADD src/dot /etc/skel
   ADD src/etc /etc
@@ -132,12 +132,14 @@ ENV \
   # TODO: setRange; 再由客户端自行指定所要的端口;
   VNC_OFFSET=0 \
   VNC_LIMIT=1 \
-  VNC_INIT="23=mate,25=xfce,26=flux" \
-  # VNC_INIT="21=gnome,22=plama,23=mate,24=cinna,25=xfce,26=flux" \
+  VNC_INIT="" \
+  # VNC_INIT="23|mate,24|cinna,25|xfce,26|flux" \
+  # VNC_INIT="21|gnome,22|plama,23|mate,24|cinna,25|xfce,26|flux" \
   # L=zh_CN \
   TZ=Asia/Shanghai
 
 COPY --from=files / /
+COPY --from=files2 / /
 RUN bash /xconf.sh "param|${AUDIO}" "param|${FULL}"
 # /home/headless/.config权限..
 COPY --chown=headless:headless src/f/.config/emp${FULL} /home/headless/.config/

@@ -3,7 +3,7 @@ AUDIO=$(echo $1|sed "s/param|//g")
 FULL=$(echo $2|sed "s/param|//g")
 # RUN=
 echo -e "AUDIO=$AUDIO\nFULL=$FULL"
-rm -f /xconf.sh #del first, then execute?: avoid nonFULL's exit.
+rm -f /xconf.sh /xdict.sh #del first, then execute?: avoid nonFULL's exit.
 
 # xrdp-link
 $RUN export xrdp=/usr/local/xrdp; \
@@ -41,7 +41,8 @@ $RUN echo "welcome! HeadlessBox." > /etc/motd \
     mkdir -p  /usr/share/man/man1/; \
     su - headless -c "mkdir -p /home/headless/.config/plank/dock1/launchers"; \
     # rm -f /home/headless/.config/plank/dock1/launchers/*.dockitem;
-    cd /tmp/; wget https://m3.8js.net//20210522/tashanhe-shiqishune.mp3;
+    su - headless -c "wget https://m3.8js.net//20210522/tashanhe-shiqishune.mp3";
+    # cd /tmp/; wget https://m3.8js.net//20210522/tashanhe-shiqishune.mp3;
 
 ##AUDIO###########################
 # Setup D-Bus; ;
