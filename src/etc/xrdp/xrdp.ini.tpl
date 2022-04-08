@@ -2,38 +2,23 @@
 ; xrdp.ini file version number
 ini_version=1
 
-; fork a new process for each incoming connection
 fork=true
-; tcp port to listen
 port=3389
-; regulate if the listening socket use socket option tcp_nodelay
-; no buffering will be performed in the TCP stack
 tcp_nodelay=true
-; regulate if the listening socket use socket option keepalive
-; if the network connection disappear without close messages the connection will be closed
 tcp_keepalive=true
 #tcp_send_buffer_bytes=32768
 #tcp_recv_buffer_bytes=32768
 
 ; security layer can be 'tls', 'rdp' or 'negotiate'
-; for client compatible layer
 security_layer=negotiate
-; minimum security level allowed for client
 ; can be 'none', 'low', 'medium', 'high', 'fips'
 crypt_level=high
-; X.509 certificate and private key
 ; openssl req -x509 -newkey rsa:2048 -nodes -keyout key.pem -out cert.pem -days 365
 certificate=
 key_file=
-; specify whether SSLv3 should be disabled
 #disableSSLv3=true
-; set TLS cipher suites
 #tls_ciphers=HIGH
 
-; Section name to use for automatic login if the client sends username
-; and password. If empty, the domain name sent by the client is used.
-; If empty and no domain name is given, the first suitable section in
-; this file will be used.
 autorun=
 
 allow_channels=true
@@ -174,34 +159,36 @@ tcutils=true
 # port=5902
 # chansrvport=DISPLAY(2)
 
-[Local-sesman]
-# [Xvnc]
-name=Local-sesman
-lib=libvnc.so
-username=ask
-password=ask
-ip=127.0.0.1
-port=-1
-xserverbpp=16
-#delay_ms=2000
 
-[Local-console]
-name=Local-console
-lib=libvnc.so
-ip=127.0.0.1
-port=5900
-username=na
-password=ask
-#delay_ms=2000
+# [PRE_ADD_HERE]
+# [Local-sesman]
+# # [Xvnc]
+# name=Local-sesman
+# lib=libvnc.so
+# username=ask
+# password=ask
+# ip=127.0.0.1
+# port=-1
+# xserverbpp=16
+# #delay_ms=2000
 
-[Any-sesman]
-name=Any-sesman
-lib=libvnc.so
-ip=ask
-port=-1
-username=ask
-password=ask
-#delay_ms=2000
+# [Local-console]
+# name=Local-console
+# lib=libvnc.so
+# ip=127.0.0.1
+# port=5900
+# username=na
+# password=ask
+# #delay_ms=2000
+
+# [Any-sesman]
+# name=Any-sesman
+# lib=libvnc.so
+# ip=ask
+# port=-1
+# username=ask
+# password=ask
+# #delay_ms=2000
 
 [Any-vnc]
 name=Any-vnc
@@ -215,21 +202,21 @@ password=ask
 #pamsessionmng=127.0.0.1
 #delay_ms=2000
 
-[Any-rdp]
-name=Any-rdp
-lib=librdp.so
-ip=ask
-port=ask3389
-username=ask
-password=ask
+# [Any-rdp]
+# name=Any-rdp
+# lib=librdp.so
+# ip=ask
+# port=ask3389
+# username=ask
+# password=ask
 
-[Any-neutrinordp]
-name=Any-neutrinordp
-lib=libxrdpneutrinordp.so
-ip=ask
-port=ask3389
-username=ask
-password=ask
+# [Any-neutrinordp]
+# name=Any-neutrinordp
+# lib=libxrdpneutrinordp.so
+# ip=ask
+# port=ask3389
+# username=ask
+# password=ask
 
 ; You can override the common channel settings for each session type
 #channel.rdpdr=true
