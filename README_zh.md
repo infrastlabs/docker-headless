@@ -67,8 +67,10 @@ echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /
 # JAVA
 sudo apt -y install openjdk-8-jdk openjdk-8-source && sudo apt -y install maven 
 # GO
-wget https://studygolang.com/dl/golang/go1.13.15.linux-amd64.tar.gz
-tar -zxf go1.13.15.linux-amd64.tar.gz; mv go go1.13.15.linux-amd64
+goVer=go1.17.8 #go1.16.15 #go1.13.15
+wget https://studygolang.com/dl/golang/$goVer.linux-amd64.tar.gz
+tar -zxf $goVer.linux-amd64.tar.gz; mv go $goVer.linux-amd64
+rm -f godev; ln -s $goVer.linux-amd64 godev #link godev
 # NODE
 wget https://npm.taobao.org/mirrors/node/v14.13.1/node-v14.13.1-linux-x64.tar.xz
 xz -d node-v14.13.1-linux-x64.tar.xz #tar.xz消失
@@ -77,12 +79,12 @@ tar -xvf node-v14.13.1-linux-x64.tar
 cat >> /etc/profile <<EOF
 # NODE
 NODE_HOME=/_ext/down/node-v14.13.1-linux-x64
-PATH=\$PATH:\$NODE_HOME/bin
+PATH=\$NODE_HOME/bin:\$PATH
 export NODE_HOME PATH
 # GO
-GO_HOME=/_ext/down/go1.13.15.linux-amd64
+GO_HOME=/_ext/down/godev
 GOPATH=/_ext/gopath
-PATH=\$PATH:\$GO_HOME/bin:\$GOPATH/bin
+PATH=\$GO_HOME/bin:\$GOPATH/bin:\$PATH
 export GO_HOME GOPATH PATH
 export GO111MODULE=on
 export GOPROXY=https://goproxy.cn
