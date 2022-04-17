@@ -1,0 +1,33 @@
+[plugins.opt]
+  path = "/var/lib/rancher/k3s/agent/containerd"
+
+[plugins.cri]
+  stream_server_address = "127.0.0.1"
+  stream_server_port = "10010"
+  enable_selinux = false  
+  sandbox_image = "docker.io/rancher/pause:3.1"
+
+[plugins.cri.cni]
+  bin_dir = "/bin"
+  conf_dir = "/var/lib/rancher/k3s/agent/etc/cni/net.d"
+
+# ref: https://github.com/easzlab/kubeasz/blob/d662135334d243468e259aa44bcfb35aafd5bacc/roles/containerd/templates/config.toml.j2
+# ref 22.1.4: https://github.com/easzlab/kubeasz/blob/master/roles/containerd/templates/config.toml.j2
+#[plugins.cri.registry]
+[plugins.cri.registry.mirrors]
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
+    endpoint = ["https://docker.mirrors.ustc.edu.cn", "http://hub-mirror.c.163.com"]
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."gcr.io"]
+    endpoint = ["https://gcr.mirrors.ustc.edu.cn"]
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."k8s.gcr.io"]
+    endpoint = ["https://gcr.mirrors.ustc.edu.cn/google-containers/"]
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."quay.io"]
+    endpoint = ["https://quay.mirrors.ustc.edu.cn"]
+  
+  # reference from https://www.ilanni.com/?p=14534
+  # [plugins.cri.registry.mirrors."docker.io"]
+  #   endpoint = [
+  #     "https://dockerhub.azk8s.cn",
+  #     "https://docker.mirrors.ustc.edu.cn",
+  #     "http://hub-mirror.c.163.com"
+  #   ]

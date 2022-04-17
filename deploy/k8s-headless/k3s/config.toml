@@ -1,0 +1,22 @@
+
+#out: v1.20.4-k3s1-amd64
+[plugins.opt]
+  path = "/var/lib/rancher/k3s/agent/containerd"
+
+[plugins.cri]
+  stream_server_address = "127.0.0.1"
+  stream_server_port = "10010"
+  enable_selinux = false
+  sandbox_image = "docker.io/rancher/pause:3.1"
+
+[plugins.cri.containerd]
+  disable_snapshot_annotations = true
+  snapshotter = "overlayfs"
+
+[plugins.cri.cni]
+  bin_dir = "/bin"
+  conf_dir = "/var/lib/rancher/k3s/agent/etc/cni/net.d"
+
+
+[plugins.cri.containerd.runtimes.runc]
+  runtime_type = "io.containerd.runc.v2"
