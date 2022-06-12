@@ -1,0 +1,21 @@
+<application>
+  <component name="PropertiesComponent">
+    <property name="Default.savedEditorTheme" value="_@user_Default" />
+    <property name="installed.kotlin.plugin.version" value="1.0.5-release-IJ2016.3-1" />
+    <property name="android-component-compatibility-check" value="1653027606453" />
+    <property name="project.wizard.group" value="JAVA_MODULE" />
+    <property name="toolwindow.stripes.buttons.info.shown" value="true" />
+    <property name="lastTip" value="1" />
+    <property name="project.wizard.template" value="Java" />
+    <property name="file.chooser.recent.files" value="/_ext/working/diy_java_tech&#10;/_ext/working/root-pom&#10;/_ext/working/_ee/fk-spring-boot&#10;/_ext/working/_jdus/2022/yx-component-diy&#10;/_ext/working/_jdus/2022/demo-tax-exporter&#10;/_ext/working/_jdus/2022/fk-onemall&#10;/_ext/working/_jdus/2022/cmp-service-sdf&#10;/_ext/working/pci-continuous&#10;/home/headless/_temp1/md-application&#10;/_ext/working/_mids/fk-elasticsearch-http-basic-auth-plugin&#10;/_ext/working/_hub/nacos-spring-boot-project&#10;/_ext/working/pciversion&#10;/usr/lib/jvm/openjdk-8&#10;/usr/lib/jvm/java-8-openjdk-amd64&#10;/_ext/working/fk-nacos" />
+    <property name="Copy.OpenInEditor" value="true" />
+    <property name="JUnitSupport.hidePassedTests" value="false" />
+    <property name="decompiler.legal.notice.accepted" value="true" />
+    <property name="ExpandBeforeRunStepsPanel" value="true" />
+    <property name="CommitChangeListDialog.DETAILS_SPLITTER_PROPORTION_2" value="0.4336493" />
+    <property name="MemberChooser.showClasses" value="true" />
+    <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="fileTypeChangedCounter" value="1" />
+    <property name="search.everywhere.max.popup.width" value="612" />
+  </component>
+</application>
