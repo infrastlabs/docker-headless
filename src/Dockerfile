@@ -142,7 +142,7 @@ COPY --from=files / /
 COPY --from=files2 / /
 RUN bash /xconf.sh "param|${AUDIO}" "param|${FULL}"
 # /home/headless/.config权限..
-COPY --chown=headless:headless src/f/.config/emp${FULL} /home/headless/.config/
+COPY --chown=headless:headless src/f/emp${FULL} /home/headless/
 RUN test -z "$AUDIO" && exit 0;\ 
   test -z "$FULL" && apt.sh gnome-system-monitor; \
   cd /home/headless/.qmmp/skins/; unzip Dark_Materia.wsz; chmod 755 -R darkmateria; \
