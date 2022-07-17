@@ -72,13 +72,13 @@ wget https://studygolang.com/dl/golang/$goVer.linux-amd64.tar.gz
 tar -zxf $goVer.linux-amd64.tar.gz; mv go $goVer.linux-amd64
 rm -f godev; ln -s $goVer.linux-amd64 godev #link godev
 # NODE
-wget https://npm.taobao.org/mirrors/node/v14.13.1/node-v14.13.1-linux-x64.tar.xz
-xz -d node-v14.13.1-linux-x64.tar.xz #tar.xz消失
-tar -xvf node-v14.13.1-linux-x64.tar
+wget https://npm.taobao.org/mirrors/node/v14.20.0/node-v14.20.0-linux-x64.tar.xz
+xz -d node-v14.20.0-linux-x64.tar.xz #tar.xz消失
+tar -xvf node-v14.20.0-linux-x64.tar
 
 cat >> /etc/profile <<EOF
 # NODE
-NODE_HOME=/_ext/down/node-v14.13.1-linux-x64
+NODE_HOME=/_ext/down/node-v14.20.0-linux-x64
 PATH=\$NODE_HOME/bin:\$PATH
 export NODE_HOME PATH
 # GO
