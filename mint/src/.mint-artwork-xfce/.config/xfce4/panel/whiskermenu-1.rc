@@ -1,0 +1,11 @@
+button-icon=linuxmint-logo-ring-symbolic
+launcher-show-name=true
+launcher-show-description=true
+favorites=firefox.desktop,thunderbird.desktop,pix.desktop,rhythmbox.desktop,org.gnome.Calculator.desktop,xed.desktop,mintinstall.desktop,xfce4-taskmanager.desktop
+hover-switch-category=true
+position-search-alternate=true
+position-commands-alternate=false
+position-categories-alternate=true
+command-switchuser=dm-tool switch-to-greeter
+item-icon-size=2
+view-as-icons=false
