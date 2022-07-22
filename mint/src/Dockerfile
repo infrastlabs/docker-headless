@@ -9,7 +9,7 @@ RUN export DOMAIN="mirrors.aliyun.com"; \
   echo 'apt update -qq && apt install -yq --no-install-recommends $@ && apt clean && rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
     && chmod +x /usr/local/bin/apt.sh
  
-COPY mate/excludes /etc/dpkg/dpkg.cfg.d/excludes
+COPY src/excludes /etc/dpkg/dpkg.cfg.d/excludes
 
 # TOOLS
 RUN \
@@ -41,17 +41,20 @@ RUN \
   dbus-x11 at-spi2-core language-pack-gnome-zh-hans
 
 # RUN apt.sh greybird-gtk-theme gnome-icon-theme  papirus-icon-theme ;
-RUN export DOMAIN="mirrors.163.com"; \
-  echo "deb http://${DOMAIN}/ubuntu focal main restricted universe multiverse" > /etc/apt/sources.list \
-  && echo "deb http://${DOMAIN}/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list;
+# RUN export DOMAIN="mirrors.163.com"; \
+#   echo "deb http://${DOMAIN}/ubuntu focal main restricted universe multiverse" > /etc/apt/sources.list \
+#   && echo "deb http://${DOMAIN}/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list;
 
 # REF: docker-gui > ubt2004-mint-cinna
 # http://packages.linuxmint.com/
 # https://mirrors.tuna.tsinghua.edu.cn/linuxmint
 # 2536 kB
+# 20.3: una main upstream import backport #LINUX_MINT_KEY: A6616109451BBBF2
+# 18.2: https://mirrors.aliyun.com/linuxmint sonya main upstream import backport #无una, 取不到LINUX_MINT_KEY
 RUN apt.sh gnupg; \
   echo "deb https://mirrors.tuna.tsinghua.edu.cn/linuxmint una main upstream import backport">> /etc/apt/sources.list; \
   LINUX_MINT_KEY=$(apt update 2>&1 | grep -o '[0-9A-Z]\{16\}$' | xargs) && \
+  echo "LINUX_MINT_KEY: $LINUX_MINT_KEY"; \
   apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 ${LINUX_MINT_KEY}; \
   apt clean && rm -rf /var/lib/apt/lists/*;
 
@@ -106,25 +109,35 @@ RUN \
   cd /usr/share/icons/hicolor/scalable/apps; rm -f asbru-cm.svg; ln -s /usr/local/asbru/res/asbru-logo.svg ./asbru-cm.svg
 
 # +pnmixer: 159 kB 
-RUN apt.sh pnmixer
+RUN apt.sh pnmixer supervisor
 
-ADD src/bin/pkgsize /bin/pkgsize
-COPY src/*.service /etc/systemd/system/
-RUN dpkg-divert --local --rename --add /sbin/udevadm; \
-  ln -s /bin/true /sbin/udevadm; \
-  systemctl enable de-start; \
-  systemctl disable systemd-resolved; 
+# COPY src/*.service /etc/systemd/system/
+# RUN dpkg-divert --local --rename --add /sbin/udevadm; \
+#   ln -s /bin/true /sbin/udevadm; 
+  # systemctl enable de-start; \
+  # systemctl disable systemd-resolved; 
   # systemctl disable gdm3;
 
 # HEADLESS
-COPY src/*.sh /
-ADD src/dot /etc/skel
-# ADD src/pepper_skel /etc/skel
-ADD src/mint-artwork-xfce /etc/skel
-# +xf
-ADD src/xf /etc/skel
-RUN bash /xconf.sh
-RUN cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*;
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:mint-compile as Xvnc
+FROM scratch as files
+  COPY --from=Xvnc /tigervnc-pkg /
+  COPY --from=Xvnc /rootfs /
+  # 
+  # ADD src/etc /etc
+  # Add src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
+  # COPY src/f/dconf.ini /usr/share/dconf.ini 
+  # 
+  COPY src/*.sh /
+  ADD src/dot /etc/skel
+  ADD src/xf /etc/skel
+  ADD src/mint-artwork-xfce /etc/skel
+  ADD src/sv.conf /etc/supervisor/conf.d/xrdp.conf
+  ADD src/bin/pkgsize /bin/pkgsize
+
+COPY --from=files / /
+RUN bash /xconf.sh；\
+  cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*;
 
 ENV \
   # mintwelcome
@@ -139,8 +152,7 @@ ENV \
   PULSE_SERVER="tcp:localhost:4735"
 
 
+# VOLUME ["/sys/fs/cgroup"]
 STOPSIGNAL SIGRTMIN+3
-VOLUME ["/sys/fs/cgroup"]
-# ENTRYPOINT /entry.sh
 ENTRYPOINT ["/entry.sh"]
 CMD ["xfce4-session"]
