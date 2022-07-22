@@ -93,6 +93,7 @@ fi
 if [ ! -z "$1" ]; then
     exec $@
 else
-    exec /sbin/init #TODO: 保活>> sv?? (dbus: sysd> sv)
+    # exec /sbin/init #TODO: 保活>> sv?? (dbus: sysd> sv)
+    exec supervisord -n
 fi
 # exec /sbin/init
