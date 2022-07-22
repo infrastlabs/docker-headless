@@ -1,5 +1,72 @@
 #!/bin/bash
 
+function oneVnc(){
+    local N=$1
+    local name1=$2
+    local user1=xvnc$N
+    local port1=$(expr 5900 + $N)
+    echo "oneVnc: id=$N, name=$name1"
+
+    # createUser
+    if [ "headless" != "$name1" ]; then #固定headless名?
+        echo "SKEL=/etc/skel2" >> /etc/default/useradd
+        useradd -ms /usr/sbin/nologin xvnc$N;
+        sed -i "s^SKEL=/etc/skel2^# SKEL=/etc/skel2^g" /etc/default/useradd
+    else
+        user1=headless #xvnc$N
+    fi
+
+    # SV
+    echo """
+[program:xvnc$N-$name1]
+environment=DISPLAY=:$N,HOME=/home/$user1
+priority=35
+user=$user1
+command=/xvnc.sh xvnc $N
+stdout_logfile=/dev/fd/1
+stdout_logfile_maxbytes=0
+redirect_stderr=true
+
+# [program:xrec$N-$name1]
+# environment=DISPLAY=:$N,HOME=/home/$user1
+# priority=36
+# user=$user1
+# command=/xvnc.sh xrec $N
+# stdout_logfile=/dev/fd/1
+# stdout_logfile_maxbytes=0
+# redirect_stderr=true
+    """ > /etc/supervisor/conf.d/xvnc$N.conf
+}
+# oneVnc "$id" "$name"
+function setXserver(){
+    #tpl replace: each revert clean;
+    cat /etc/xrdp/xrdp.ini.tpl > /etc/xrdp/xrdp.ini
+    # cat /usr/local/novnc/index.tpl.html > /usr/local/novnc/index.html
+
+    # setPorts; sed port=.* || env_ctReset
+    sed -i "s^port=3389^port=${RDP_PORT}^g" /etc/xrdp/xrdp.ini
+    sed -i "s/EFRp 22/EFRp ${SSH_PORT}/g" /etc/supervisor/conf.d/xrdp.conf #sv.conf
+    # sesman
+    SES_PORT=$(echo "${RDP_PORT%??}50") #ref RDP_PORT, replace last 2 char
+    sed -i "s/ListenPort=3350/ListenPort=${SES_PORT}/g" /etc/xrdp/sesman.ini
+    # xvnc0-de
+    port0=$(expr 0 + $VNC_OFFSET)
+    sed -i "s/_DISPLAY_/$port0/" /etc/supervisor/conf.d/xrdp.conf
+    oneVnc "$port0" "headless" #sv
+
+    # SSH_PASS VNC_PASS VNC_PASS_RO
+    lock=/.initpw.lock
+    if [ ! -f "$lock" ]; then
+        echo "headless:$SSH_PASS" |chpasswd
+        echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |vncpasswd /etc/xrdp/vnc_pass; chmod 644 /etc/xrdp/vnc_pass
+        echo "" #newLine
+        touch $lock
+    fi
+    unset SSH_PASS VNC_PASS VNC_PASS_RO #unset, not show in desktopEnv.
+    unset LOC_XFCE LOC_APPS LOC_APPS2 DEBIAN_FRONTEND    
+}
+setXserver
+
 function setLocale(){
     env |grep "TZ\|^L="
     # L="zh_CN" ##${L##*.} > zh_CN
@@ -34,66 +101,14 @@ env | grep -Ev '^(.*PASS.*|PWD|OLDPWD|HOME|USER|SHELL|TERM|([^=]*(PASSWORD|SECRE
  |grep -v "LOC_\|DEBIAN_FRONTEND" | sort > /etc/environment
 
 # ENV
-DISPLAY=${DISPLAY:-localhost:21}
-PULSE_SERVER=${PULSE_SERVER:-tcp:localhost:4721}
-cat /etc/profile |grep -v "export DISPLAY\|export PULSE_SERVER" > /tmp/profile.txt
-echo "export DISPLAY=$DISPLAY" >> /tmp/profile.txt
-echo "export PULSE_SERVER=$PULSE_SERVER" >> /tmp/profile.txt
-test "XFCE" == "$XDG_CURRENT_DESKTOP" && echo "export XDG_CURRENT_DESKTOP=XFCE" >> /tmp/profile.txt
-cat /tmp/profile.txt > /etc/profile
-
-# SESSION 
-echo "entry params: $@"
-session="$@"; echo "sessionParams: $session"
-test -z "$session" || sed -i "s^gnome-session^$session^g" /etc/systemd/system/de-start.service
+# DISPLAY=${DISPLAY:-localhost:21}
+# PULSE_SERVER=${PULSE_SERVER:-tcp:localhost:4721}
+# echo "export DISPLAY=$DISPLAY" >> /tmp/profile.txt
+# echo "export PULSE_SERVER=$PULSE_SERVER" >> /tmp/profile.txt
 
 # CONF
 test -f /home/headless/.ICEauthority && chmod 644 /home/headless/.ICEauthority #mate err
 
-# +SKIP_X11CHECK
-function registXvnc(){
-    echo "DISPLAY: $DISPLAY"
-    host=${DISPLAY%:*}; test -z "$host" && host="localhost"
-    id=${DISPLAY#*:}; #test -z "$host" && errExit "xx"
-    echo "host: $host, id: $id"
-    
-    # test: nc -vz $host 10083
-    hook_code=1
-    while [ "0" != "$hook_code" ]; do
-        test "true" == "$SKIP_X11CHECK" && break
-        echo "sleep 0.3" && sleep 0.3
-        nc -vz $host 10083
-        hook_code=$?
-    done
-    ret=$(curl -s "$host:10083/xdict?id=$id&name=$DESKTOP")
-    # matchErr=$(cat $ret |grep err)
-    echo $ret
-
-    # test: vnc port
-    vnc_code=1
-    local port1=$(expr 5900 + $id)
-    while [ "0" != "$vnc_code" ]; do
-        test "true" == "$SKIP_X11CHECK" && break
-        echo "sleep 0.3" && sleep 0.3
-        nc -vz $host $port1
-        vnc_code=$?
-    done
-}
-registXvnc
-
 cnt=0.1
 echo "sleep $cnt" && sleep $cnt;
-# exec supervisord -n
-
-if [ "dbg" == "$1" ]; then #flux-dbg
-    # su - headless -c "startfluxbox"
-    startfluxbox #just root, avoid chown
-fi
-
-if [ ! -z "$1" ]; then
-    exec $@
-else
-    # exec /sbin/init #TODO: 保活>> sv?? (dbus: sysd> sv)
-    exec supervisord -n
-fi
-# exec /sbin/init
+exec supervisord -n

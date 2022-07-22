@@ -1,6 +1,14 @@
 #!/bin/bash
 rm -f /xconf.sh
 
+##########################################
+# xrdp-link
+$RUN export xrdp=/usr/local/xrdp; \
+  ln -s $xrdp/sbin/xrdp /usr/sbin/; ln -s $xrdp/sbin/xrdp-sesman /usr/sbin/;\
+  ln -s $xrdp/sbin/xrdp-chansrv /usr/sbin/; ln -s $xrdp/bin/xrdp-keygen /usr/bin/;
+  mkdir -p /etc/xrdp && xrdp-keygen xrdp auto #/etc/xrdp/rsakeys.ini
+
+##########################################
 $RUN \
   export user=headless; \
   useradd -mp j9X2HRQvPCphA -s /bin/bash -G sudo $user \

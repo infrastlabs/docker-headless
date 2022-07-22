@@ -1,8 +1,28 @@
-# back-back: https://gitee.com/huapox/fk-docker-ubuntu-desktop-vnc/blob/aa21d6805d25537d68e29aa1d88af46e7e00640c/src/Dockerfile.cxfce
-FROM ubuntu:20.04
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:mint-compile as Xvnc
+FROM scratch as files1
+  COPY --from=Xvnc /tigervnc-pkg/tigervnc-1.12.0.x86_64 /
+  COPY --from=Xvnc /rootfs /
 
+FROM scratch as files2
+  # Add src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
+  # COPY src/f/dconf.ini /usr/share/dconf.ini 
+  # 
+  COPY src/*.sh /
+  ADD src/etc /etc
+  ADD src/dot /etc/skel
+  ADD src/xf /etc/skel
+  ADD src/.mint-artwork-xfce /etc/skel
+  ADD src/sv.conf /etc/supervisor/conf.d/xrdp.conf
+  # dest: /bin > /usr/bin; avoid softLink's replace
+  ADD src/bin/pkgsize /usr/bin/pkgsize
+
+FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND noninteractive
-RUN export DOMAIN="mirrors.aliyun.com"; \
+# mirrors.tuna.tsinghua.edu.cn
+# mirrors.ustc.edu.cn
+# mirrors.aliyun.com
+# mirrors.163.com
+RUN export DOMAIN="mirrors.ustc.edu.cn"; \
   echo "deb http://${DOMAIN}/ubuntu focal main restricted universe multiverse" > /etc/apt/sources.list \
   && echo "deb http://${DOMAIN}/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
   \
@@ -11,72 +31,57 @@ RUN export DOMAIN="mirrors.aliyun.com"; \
  
 COPY src/excludes /etc/dpkg/dpkg.cfg.d/excludes
 
-# TOOLS
+# MISC 15.1 MB
 RUN \
   # \2487 kB
-  apt.sh wget ca-certificates; \
+  apt.sh wget ca-certificates \
   # \5529 kB 
-  apt.sh curl lame sox libsox-fmt-mp3; \
+  curl lame sox libsox-fmt-mp3 \
   # \4610 kB
-  apt.sh htop rsync tree tmux lrzsz psmisc fuse net-tools iputils-ping procps sudo iproute2 iptables \
-  zip unzip xz-utils vim-tiny; \
+  htop rsync tree tmux lrzsz psmisc fuse net-tools netcat iputils-ping \
+  procps sudo iproute2 iptables zip unzip xz-utils vim-tiny \
   # \2476 kB
-  apt.sh dropbear-bin dropbear-run openssh-sftp-server lftp jq;
+  dropbear-bin dropbear-run openssh-sftp-server lftp jq;
 
-#LOCALE 15.0 MB 
-RUN apt.sh dconf-cli locales tzdata apt-utils fonts-wqy-zenhei ;
-# Audio 39.8 MB 
-# pnmixer
-RUN apt.sh pulseaudio pavucontrol ;
-# VIDEO: 30.5 MB
-# libllvm12 已包含 # libgl1-mesa-glx >libgl1-mesa-dri ##ex:  mesa-utils 
-RUN apt.sh libgl1-mesa-glx mesa-utils 
-
-# MISC
-# rofi clipit 
+# VID, AUD, LOC 87.4 MB
 RUN \
-  # \11.2 MB 
-  apt.sh geany sakura \
+  # LOCALE 15.0 MB 
+  apt.sh dconf-cli locales tzdata apt-utils fonts-wqy-zenhei \
+  # Audio 39.8 MB 
+  pulseaudio pavucontrol \
+  # VIDEO: 30.5 MB
+  # libllvm12 已包含 # libgl1-mesa-glx >libgl1-mesa-dri ##ex:  mesa-utils 
+  libgl1-mesa-glx mesa-utils 
+
+
+# APPS 25.7 MB
+RUN \
+  # LOC_APPS="tint2 plank thunar sakura" # clipit; +pnmixer: 159 kB; +sv # 7056 kB
+  apt.sh tumbler tint2 plank rofi \
+  clipit pnmixer lxappearance gtk2-engines-pixbuf supervisor gnupg \
+  \
+  # LOC_APPS2="gnome-system-monitor engrampa ristretto" # 11.2 MB 
+  geany sakura \
   gnome-system-monitor engrampa ristretto \
   dbus-x11 at-spi2-core language-pack-gnome-zh-hans
 
-# RUN apt.sh greybird-gtk-theme gnome-icon-theme  papirus-icon-theme ;
-# RUN export DOMAIN="mirrors.163.com"; \
-#   echo "deb http://${DOMAIN}/ubuntu focal main restricted universe multiverse" > /etc/apt/sources.list \
-#   && echo "deb http://${DOMAIN}/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list;
-
-# REF: docker-gui > ubt2004-mint-cinna
-# http://packages.linuxmint.com/
-# https://mirrors.tuna.tsinghua.edu.cn/linuxmint
 # 2536 kB
-# 20.3: una main upstream import backport #LINUX_MINT_KEY: A6616109451BBBF2
-# 18.2: https://mirrors.aliyun.com/linuxmint sonya main upstream import backport #无una, 取不到LINUX_MINT_KEY
-RUN apt.sh gnupg; \
+# REF: docker-gui > ubt2004-mint-cinna
+# http://packages.linuxmint.com/ # https://mirrors.tuna.tsinghua.edu.cn/linuxmint
+RUN \
   echo "deb https://mirrors.tuna.tsinghua.edu.cn/linuxmint una main upstream import backport">> /etc/apt/sources.list; \
   LINUX_MINT_KEY=$(apt update 2>&1 | grep -o '[0-9A-Z]\{16\}$' | xargs) && \
   echo "LINUX_MINT_KEY: $LINUX_MINT_KEY"; \
   apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 ${LINUX_MINT_KEY}; \
   apt clean && rm -rf /var/lib/apt/lists/*;
 
-# 18.9 MB 
-# deps: cpp cpp-9
+# 18.9 MB > 14.3 MB
+# LOC_XFCE="xfce4-settings xfce4-session xfwm4 xfdesktop4" # deps: cpp cpp-9
 RUN apt.sh xfce4-settings xfce4-session xfwm4 xfdesktop4 \
-  xfce4-notifyd
+  xfce4-notifyd thunar
 
-# XFCE
-# ENV \
-#   LOC_APPS="tint2 plank thunar sakura" \
-#   LOC_APPS2="gnome-system-monitor engrampa ristretto" \
-#   LOC_XFCE="xfce4-settings xfce4-session xfwm4 xfdesktop4"
-# RUN apt.sh ${LOC_XFCE} tint2 plank
-# clipit; +nc 
-# 7056 kB
-RUN apt.sh thunar tumbler tint2 plank rofi netcat \
-  lxappearance xfce4-notifyd clipit gtk2-engines-pixbuf
-
-# 70.5 MB
-  # clean: /usr/share
-# RUN apt.sh mint-x-icons
+# 70.5 MB --
+# mint-x-icons # clean: /usr/share
 RUN apt.sh mint-y-icons mint-themes; \
 # RUN \
   # cd /usr/share/xfce4/backdrops; rm -f `ls |grep -v "linuxmint.jpg"`; \
@@ -87,57 +92,32 @@ RUN apt.sh mint-y-icons mint-themes; \
   cd /usr/share/i18n/locales; rm -rf `ls |grep -v "locale.alias\|zh\|en"`; 
   # cd /usr/share/applications; rm -rf `ls |grep "kde"`;     
 
+# FULL(icon,ibus,git,flameshot) 49.1 MB
 RUN \
   #19.642 MB; #APPS2 5.6 MB #LOCALE 13.4 MB
   # \14.4 MB
-  apt.sh  papirus-icon-theme; \
-  \
+  apt.sh  papirus-icon-theme \
   # \12.3 MB
-  apt.sh ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi; \
+  ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
   # \20.5 MB
-  apt.sh flameshot arandr; \
+  flameshot arandr \
   # \12.6 MB
-  apt.sh git; \
+  git \
   # \343 kB
-  apt.sh gnupg libsecret-1-0 libnss3 libxtst6 libasound2 libglu1-mesa xdg-utils;
+  libsecret-1-0 libnss3 libxtst6 libasound2 libglu1-mesa xdg-utils;
   
-# asbru-cm: 10.5  (apt down: 3585 kB)
+# ASBRU: 3586 kB (disk: 15.5 MB)
 RUN \
   curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash; \
   apt.sh asbru-cm; rm -f /etc/apt/sources.list.d/asbru-cm-release.list; \
   mv /opt/asbru /usr/local; rm -f /usr/bin/asbru-cm; ln -s /usr/local/asbru/asbru-cm /usr/bin/; \
   cd /usr/share/icons/hicolor/scalable/apps; rm -f asbru-cm.svg; ln -s /usr/local/asbru/res/asbru-logo.svg ./asbru-cm.svg
 
-# +pnmixer: 159 kB 
-RUN apt.sh pnmixer supervisor
-
-# COPY src/*.service /etc/systemd/system/
-# RUN dpkg-divert --local --rename --add /sbin/udevadm; \
-#   ln -s /bin/true /sbin/udevadm; 
-  # systemctl enable de-start; \
-  # systemctl disable systemd-resolved; 
-  # systemctl disable gdm3;
-
 # HEADLESS
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:mint-compile as Xvnc
-FROM scratch as files
-  COPY --from=Xvnc /tigervnc-pkg /
-  COPY --from=Xvnc /rootfs /
-  # 
-  # ADD src/etc /etc
-  # Add src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
-  # COPY src/f/dconf.ini /usr/share/dconf.ini 
-  # 
-  COPY src/*.sh /
-  ADD src/dot /etc/skel
-  ADD src/xf /etc/skel
-  ADD src/mint-artwork-xfce /etc/skel
-  ADD src/sv.conf /etc/supervisor/conf.d/xrdp.conf
-  ADD src/bin/pkgsize /bin/pkgsize
-
-COPY --from=files / /
-RUN bash /xconf.sh；\
-  cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*;
+COPY --from=files1 / /
+COPY --from=files2 / /
+RUN bash /xconf.sh
+RUN cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*;
 
 ENV \
   # mintwelcome
@@ -146,13 +126,24 @@ ENV \
   SHELL=/bin/bash \
   L="zh_CN" \
   TZ="Asia/Shanghai" \
-  SKIP_X11CHECK="true" \
-  DESKTOP="xfce" \
-  DISPLAY="localhost:35" \
-  PULSE_SERVER="tcp:localhost:4735"
-
+  \
+  # DISPLAY="localhost:35" \
+  # PULSE_SERVER="tcp:localhost:4735"
+  \
+  SSH_PORT=10022 \
+  RDP_PORT=10089 \
+  VNC_PORT=10081 \
+  # 
+  SSH_PASS=headless \
+  VNC_PASS=headless \
+  VNC_PASS_RO=View123 \
+  # 
+  VNC_OFFSET=10 \
+  VNC_LIMIT=1
+  # VNC_INIT="21|gnome,22|plama,23|mate,24|cinna,25|xfce,26|flux" \
 
 # VOLUME ["/sys/fs/cgroup"]
 STOPSIGNAL SIGRTMIN+3
-ENTRYPOINT ["/entry.sh"]
-CMD ["xfce4-session"]
+# ENTRYPOINT ["/entry.sh"]
+# CMD ["xfce4-session"]
+CMD ["/entry.sh"]

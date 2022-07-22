@@ -24,7 +24,7 @@ RUN apt.sh \
 
 WORKDIR /opt
 
-##################################################
+###xrdp, xorgxrdp###############################################
 FROM stage-base as stage-xrdp-xorgxrdp
 RUN apt.sh \
     git autoconf libtool pkg-config gcc g++ make  libssl-dev libpam0g-dev \
@@ -64,7 +64,7 @@ CPPFLAGS="-I/usr/local/xrdp/include"  LDFLAGS="-L/usr/local/xrdp/lib" ./configur
 make;\
 sudo make install;
 
-##################################################
+###pulseaudio-module-xrdp###############################################
 # pulse-xrdp: git-latest
 FROM stage-base as stage-pulsexrdp
 #### pulseaudio-module-xrdp >> pulseaudio ver: 10.0
@@ -93,20 +93,19 @@ RUN cd /opt && git clone https://hub.fastgit.xyz/neutrinolabs/pulseaudio-module-
 
 
 
-##################################################
+###merge: xrdp, pulse, tigervnc###############################################
 # 11.9M
+# FROM scratch
+FROM ubuntu:20.04
+WORKDIR /usr/local
 # tigervnc 1.10.1 > 1.12.0 
 # https://udomain.dl.sourceforge.net/project/tigervnc/stable/1.10.1/tigervnc-1.10.1.x86_64.tar.gz
 # COPY > ADD: unpack; pack2: drop tigervnc-1.10.1.x86_64 dir;
-# ADD x11-tiger/tigervnc-1.10.1.x86_64-pack2.tar.gz /
-FROM scratch
-# FROM ubuntu:20.04
-WORKDIR /usr/local
 ENV ver=1.12.0
-# udomain
-ADD https://jaist.dl.sourceforge.net/project/tigervnc/stable/${ver}/tigervnc-${ver}.x86_64.tar.gz /tigervnc-pkg
+ADD tigervnc-${ver}.x86_64.tar.gz /tigervnc-pkg
+# xrdp
 COPY --from=stage-xrdp-xorgxrdp /usr/local/xrdp /rootfs/usr/local/xrdp
 COPY --from=stage-xrdp-xorgxrdp /usr/lib/xorg/modules /rootfs/usr/lib/xorg/modules
 COPY --from=stage-pulsexrdp /var/lib/xrdp-pulseaudio-installer /rootfs/var/lib/xrdp-pulseaudio-installer
 
-# RUN find /usr/local
+RUN find /tigervnc-pkg ; find /rootfs
