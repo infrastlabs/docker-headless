@@ -1,0 +1,100 @@
+# 2021.5.13:
+# xrdp-0.9.16
+# xorgxrdp-0.2.16
+FROM ubuntu:20.04 as stage-base
+ENV DEBIAN_FRONTEND noninteractive
+# domain="mirrors.163.com" //aliyun
+RUN export DOMAIN="mirrors.163.com"; \
+  echo "deb http://${DOMAIN}/ubuntu focal main restricted universe multiverse" > /etc/apt/sources.list \
+  && echo "deb http://${DOMAIN}/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
+  \
+  echo 'apt update -qq && apt install -yq --no-install-recommends $@ && apt clean && rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
+    && chmod +x /usr/local/bin/apt.sh
+
+# BASE
+RUN apt.sh \
+  htop rsync tree tmux lrzsz wget psmisc openssl net-tools \
+  curl sudo iputils-ping procps iproute2 iptables ca-certificates \
+  zip unzip xz-utils
+# BUILD_common 81M
+RUN apt.sh \
+  git autoconf libtool pkg-config gcc g++ make \
+  autoconf m4 intltool build-essential dpkg-dev \
+  build-essential check
+
+WORKDIR /opt
+
+##################################################
+FROM stage-base as stage-xrdp-xorgxrdp
+RUN apt.sh \
+    git autoconf libtool pkg-config gcc g++ make  libssl-dev libpam0g-dev \
+    libjpeg-dev libx11-dev libxfixes-dev libxrandr-dev  flex bison libxml2-dev \
+    intltool xsltproc xutils-dev python-libxml2 g++ xutils libfuse-dev \
+    libmp3lame-dev nasm libpixman-1-dev xserver-xorg-dev
+RUN apt.sh \
+  libfdk-aac-dev libopus-dev
+#0.9.5
+ENV ver="0.9.16"
+# https://hub.fastgit.org/neutrinolabs/xrdp/wiki/Building-on-Debian-8
+# configure: error: please install libfdk-aac-dev or fdk-aac-devel
+		# --enable-tjpeg \
+# ./configure --prefix=/usr/local/xrdp --enable-fuse --enable-mp3lame --enable-pixman;\
+RUN wget https://hub.fastgit.org/neutrinolabs/xrdp/releases/download/v${ver}/xrdp-${ver}.tar.gz; \
+tar -zxf xrdp-${ver}.tar.gz;\
+cd xrdp-${ver};\
+./bootstrap;\
+./configure \
+		--prefix=/usr/local/xrdp \
+		--enable-vsock \
+		--enable-fdkaac \
+		--enable-opus \
+		--enable-fuse \
+		--enable-mp3lame \
+		--enable-pixman \
+		CFLAGS='-Wno-format';\
+make;\
+make install;
+#####git clone; xorgxrdp with xrdp --prefix, testOK;
+RUN git clone --branch br-0214 https://gitee.com/g-system/xorgxrdp;\
+cd xorgxrdp;\
+./bootstrap;\
+CPPFLAGS="-I/usr/local/xrdp/include"  LDFLAGS="-L/usr/local/xrdp/lib" ./configure;\
+make;\
+sudo make install;
+
+##################################################
+FROM stage-base as stage-pulsexrdp
+#### pulseaudio-module-xrdp >> pulseaudio ver: 10.0
+# RUN git submodule update --init --recursive
+RUN apt update && apt install -qy pulseaudio libpulse-dev \
+  autoconf m4 intltool build-essential dpkg-dev
+RUN apt update && apt build-dep -q -y pulseaudio && \
+  cd /opt && apt source pulseaudio && \
+  pulseaudio=$(pulseaudio --version | awk '{print $2}') && \
+  cd /opt/pulseaudio-${pulseaudio} && ./configure
+# hand copy: /opt/pulseaudio-1.11/config.h +src/pulsecore
+RUN cd /opt && git clone https://github.com.cnpmjs.org/neutrinolabs/pulseaudio-module-xrdp.git && \
+  cd /opt/pulseaudio-module-xrdp && ./bootstrap && ./configure PULSE_DIR="/opt/pulseaudio-${pulseaudio}"; \
+  pulseaudio=$(pulseaudio --version | awk '{print $2}') && echo "pulseaudio ver: $pulseaudio" && \
+  cp -a /opt/pulseaudio-${pulseaudio}/config.h . && cp -a /opt/pulseaudio-${pulseaudio}/src/pulsecore/ .; \
+  make && \
+  cd /opt/pulseaudio-module-xrdp/src/.libs && \
+  install -t "/var/lib/xrdp-pulseaudio-installer" -D -m 644 *.so;
+
+# 11.9M
+# https://udomain.dl.sourceforge.net/project/tigervnc/stable/1.10.1/tigervnc-1.10.1.x86_64.tar.gz
+# COPY > ADD: unpack; pack2: drop tigervnc-1.10.1.x86_64 dir;
+# ADD x11-tiger/tigervnc-1.10.1.x86_64-pack2.tar.gz /
+
+
+##################################################
+# FROM scratch
+FROM ubuntu:20.04
+WORKDIR /usr/local
+
+# xrdp_deb
+COPY --from=stage-xrdp-xorgxrdp /usr/local/xrdp /usr/local/appdata/xrdp 
+COPY --from=stage-xrdp-xorgxrdp /usr/lib/xorg/modules /usr/local/sysdata/usr/lib/xorg/modules
+COPY --from=stage-pulsexrdp /var/lib/xrdp-pulseaudio-installer /usr/local/sysdata/var/lib/xrdp-pulseaudio-installer
+
+RUN find /usr/local
