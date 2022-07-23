@@ -1,13 +1,16 @@
+# mint
 
+从deb9演进(debian9 > ubuntu2004), mint主题+xfce4.16+tint2+plank
 
 ```bash
+# -e RDP_PORT=10089 
+docker run -it --rm --net=host infrastlabs/docker-headless:mint
+rdesktop localhost:10089 -uheadless -pheadless -a 8 -g 1600x1010
+```
 
-# docker  run -it --rm -p 10099:10089 -v $(pwd):/mnt registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:mint
-docker  run -it --rm --net=host -e RDP_PORT=10099 -v $(pwd):/mnt registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:mint 
+## 问题记录
 
-rdesktop localhost:10099 -uheadless -pab132132 -a 8 -g 1600x1010
-
-
+```bash
 # xfdesk/thunar@gemmi-deb11卡死
 # root@debian11:/home/headless# cat xfdesk.txt 
 kill -9 `ps -ef |grep xfdesk |grep -v grep  |awk '{print }'` && xfdesktop
