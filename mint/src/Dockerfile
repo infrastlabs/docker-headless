@@ -105,7 +105,9 @@ RUN \
   git \
   # \343 kB
   libsecret-1-0 libnss3 libxtst6 libasound2 libglu1-mesa xdg-utils;
-  
+# xrdp-chansrv
+RUN apt.sh libfdk-aac1;
+
 # ASBRU: 3586 kB (disk: 15.5 MB)
 RUN \
   curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash; \

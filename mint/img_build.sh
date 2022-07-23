@@ -18,7 +18,14 @@ compile)
     docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile.compile . 
     docker push $repo/$ns/$img
     ;; 
-
+hub)
+    repoHub=docker.io
+    echo "${DOCKER_REGISTRY_PW_dockerhub}" |docker login --username=${DOCKER_REGISTRY_USER_dockerhub} --password-stdin $repoHub
+    # SLIM
+    img="docker-headless:mint" && echo -e "\n\nimg: $img"
+    docker tag $repo/$ns/$img $ns/$img
+    docker push $ns/$img
+    ;;
 *)
     img="docker-headless:mint"
     docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile . 

@@ -190,10 +190,18 @@ tcutils=true
 # password=ask
 # #delay_ms=2000
 
+[Any-vnc01]
+name=Any-vnc01
+lib=libvnc.so
+ip=asklocalhost
+port=ask5910
+username=na
+password=askheadless
+
 [Any-vnc]
 name=Any-vnc
 lib=libvnc.so
-ip=ask
+ip=asklocalhost
 port=ask5900
 username=na
 password=ask
