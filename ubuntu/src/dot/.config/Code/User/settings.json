@@ -1,0 +1,18 @@
+{
+    "window.zoomLevel": 1,
+    "workbench.iconTheme": "material-icon-theme",
+    "git.confirmSync": false,
+    "git.autofetch": true,
+    "files.autoSave": "afterDelay",
+    "javascript.updateImportsOnFileMove.enabled": "never",
+    "explorer.confirmDragAndDrop": false,
+    "explorer.confirmDelete": false,
+    "editor.links": false,
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.suggest.snippetsPreventQuickSuggestions": false,
+    "workbench.editor.openPositioning": "last",
+    "workbench.editor.enablePreview": false,
+    "workbench.editor.tabSizing": "shrink",
+    "diffEditor.renderSideBySide": true,
+    "update.mode": "none"
+}
