@@ -84,6 +84,8 @@ RUN echo 1;\
   mv /opt/asbru /usr/local; rm -f /usr/bin/asbru-cm; ln -s /usr/local/asbru/asbru-cm /usr/bin/; \
   cd /usr/share/icons/hicolor/scalable/apps; rm -f asbru-cm.svg; ln -s /usr/local/asbru/res/asbru-logo.svg ./asbru-cm.svg
 
+RUN apt.sh xinit xterm x11-xkb-utils
+
 # HEADLESS
 COPY --from=files1 / /
 COPY --from=files2 / /
