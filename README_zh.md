@@ -27,6 +27,12 @@ Audio | http://192.168.0.x:10082 |     -      | -
 RDP   | 192.168.0.x:10089        | `headless` | - 
 SSH   | ssh -p 10022 headless@192.168.0.x | `headless` | - 
 
+**(0)源码目录**
+
+- [deb9: 基于Debian的版本(体积小,稳定)](./deb9/src/)
+- [mint: 基于Ubuntu的新版(简单通用,多用户多桌面)](./mint/src/)
+
+
 **(1)密码修改**: 生产禁用默认密码，初始后请修改!!
 
 ```bash
