@@ -1,6 +1,7 @@
 version: '2.4'
 services:
   headless:
+    # latest, slim, full
     image: infrastlabs/docker-headless:full
     container_name: headless
     restart: unless-stopped
@@ -11,17 +12,30 @@ services:
       timeout: 3s 
       retries: 3
       start_period: 5s
-    # initPass, Locale
+    network_mode: bridge #when network_mode!=host, change the mapping to avoid port-confilct.
+    # privileged: true
+    shm_size: 1g
+    ports:
+      - "10089:10089"
+      - "10081:10081"
+      - "10082:10082"
+      - "10022:10022"
+      # - "6000-6009:6000-6009" #VNC: offset 0, limit 10;
+      # - "4700-4709:4700-4709"
     environment:
       - SSH_PASS=headless
       - VNC_PASS=headless
       - VNC_PASS_RO=View123
-      - VNC_OFFSET=10  #Aviod port-conflict
+      - VNC_SSL_ONLY=false
+      - VNC_CERT=      #when empty: random generate each restart.
+      - VNC_OFFSET=10  #network_mode: host, aviod port-conflict
+      # - VNC_LIMIT=3  #GatewayMode: for multi vnc instances.
+      - TZ=Asia/Shanghai
       - L=zh_CN
-    network_mode: host
-    shm_size: 1g
-    # Persist Data
+    # Persist Data: /_ext, /opt; Host Root: /mnt/xxx
     volumes:
       - /_ext:/_ext
       - /opt:/opt
       - /:/mnt
+    cap_add:
+      - SYS_ADMIN    #xrdp remote volume mount
