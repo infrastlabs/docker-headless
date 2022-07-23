@@ -53,8 +53,8 @@ $RUN test -z "$AUDIO" && exit 0;\
   ln -sf /etc/machine-id /var/lib/dbus/machine-id; \
   \
   # cd /home/headless/.qmmp/skins/; unzip Dark_Materia.wsz; chmod 755 -R darkmateria; \
-  wget -qO /usr/share/backgrounds/xfce/pure-blue.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/deploy/assets/pure-blue.jpg; \
-  wget -qO /usr/share/backgrounds/xfce/xfce-teal.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/deploy/assets/bg-debian-litegrey.png;
+  wget -qO /usr/share/backgrounds/xfce/pure-blue.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/pure-blue.jpg; \
+  wget -qO /usr/share/backgrounds/xfce/xfce-teal.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-litegrey.png;
   
 
 
@@ -89,7 +89,7 @@ $RUN test -z "$FULL" && exit 0;\
   sed -i "s^OSH_THEME=\"font\"^OSH_THEME=\"axin\"^g" /home/headless/.bashrc; \
   # cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*; \
   \
-  wget -qO /usr/share/backgrounds/xfce/xfce-teal.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/deploy/assets/bg-blue-linestar.jpg; \
+  wget -qO /usr/share/backgrounds/xfce/xfce-teal.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-blue-linestar.jpg; \
   # wget http://asia.pkg.bunsenlabs.org/debian/pool/main/b/bunsen-papirus-icon-theme/bunsen-papirus-icon-theme_10.3-2_all.deb; \
-  wget https://gitee.com/infrastlabs/docker-headless/raw/dev/deploy/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
+  wget https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
   dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb; 
