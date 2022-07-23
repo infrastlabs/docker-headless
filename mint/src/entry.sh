@@ -68,6 +68,24 @@ function setXserver(){
 }
 setXserver
 
+# touch /var/run/dbus/system_bus_socket && chmod 777 /var/run/dbus/system_bus_socket; #>>pulse: conn dbus err.
+# # Start DBUS session bus: (ref: deb9 .flubxbox/startup)
+# if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
+#    eval $(dbus-launch --sh-syntax --exit-with-session)
+# fi
+
+##xconf.sh#########
+#   # 
+#   mkdir -p /run/dbus/ && chown messagebus:messagebus /run/dbus/; \
+#   dbus-uuidgen > /etc/machine-id; \
+#   ln -sf /etc/machine-id /var/lib/dbus/machine-id; \
+#   # dconf: ibus, plank, engrampa; dconf dump / > xx.ini
+#   mkdir -p /etc/dconf/db;\
+#   su - headless -c "dbus-launch dconf reset -f /; dbus-launch dconf load / < /usr/share/dconf.ini; ";\
+#   dbus-launch dconf update;
+
+
+
 function setLocale(){
     env |grep "TZ\|^L="
     # L="zh_CN" ##${L##*.} > zh_CN

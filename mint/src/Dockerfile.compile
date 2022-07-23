@@ -33,8 +33,8 @@ RUN apt.sh \
     libmp3lame-dev nasm libpixman-1-dev xserver-xorg-dev
 RUN apt.sh \
   libfdk-aac-dev libopus-dev
-#0.9.5 > 0.9.16 > 0.9.19
-ENV ver="0.9.19"
+#0.9.5 > 0.9.16 > 0.9.19(thunar@gemmi-deb11卡死)
+ENV ver="0.9.16"
 # https://hub.fastgit.org/neutrinolabs/xrdp/wiki/Building-on-Debian-8
 # configure: error: please install libfdk-aac-dev or fdk-aac-devel
 		# --enable-tjpeg \

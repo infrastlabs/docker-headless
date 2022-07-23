@@ -65,6 +65,22 @@ RUN \
   gnome-system-monitor engrampa ristretto \
   dbus-x11 at-spi2-core language-pack-gnome-zh-hans
 
+# FULL(icon,ibus,git,flameshot) 49.1 MB
+RUN \
+  #19.642 MB; #APPS2 5.6 MB #LOCALE 13.4 MB
+  # \14.4 MB
+  apt.sh  papirus-icon-theme \
+  # \12.3 MB
+  ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
+  # \20.5 MB
+  flameshot arandr \
+  # \12.6 MB
+  git \
+  # \343 kB
+  libsecret-1-0 libnss3 libxtst6 libasound2 libglu1-mesa xdg-utils \
+  # xrdp-chansrv
+  libfdk-aac1;
+
 # 2536 kB
 # REF: docker-gui > ubt2004-mint-cinna
 # http://packages.linuxmint.com/ # https://mirrors.tuna.tsinghua.edu.cn/linuxmint
@@ -92,24 +108,8 @@ RUN apt.sh mint-y-icons mint-themes; \
   cd /usr/share/i18n/locales; rm -rf `ls |grep -v "locale.alias\|zh\|en"`; 
   # cd /usr/share/applications; rm -rf `ls |grep "kde"`;     
 
-# FULL(icon,ibus,git,flameshot) 49.1 MB
-RUN \
-  #19.642 MB; #APPS2 5.6 MB #LOCALE 13.4 MB
-  # \14.4 MB
-  apt.sh  papirus-icon-theme \
-  # \12.3 MB
-  ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
-  # \20.5 MB
-  flameshot arandr \
-  # \12.6 MB
-  git \
-  # \343 kB
-  libsecret-1-0 libnss3 libxtst6 libasound2 libglu1-mesa xdg-utils;
-# xrdp-chansrv
-RUN apt.sh libfdk-aac1;
-
 # ASBRU: 3586 kB (disk: 15.5 MB)
-RUN \
+RUN echo 1;\
   curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash; \
   apt.sh asbru-cm; rm -f /etc/apt/sources.list.d/asbru-cm-release.list; \
   mv /opt/asbru /usr/local; rm -f /usr/bin/asbru-cm; ln -s /usr/local/asbru/asbru-cm /usr/bin/; \
