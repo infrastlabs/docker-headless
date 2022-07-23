@@ -7,7 +7,7 @@ ns=infrastlabs
 # cache="--no-cache"
 # pull="--pull"
 
-ver=v3 # latest
+ver=v1 # latest
 case "$1" in
 *)
     img="docker-headless:ubt-$ver"
