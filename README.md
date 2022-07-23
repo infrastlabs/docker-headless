@@ -36,22 +36,22 @@ echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /
 
 **(2)UserManual**: 
 
-- [CloudDesktop Introduce](./docs/01-CloudDesktop.md)
-- [Next TODO](./docs/b0-todo.md)
-- [1.How to set Locale?](./docs/b1-locale.md)
-- [2.Usage of Double-Screen, ClipBoard, Audio?](./docs/b2-rdp.md)
-- [3.Web entry of desktop?](./docs/b3-vnc.md)
-- [4.Usage of IBUS/Flameshot](./docs/b4-apps.md)
+- [CloudDesktop Introduce](./_doc/mannual/01-CloudDesktop.md)
+- [Next TODO](./_doc/mannual/b0-todo.md)
+- [1.How to set Locale?](./_doc/mannual/b1-locale.md)
+- [2.Usage of Double-Screen, ClipBoard, Audio?](./_doc/mannual/b2-rdp.md)
+- [3.Web entry of desktop?](./_doc/mannual/b3-vnc.md)
+- [4.Usage of IBUS/Flameshot](./_doc/mannual/b4-apps.md)
 - [Details](./detail.md) （Hotkeys, Envs, SysApps）
 
 
-![](https://gitee.com/infrastlabs/docker-headless/raw/dev/docs/res/01rdp-double-screen.png)
+![](https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/mannual/res/01rdp-double-screen.png)
 
 **(3)Producttion-Deployment**: 
 
-- [Windows-VM Deployment：](./deploy/win-vbox/README.md) With `barge-os` mini-container system, `--net=host` Use the VM's IP 
-- [Linux-Server Deployment：](./deploy/fat-docker/README.md) Use `macvlan`'s network，with special IP，sugest with lxcfs installed.
-- [Kubernetes Deployment：](./deploy/k8s-headless/README.md) Deployment+Service
+- [Windows-VM Deployment：](./_doc/deploy/win-vbox/README.md) With `barge-os` mini-container system, `--net=host` Use the VM's IP 
+- [Linux-Server Deployment：](./_doc/deploy/fat-docker/README.md) Use `macvlan`'s network，with special IP，sugest with lxcfs installed.
+- [Kubernetes Deployment：](./_doc/deploy/k8s-headless/README.md) Deployment+Service
 
 ## UseCase
 
@@ -91,7 +91,7 @@ wget https://vscode.cdn.azure.cn/stable/6cba118ac49a1b88332f312a8f67186f7f3c1643
 wget https://download.jetbrains.8686c.com/idea/ideaIC-2016.3.8-no-jdk.tar.gz
 ```
 
-![](docs/res/02/ide2-vscode.png)
+![](_doc/mannual/res/02/ide2-vscode.png)
 
 **(2)Office**
 
@@ -108,12 +108,12 @@ sudo sed -i "1a export XMODIFIERS=@im=ibus" /usr/bin/{wps,wpp,et}
 sudo sed -i "2a export QT_IM_MODULE=ibus" /usr/bin/{wps,wpp,et}
 ```
 
-![](docs/res/02/apps-office-wps.jpg)
+![](_doc/mannual/res/02/apps-office-wps.jpg)
 
 
 **(3)Docker Dind**
 
-![](docs/res/02/dind2-headlessLinks.png)
+![](_doc/mannual/res/02/dind2-headlessLinks.png)
 
 ```bash
 # exec@host: docker,dcp

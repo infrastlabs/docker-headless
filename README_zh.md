@@ -38,24 +38,24 @@ echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /
 
 **(2)使用帮助**: 
 
-- [云桌面功能简介](./docs/01-CloudDesktop.md)
-- [Next TODO](./docs/b0-todo.md)
-- [1.如何设置为中文或其它语言？](./docs/b1-locale.md)
-- [2.双屏连接，远程剪切板、音频如何使用？](./docs/b2-rdp.md)
-- [3.如何WEB访问远程桌面？](./docs/b3-vnc.md)
-- [4.中文输入法、截图软件使用说明](./docs/b4-apps.md)
-- [5.音乐播放器及远程音频相关说明](./docs/b5-audio.md)
-- [6.如何使用Ubuntu, Mate，KDE等其它桌面](./docs/b6-desktop.md) (多桌面,网关模式)
+- [云桌面功能简介](./_doc/mannual/01-CloudDesktop.md)
+- [Next TODO](./_doc/mannual/b0-todo.md)
+- [1.如何设置为中文或其它语言？](./_doc/mannual/b1-locale.md)
+- [2.双屏连接，远程剪切板、音频如何使用？](./_doc/mannual/b2-rdp.md)
+- [3.如何WEB访问远程桌面？](./_doc/mannual/b3-vnc.md)
+- [4.中文输入法、截图软件使用说明](./_doc/mannual/b4-apps.md)
+- [5.音乐播放器及远程音频相关说明](./_doc/mannual/b5-audio.md)
+- [6.如何使用Ubuntu, Mate，KDE等其它桌面](./_doc/mannual/b6-desktop.md) (多桌面,网关模式)
 - [Detail明细说明](./detail.md) （快捷键、环境变量、系统应用）
 
 
-![](https://gitee.com/infrastlabs/docker-headless/raw/dev/docs/res/01rdp-double-screen.png)
+![](https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/mannual/res/01rdp-double-screen.png)
 
 **(3)生产部署指引**: 
 
-- [Windows虚拟机部署：](./deploy/win-vbox/README.md) 采用barge-os迷你容器系统, --net=host 采用虚机IP 
-- [Linux服务器部署：](./deploy/fat-docker/README.md) 容器使用macvlan网络，分配专用IP，建议安装lxcfs
-- [K8S内部署：](./deploy/k8s-headless/README.md) Deployment+Service
+- [Windows虚拟机部署：](./_doc/deploy/win-vbox/README.md) 采用barge-os迷你容器系统, --net=host 采用虚机IP 
+- [Linux服务器部署：](./_doc/deploy/fat-docker/README.md) 容器使用macvlan网络，分配专用IP，建议安装lxcfs
+- [K8S内部署：](./_doc/deploy/k8s-headless/README.md) Deployment+Service
 
 ## 使用示例
 
@@ -97,7 +97,7 @@ wget https://vscode.cdn.azure.cn/stable/6cba118ac49a1b88332f312a8f67186f7f3c1643
 wget https://download.jetbrains.8686c.com/idea/ideaIC-2016.3.8-no-jdk.tar.gz
 ```
 
-![](docs/res/02/ide2-vscode.png)
+![](_doc/mannual/res/02/ide2-vscode.png)
 
 **(2)浏览器、Office办公**
 
@@ -114,14 +114,14 @@ sudo sed -i "1a export XMODIFIERS=@im=ibus" /usr/bin/{wps,wpp,et}
 sudo sed -i "2a export QT_IM_MODULE=ibus" /usr/bin/{wps,wpp,et}
 ```
 
-![](docs/res/02/apps-office-wps.jpg)
+![](_doc/mannual/res/02/apps-office-wps.jpg)
 
 
 **(3)Docker Dind模式**
 
 支持在容器内调用宿主机的dockerd，用于dockerfile构建、容器控制等场景。
 
-![](docs/res/02/dind2-headlessLinks.png)
+![](_doc/mannual/res/02/dind2-headlessLinks.png)
 
 ```bash
 # 宿主机运行：获取docker,docker-compose文件:

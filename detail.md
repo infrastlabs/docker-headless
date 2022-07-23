@@ -27,7 +27,7 @@ export PULSE_SERVER=tcp:192.168.0.x:4721 #远程声音
 # ./xx 启动图形化应用
 ```
 
-![](https://gitee.com/infrastlabs/docker-headless/raw/dev/docs/res/design-MultiBox.png)
+![](https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/mannual/res/design-MultiBox.png)
 
 **1.HotKeys**
 
