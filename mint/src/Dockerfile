@@ -115,11 +115,22 @@ RUN echo 1;\
   mv /opt/asbru /usr/local; rm -f /usr/bin/asbru-cm; ln -s /usr/local/asbru/asbru-cm /usr/bin/; \
   cd /usr/share/icons/hicolor/scalable/apps; rm -f asbru-cm.svg; ln -s /usr/local/asbru/res/asbru-logo.svg ./asbru-cm.svg
 
+
+# webhookd, noVNC
+RUN cd /tmp; file=webhookd.tar.gz; curl -fSL -k -O https://gitee.com/infrastlabs/fk-webhookd/attach_files/1135812/download/$file; \
+  mkdir -p /usr/local/webhookd; tar -zxvf $file -C /usr/local/webhookd; rm -f $file
+RUN cd /usr/local/webhookd/static; file=v1.3.0.tar.gz; curl -fSL -k -O https://hub.fastgit.xyz/novnc/noVNC/archive/$file; \
+  bash down_vnc.sh; rm -f $file
+
 # HEADLESS
 COPY --from=files1 / /
 COPY --from=files2 / /
 RUN bash /xconf.sh
-RUN cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*;
+
+# libopus0: /usr/local/xrdp/sbin/xrdp-chansrv
+RUN cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*; \
+  apt.sh libopus0
+ADD src/bcs_push.sh /usr/local/webhookd/static/bcs_push.sh
 
 ENV \
   # mintwelcome
@@ -132,9 +143,9 @@ ENV \
   # DISPLAY="localhost:35" \
   # PULSE_SERVER="tcp:localhost:4735"
   \
-  SSH_PORT=10022 \
-  RDP_PORT=10089 \
-  VNC_PORT=10081 \
+  PORT_SSH=10022 \
+  PORT_RDP=10089 \
+  PORT_VNC=10081 \
   # 
   SSH_PASS=headless \
   VNC_PASS=headless \
@@ -144,8 +155,7 @@ ENV \
   VNC_LIMIT=1
   # VNC_INIT="21|gnome,22|plama,23|mate,24|cinna,25|xfce,26|flux" \
 
-# VOLUME ["/sys/fs/cgroup"]
 STOPSIGNAL SIGRTMIN+3
-# ENTRYPOINT ["/entry.sh"]
-# CMD ["xfce4-session"]
+WORKDIR /home/headless
+EXPOSE 10089/tcp 10081/tcp 10022/tcp
 CMD ["/entry.sh"]

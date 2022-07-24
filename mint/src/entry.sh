@@ -23,8 +23,8 @@ environment=DISPLAY=:$N,HOME=/home/$user1
 priority=35
 user=$user1
 command=/xvnc.sh xvnc $N
-#stdout_logfile=/dev/fd/1
-stdout_logfile=/dev/null
+stdout_logfile=/dev/fd/1
+#stdout_logfile=/dev/null
 stdout_logfile_maxbytes=0
 redirect_stderr=true
 
@@ -45,10 +45,11 @@ function setXserver(){
     # cat /usr/local/novnc/index.tpl.html > /usr/local/novnc/index.html
 
     # setPorts; sed port=.* || env_ctReset
-    sed -i "s^port=3389^port=${RDP_PORT}^g" /etc/xrdp/xrdp.ini
-    sed -i "s/EFRp 22/EFRp ${SSH_PORT}/g" /etc/supervisor/conf.d/xrdp.conf #sv.conf
+    sed -i "s^port=3389^port=${PORT_RDP}^g" /etc/xrdp/xrdp.ini
+    sed -i "s/EFRp 22/EFRp ${PORT_SSH}/g" /etc/supervisor/conf.d/xrdp.conf #sv.conf
     # sesman
-    SES_PORT=$(echo "${RDP_PORT%??}50") #ref RDP_PORT, replace last 2 char
+    # SES_PORT=$(echo "${PORT_RDP%??}50") #ref PORT_RDP, replace last 2 char
+    SES_PORT=$(($PORT_RDP + 100))
     sed -i "s/ListenPort=3350/ListenPort=${SES_PORT}/g" /etc/xrdp/sesman.ini
     # xvnc0-de
     port0=$(expr 0 + $VNC_OFFSET)

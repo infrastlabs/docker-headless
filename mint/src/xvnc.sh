@@ -1,9 +1,6 @@
 #!/bin/bash
 offsetLimitIndex=$2
 offsetLimitIndex=${offsetLimitIndex:-99}
-BCS_PORT=${BCS_PORT:-9222}
-indexName=$(cat /usr/local/webhook/scripts/xdict.txt |sort -u |grep -v "^#\|^$" |grep $offsetLimitIndex |cut -d'|' -f2)
-echo "indexInfo: $offsetLimitIndex-$indexName, BCS_PORT: $BCS_PORT"
 
 function startXvnc(){
     # PULSE#################################################
@@ -29,6 +26,10 @@ xvnc)
     startXvnc
     ;;
 xrec)
+    BCS_PORT=${BCS_PORT:-9222}
+    indexName=$(cat /usr/local/webhook/scripts/xdict.txt |sort -u |grep -v "^#\|^$" |grep $offsetLimitIndex |cut -d'|' -f2)
+    echo "indexInfo: $offsetLimitIndex-$indexName, BCS_PORT: $BCS_PORT"
+
     # go:recordmp3> go:record+lame > just parec+lame
     url="localhost:$BCS_PORT/$offsetLimitIndex-$indexName.mp3?stream=true&advertise=true"
     exec parec --format=s16le -d xrdp-sink.monitor |lame -r -ab 52 - - \
