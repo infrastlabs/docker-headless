@@ -6,7 +6,8 @@
 # 10022, 10089, 10081
 # env="-e PORT_SSH=10092 -e PORT_RDP=10099 -e PORT_VNC=10091"
 docker run -it --rm --net=host $env -e VNC_OFFSET=10  infrastlabs/docker-headless:mint-v3
-rdesktop localhost:10089 -uheadless -pheadless -a 8 -g 1600x1010
+# gemmi-deb11 连接本地 声音无延迟、不卡顿
+rdesktop localhost:10089 -uabc -pheadless -a 16 -g 1600x1010 -r sound:local
 ```
 
 ## 问题记录
