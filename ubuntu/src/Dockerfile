@@ -65,7 +65,7 @@ RUN \
 RUN \
   #19.642 MB; #APPS2 5.6 MB #LOCALE 13.4 MB
   # \14.4 MB
-  apt.sh  papirus-icon-theme \
+  apt.sh  \
   # \12.3 MB
   ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
   # \20.5 MB
@@ -92,8 +92,7 @@ COPY --from=files2 / /
 RUN bash /xconf.sh
 
 ENV \
-  # mintwelcome
-  XDG_CURRENT_DESKTOP=XFCE \
+  # XDG_CURRENT_DESKTOP=XFCE \
   TERM=xterm \
   SHELL=/bin/bash \
   L="zh_CN" \
@@ -114,8 +113,7 @@ ENV \
   VNC_LIMIT=1
   # VNC_INIT="21|gnome,22|plama,23|mate,24|cinna,25|xfce,26|flux" \
 
-# VOLUME ["/sys/fs/cgroup"]
 STOPSIGNAL SIGRTMIN+3
-# ENTRYPOINT ["/entry.sh"]
-# CMD ["xfce4-session"]
+WORKDIR /home/headless
+EXPOSE 10089/tcp 10081/tcp 10022/tcp
 CMD ["/entry.sh"]
