@@ -66,10 +66,11 @@ RUN \
   dbus-x11 at-spi2-core language-pack-gnome-zh-hans
 
 # FULL(icon,ibus,git,flameshot) 49.1 MB
+# _ex: papirus-icon-theme 
 RUN \
   #19.642 MB; #APPS2 5.6 MB #LOCALE 13.4 MB
   # \14.4 MB
-  apt.sh  papirus-icon-theme \
+  apt.sh  \
   # \12.3 MB
   ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
   # \20.5 MB
@@ -102,10 +103,12 @@ RUN apt.sh mint-y-icons mint-themes; \
 # RUN \
   # cd /usr/share/xfce4/backdrops; rm -f `ls |grep -v "linuxmint.jpg"`; \
   # cd /usr/share/backgrounds; rm -rf linuxmint*; rm -f xfce/{xfce-strips,xfce-verticals}.png; \
-  cd /usr/share/icons; rm -rf `ls |grep "Mint-X\|Humanity\|Ubuntu-Mono\|LoginIcons"`; \
-  cd /usr/share/themes; rm -rf `ls |grep -v "Mint-Y"`; \
-  cd /usr/share/locales; rm -rf `ls |grep -v "locale.alias\|zh\|en"`; \
-  cd /usr/share/i18n/locales; rm -rf `ls |grep -v "locale.alias\|zh\|en"`; 
+  cd /usr/share/icons && rm -rf `ls |grep "Mint-X\|Humanity\|Ubuntu-Mono\|LoginIcons"`; \
+  cd /usr/share/themes && rm -rf `ls |grep -v "Mint-Y"`; \
+  cd /usr/share/locales && rm -rf `ls |grep -v "locale.alias\|zh\|en"`; \
+  cd /usr/share/i18n/locales && rm -rf `ls |grep -v "locale.alias\|zh\|en"`; \
+  # 80M > 42M
+  cd /usr/share/icons/Mint-Y/apps && rm -rf 256* 96*; 
   # cd /usr/share/applications; rm -rf `ls |grep "kde"`;     
 
 # ASBRU: 3586 kB (disk: 15.5 MB)

@@ -73,8 +73,8 @@ $RUN \
   bash -c 'cd /home/headless/.oh-my-bash/themes && rm -rf `ls |grep -v "axin\|sh$"` || echo "onmybash not exist, skip clear"'; \
   \
   # sed -i "s^value=\"gnome\"^value=\"Papirus-Bunsen-grey\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml; \
-  sed -i "s^OSH_THEME=\"font\"^OSH_THEME=\"axin\"^g" /home/headless/.bashrc; \
-  \
+  sed -i "s^OSH_THEME=\"font\"^OSH_THEME=\"axin\"^g" /home/headless/.bashrc; 
+  # \
   # wget -qO /usr/share/backgrounds/xfce/xfce-teal.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-blue-linestar.jpg; \
-  wget https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
-  dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb; 
+  # wget https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
+  # dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb; 
