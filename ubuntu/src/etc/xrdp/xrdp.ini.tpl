@@ -159,6 +159,15 @@ tcutils=true
 # port=5902
 # chansrvport=DISPLAY(2)
 
+[Xvnc10]
+name=Xvnc10
+lib=libvnc.so
+username=asknoUser
+password=askheadless
+ip=127.0.0.1
+port=5910
+chansrvport=DISPLAY(10)
+
 
 # [PRE_ADD_HERE]
 # [Local-sesman]
@@ -189,14 +198,6 @@ tcutils=true
 # username=ask
 # password=ask
 # #delay_ms=2000
-
-[Any-vnc01]
-name=Any-vnc01
-lib=libvnc.so
-ip=asklocalhost
-port=ask5910
-username=na
-password=askheadless
 
 [Any-vnc]
 name=Any-vnc

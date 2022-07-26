@@ -85,7 +85,8 @@ RUN echo 1;\
   cd /usr/share/icons/hicolor/scalable/apps; rm -f asbru-cm.svg; ln -s /usr/local/asbru/res/asbru-logo.svg ./asbru-cm.svg
 
 # 2422 kB #https://github.com/j8r/dockerfiles
-RUN apt.sh xinit xterm x11-xkb-utils systemd systemd-sysv fluxbox
+# +libopus0: /usr/local/xrdp/sbin/xrdp-chansrv
+RUN apt.sh xinit xterm x11-xkb-utils systemd systemd-sysv fluxbox libopus0
 
 # webhookd, noVNC
 RUN cd /tmp; file=webhookd.tar.gz; curl -fSL -k -O https://gitee.com/infrastlabs/fk-webhookd/attach_files/1135812/download/$file; \
@@ -125,12 +126,14 @@ RUN dpkg-divert --local --rename --add /sbin/udevadm; \
 ADD src/bcs_push.sh /usr/local/webhookd/static/bcs_push.sh
 
 ENV \
-  # XDG_CURRENT_DESKTOP=XFCE \
   # https://gitee.com/hegp/docker-learning/blob/master/%E5%AE%8C%E6%95%B4%E7%B3%BB%E7%BB%9F%E7%9A%84%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C.md
   # 使得Systemd识别到Docker是它的虚拟化环境
   # 使得对init发送信号SIGRTMIN+3可以使Systemd正常关闭，也就是第二行里面的STOPSIGNAL SIGRTMIN+3
   container=docker \
   # LC_ALL=C \
+  \
+  # mintwelcome
+  # XDG_CURRENT_DESKTOP=XFCE \
   TERM=xterm \
   SHELL=/bin/bash \
   L="zh_CN" \
@@ -158,6 +161,6 @@ EXPOSE 10089/tcp 10081/tcp 10022/tcp
 # CMD ["/sbin/init"]
 
 VOLUME [ "/sys/fs/cgroup" ]
-# CMD ["/lib/systemd/systemd"]
 # /sbin/init
+# CMD ["/lib/systemd/systemd"]
 CMD ["bash", "-c", "setsysenv; exec /lib/systemd/systemd"]

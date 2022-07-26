@@ -87,6 +87,7 @@ setXserver
 
 # setLocale: bin/setlocale
 setlocale
+# TODO export LANG LANGUAGE to supervisord <sv,sysd>
 
 # Dump environment variables
 # https://hub.fastgit.org/hectorm/docker-xubuntu/blob/master/scripts/bin/container-init
