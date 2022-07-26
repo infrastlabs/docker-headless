@@ -9,6 +9,15 @@ ns=infrastlabs
 
 ver=v2 # latest
 case "$1" in
+compile)
+    vncver=1.12.0 ## udomain > jaist
+    file=tigervnc-${vncver}.x86_64.tar.gz
+    test -s "$file" || curl -fSL -k -O https://jaist.dl.sourceforge.net/project/tigervnc/stable/${ver}/$file
+    # 
+    img="docker-headless:mint-compile"
+    docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile.compile . 
+    docker push $repo/$ns/$img
+    ;; 
 *)
     img="docker-headless:ubt-$ver"
     # --cache-from $repo/$ns/$img 
