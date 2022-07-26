@@ -1,0 +1,28 @@
+[Unit]
+Description=x11 desktop
+ 
+[Service]
+Type=simple
+User=headless
+#Group=xxx
+
+#environment=DISPLAY=:_DISPLAY_,HOME=/home/headless,USER=headless,SHELL=/bin/bash,TERM=xterm
+Environment=DISPLAY=:10
+Environment=HOME=/home/headless
+Environment=USER=headless
+Environment=SHELL=/bin/bash
+Environment=TERM=xterm
+#setlocale> lang
+Environment=LANG=zh_CN.UTF-8
+Environment=LANGUAGE=zh_CN:en
+
+#sleep 5; wait sv.xvnc start
+WorkingDirectory=/home/headless
+ExecStart=/bin/bash -c "source /.env; setlocale; sleep 5; export XDG_SESSION_TYPE=x11; export XKL_XMODMAP_DISABLE=1; unset SESSION_MANAGER; unset DBUS_SESSION_BUS_ADDRESS; exec dbus-launch --exit-with-session gnome-session"
+LimitNOFILE=65535
+StandardOutput=journal
+#Restart=always
+
+#for: systemctl enable de-start;
+[Install]
+WantedBy=multi-user.target
