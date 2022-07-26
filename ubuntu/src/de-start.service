@@ -6,7 +6,7 @@ Type=simple
 User=headless
 #export XDG_SESSION_TYPE=x11; export XKL_XMODMAP_DISABLE=1; unset SESSION_MANAGER; unset DBUS_SESSION_BUS_ADDRESS; 
 # dbus-launch gnome-session --builtin --session=pantheon --debug
-ExecStart=/bin/bash -c "source /etc/profile; export XDG_SESSION_TYPE=x11; export XKL_XMODMAP_DISABLE=1; unset SESSION_MANAGER; unset DBUS_SESSION_BUS_ADDRESS; exec dbus-launch --exit-with-session startfluxbox"
+ExecStart=/bin/bash -c "source /env.txt; export XDG_SESSION_TYPE=x11; export XKL_XMODMAP_DISABLE=1; unset SESSION_MANAGER; unset DBUS_SESSION_BUS_ADDRESS; exec dbus-launch --exit-with-session startfluxbox"
  
 [Install]
 WantedBy=multi-user.target

@@ -96,6 +96,7 @@ RUN dpkg-divert --local --rename --add /sbin/udevadm; \
   ln -s /bin/true /sbin/udevadm; \
   systemctl enable de-entry; \
   systemctl enable de-start; \
+  systemctl disable dropbear; \
   systemctl disable supervisor; \
   # systemctl mask supervisor; \
   systemctl disable systemd-resolved; 
@@ -127,4 +128,5 @@ STOPSIGNAL SIGRTMIN+3
 WORKDIR /home/headless
 EXPOSE 10089/tcp 10081/tcp 10022/tcp
 # CMD ["/entry.sh"]
-CMD ["/sbin/init"]
+# CMD ["/sbin/init"]
+CMD ["bash", "-c", "env |while read one; do echo export $one >> /env.txt; done; exec /sbin/init"]
