@@ -1,5 +1,10 @@
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v2
 
+# APPS+ #clipit> diodon
+RUN \
+  apt.sh tint2 plank rofi \
+  diodon pnmixer lxappearance
+
 # 2536 kB
 # REF: docker-gui > ubt2004-mint-cinna
 # http://packages.linuxmint.com/ # https://mirrors.tuna.tsinghua.edu.cn/linuxmint
@@ -30,6 +35,11 @@ RUN apt.sh mint-y-icons mint-themes; \
   # cd /usr/share/applications; rm -rf `ls |grep "kde"`;     
 
 # HEADLESS
+# .mint-art 调整过的
+ADD --chown=headless:headless src/xf /home/headless
+ADD --chown=headless:headless src/.mint-artwork-xfce /home/headless
+# replace: de@sv.conf
+ADD src/sv.conf /etc/supervisor/conf.d/xrdp.conf
 
 # TODO #-libopus0: /usr/local/xrdp/sbin/xrdp-chansrv
 RUN cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*; \
