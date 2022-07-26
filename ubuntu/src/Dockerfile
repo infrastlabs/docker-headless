@@ -84,12 +84,22 @@ RUN echo 1;\
   mv /opt/asbru /usr/local; rm -f /usr/bin/asbru-cm; ln -s /usr/local/asbru/asbru-cm /usr/bin/; \
   cd /usr/share/icons/hicolor/scalable/apps; rm -f asbru-cm.svg; ln -s /usr/local/asbru/res/asbru-logo.svg ./asbru-cm.svg
 
-RUN apt.sh xinit xterm x11-xkb-utils
+RUN apt.sh xinit xterm x11-xkb-utils systemd fluxbox
 
 # HEADLESS
 COPY --from=files1 / /
 COPY --from=files2 / /
 RUN bash /xconf.sh
+
+COPY src/*.service /etc/systemd/system/
+RUN dpkg-divert --local --rename --add /sbin/udevadm; \
+  ln -s /bin/true /sbin/udevadm; \
+  systemctl enable de-entry; \
+  systemctl enable de-start; \
+  systemctl disable supervisor; \
+  # systemctl mask supervisor; \
+  systemctl disable systemd-resolved; 
+RUN find / |grep -v "^/sys\|^/proc" |grep systemd |grep ".service$" |grep "supervi" |while read one; do echo $one; rm -f $one; done  
 
 ENV \
   # XDG_CURRENT_DESKTOP=XFCE \
@@ -116,4 +126,5 @@ ENV \
 STOPSIGNAL SIGRTMIN+3
 WORKDIR /home/headless
 EXPOSE 10089/tcp 10081/tcp 10022/tcp
-CMD ["/entry.sh"]
+# CMD ["/entry.sh"]
+CMD ["/sbin/init"]
