@@ -1,0 +1,10 @@
+[Unit]
+Description=x11 server
+ 
+[Service]
+Type=simple
+User=root
+ExecStart=/bin/bash -c "source /etc/profile; exec bash /entry.sh"
+ 
+[Install]
+WantedBy=multi-user.target
