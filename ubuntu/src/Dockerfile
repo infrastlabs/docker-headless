@@ -122,6 +122,7 @@ RUN dpkg-divert --local --rename --add /sbin/udevadm; \
   systemctl disable supervisor; \
   # systemctl mask supervisor; \
   systemctl disable systemd-resolved; 
+ADD src/bcs_push.sh /usr/local/webhookd/static/bcs_push.sh
 
 ENV \
   # XDG_CURRENT_DESKTOP=XFCE \
