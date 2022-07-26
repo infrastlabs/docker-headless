@@ -11,7 +11,7 @@ FROM scratch as files2
   ADD src/etc /etc
   ADD src/dot /etc/skel
   ADD src/sv.conf /etc/supervisor/conf.d/xrdp.conf
-  ADD src/bin/pkgsize /usr/bin/pkgsize
+  ADD src/bin/ /usr/bin/
 
 FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND noninteractive
@@ -84,12 +84,34 @@ RUN echo 1;\
   mv /opt/asbru /usr/local; rm -f /usr/bin/asbru-cm; ln -s /usr/local/asbru/asbru-cm /usr/bin/; \
   cd /usr/share/icons/hicolor/scalable/apps; rm -f asbru-cm.svg; ln -s /usr/local/asbru/res/asbru-logo.svg ./asbru-cm.svg
 
-RUN apt.sh xinit xterm x11-xkb-utils systemd fluxbox
+# 2422 kB #https://github.com/j8r/dockerfiles
+RUN apt.sh xinit xterm x11-xkb-utils systemd systemd-sysv fluxbox
+
+# webhookd, noVNC
+RUN cd /tmp; file=webhookd.tar.gz; curl -fSL -k -O https://gitee.com/infrastlabs/fk-webhookd/attach_files/1135812/download/$file; \
+  mkdir -p /usr/local/webhookd; tar -zxvf $file -C /usr/local/webhookd; rm -f $file
+RUN cd /usr/local/webhookd/static; file=v1.3.0.tar.gz; curl -fSL -k -O https://hub.fastgit.xyz/novnc/noVNC/archive/$file; \
+  bash down_vnc.sh; rm -f $file
 
 # HEADLESS
 COPY --from=files1 / /
 COPY --from=files2 / /
 RUN bash /xconf.sh
+RUN \
+  cd /lib/systemd/system/sysinit.target.wants/ \
+    && rm $(ls | grep -v systemd-tmpfiles-setup); \
+    \
+  rm -f /lib/systemd/system/multi-user.target.wants/* \
+    /etc/systemd/system/*.wants/* \
+    /lib/systemd/system/local-fs.target.wants/* \
+    /lib/systemd/system/sockets.target.wants/*udev* \
+    /lib/systemd/system/sockets.target.wants/*initctl* \
+    /lib/systemd/system/basic.target.wants/* \
+    /lib/systemd/system/anaconda.target.wants/* \
+    /lib/systemd/system/plymouth* \
+    /lib/systemd/system/systemd-update-utmp*; \
+    \
+  find / |grep -v "^/sys\|^/proc" |grep systemd |grep ".service$" |grep "supervi" |while read one; do echo $one; rm -f $one; done
 
 COPY src/*.service /etc/systemd/system/
 RUN dpkg-divert --local --rename --add /sbin/udevadm; \
@@ -100,10 +122,14 @@ RUN dpkg-divert --local --rename --add /sbin/udevadm; \
   systemctl disable supervisor; \
   # systemctl mask supervisor; \
   systemctl disable systemd-resolved; 
-RUN find / |grep -v "^/sys\|^/proc" |grep systemd |grep ".service$" |grep "supervi" |while read one; do echo $one; rm -f $one; done  
 
 ENV \
   # XDG_CURRENT_DESKTOP=XFCE \
+  # https://gitee.com/hegp/docker-learning/blob/master/%E5%AE%8C%E6%95%B4%E7%B3%BB%E7%BB%9F%E7%9A%84%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C.md
+  # 使得Systemd识别到Docker是它的虚拟化环境
+  # 使得对init发送信号SIGRTMIN+3可以使Systemd正常关闭，也就是第二行里面的STOPSIGNAL SIGRTMIN+3
+  container=docker \
+  # LC_ALL=C \
   TERM=xterm \
   SHELL=/bin/bash \
   L="zh_CN" \
@@ -112,9 +138,9 @@ ENV \
   # DISPLAY="localhost:35" \
   # PULSE_SERVER="tcp:localhost:4735"
   \
-  SSH_PORT=10022 \
-  RDP_PORT=10089 \
-  VNC_PORT=10081 \
+  PORT_SSH=10022 \
+  PORT_RDP=10089 \
+  PORT_VNC=10081 \
   # 
   SSH_PASS=headless \
   VNC_PASS=headless \
@@ -129,4 +155,8 @@ WORKDIR /home/headless
 EXPOSE 10089/tcp 10081/tcp 10022/tcp
 # CMD ["/entry.sh"]
 # CMD ["/sbin/init"]
-CMD ["bash", "-c", "env |while read one; do echo export $one >> /env.txt; done; exec /sbin/init"]
+
+VOLUME [ "/sys/fs/cgroup" ]
+# CMD ["/lib/systemd/systemd"]
+# /sbin/init
+CMD ["bash", "-c", "setsysenv; exec /lib/systemd/systemd"]
