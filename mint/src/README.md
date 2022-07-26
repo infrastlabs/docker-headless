@@ -1,6 +1,7 @@
 # mint
 
-从deb9演进(debian9 > ubuntu2004), mint主题+xfce4.16+tint2+plank
+- 从deb9演进(debian9 > ubuntu2004), mint主题+xfce4.16+tint2+plank
+- 复用基础镜像 `FROM docker-headless:ubt-v2`
 
 ```bash
 # 10022, 10089, 10081
