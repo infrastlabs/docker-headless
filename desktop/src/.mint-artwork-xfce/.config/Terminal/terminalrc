@@ -1,0 +1,12 @@
+[Configuration]
+FontName=Monospace 10
+MiscAlwaysShowTabs=FALSE
+MiscBell=FALSE
+MiscBordersDefault=TRUE
+MiscMenubarDefault=TRUE
+MiscToolbarsDefault=FALSE
+BackgroundMode=TERMINAL_BACKGROUND_TRANSPARENT
+BackgroundDarkness=1.0
+ColorBackground=#3c953c953c95
+ColorPalette=#000000;#cc0000;#4e9a06;#c4a000;#3465a4;#75507b;#06989a;#d3d7cf;#555753;#ef2929;#8ae234;#fce94f;#739fcf;#ad7fa8;#34e2e2;#eeeeec
+ColorCursor=#867f81c281c2

@@ -1,0 +1,30 @@
+[Configuration]
+AutomountDrives=TRUE
+AutomountMedia=TRUE
+Autobrowse=TRUE
+Autorun=TRUE
+Autoopen=TRUE
+Autoburn=FALSE
+AutoburnDataCommand=xfburn -d
+AutoburnAudioCommand=xfburn
+AutoplayAudioCd=TRUE
+AutoplayAudioCdCommand=rhythmbox %d
+AutoplayVideoCd=TRUE
+AutoplayVideoCdCommand=totem /dev/sr0
+Autoipod=FALSE
+AutoipodCommand=
+Autophoto=FALSE
+AutophotoCommand=
+Autopalm=FALSE
+AutopalmCommand=gpilotd-control-applet
+Autopocketpc=FALSE
+AutopocketpcCommand=multisync
+Autoprinter=FALSE
+AutoprinterCommand=gnome-printer-add hal://%h
+Autokeyboard=FALSE
+AutokeyboardCommand=
+Automouse=FALSE
+AutomouseCommand=
+Autotablet=FALSE
+AutotabletCommand=
+
