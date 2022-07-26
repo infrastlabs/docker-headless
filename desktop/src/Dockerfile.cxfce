@@ -1,0 +1,44 @@
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v2
+
+# REF: docker-gui > ubt2004-mint-cinna
+# http://packages.linuxmint.com/
+# https://mirrors.tuna.tsinghua.edu.cn/linuxmint
+RUN \
+  echo "deb https://mirrors.tuna.tsinghua.edu.cn/linuxmint una main upstream import backport">> /etc/apt/sources.list; \
+  LINUX_MINT_KEY=$(apt update 2>&1 | grep -o '[0-9A-Z]\{16\}$' | xargs) && \
+  apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 ${LINUX_MINT_KEY}; \
+  apt clean && rm -rf /var/lib/apt/lists/*;
+
+RUN apt.sh xfce4-settings xfce4-session xfwm4 xfdesktop4 xfce4-panel \
+  xfce4-notifyd
+
+# clipit 
+RUN apt.sh thunar tumbler tint2 rofi \
+  xfce4-pulseaudio-plugin \
+  xfce4-whiskermenu-plugin xfce4-taskmanager
+
+# 23.8 MB > 18.9M
+RUN apt.sh mint-y-icons mint-themes; \
+  cd /usr/share/icons; rm -rf `ls |grep "Mint-X\|Humanity\|Ubuntu-Mono\|LoginIcons"`; \
+  cd /usr/share/themes; rm -rf `ls |grep -v "Mint-Y"`; \
+  cd /usr/share/locales; rm -rf `ls |grep -v "locale.alias\|zh\|en"`; \
+  cd /usr/share/i18n/locales; rm -rf `ls |grep -v "locale.alias\|zh\|en"`; \
+  # 80M > 42M
+  cd /usr/share/icons/Mint-Y/apps && rm -rf 256* 96*; 
+
+
+COPY src/*.service /etc/systemd/system/
+RUN \
+  sed -i "s/gnome-session/xfce4-session/g" /etc/systemd/system/de-start.service; \
+  systemctl enable de-start;
+
+# HEADLESS
+ADD --chown=headless:headless src/.mint-artwork-xfce /home/headless
+
+ENV \
+  # mintwelcome
+  XDG_CURRENT_DESKTOP=XFCE \
+  DISPLAY=":10"
+
+# ENTRYPOINT ["/entry.sh"]
+# CMD ["xfce4-session"]

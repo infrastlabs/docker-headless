@@ -1,0 +1,18 @@
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v2
+
+# kubuntu-desktop 273 MB # 7054 kB #plasma-desktop 已装
+# https://github.com/ms-jpq/kde-in-docker/blob/daddy/base/bionic/Dockerfile #nautilus > dolphin
+RUN apt.sh kubuntu-desktop dolphin konsole
+
+COPY src/*.service /etc/systemd/system/
+RUN \
+  sed -i "s/gnome-session/startplasma-x11/g" /etc/systemd/system/de-start.service; \
+  systemctl enable de-start;
+
+# HEADLESS
+
+ENV \
+  DISPLAY=":10"
+
+# ENTRYPOINT ["/entry.sh"]
+# CMD ["plasma_session"]

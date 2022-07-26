@@ -1,0 +1,22 @@
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v2
+
+# ubuntu-desktop 128 MB
+RUN apt.sh ubuntu-desktop; \
+  apt -y remove gdm3  gvfs*
+
+COPY src/*.service /etc/systemd/system/
+RUN \
+  systemctl enable de-start;
+
+# HEADLESS
+
+ENV \
+  XDG_SESSION_TYPE=x11 \
+  # XKL_XMODMAP_DISABLE=1 \
+  \
+  # PULSE_SERVER="tcp:localhost:4731" \
+  # DISPLAY="localhost:31" \
+  DISPLAY=":10"
+
+# ENTRYPOINT ["/entry.sh"]
+# CMD ["gnome-session"]

@@ -1,0 +1,46 @@
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v2
+
+# cinna-desktop 139 MB 
+RUN apt.sh cinnamon cinnamon-l10n gnome-icon-theme
+
+# REF: docker-gui > ubt2004-mint-cinna
+# http://packages.linuxmint.com/
+# https://mirrors.tuna.tsinghua.edu.cn/linuxmint
+RUN echo "deb https://mirrors.tuna.tsinghua.edu.cn/linuxmint ulyana main upstream import backport">> /etc/apt/sources.list; \
+  LINUX_MINT_KEY=$(apt update 2>&1 | grep -o '[0-9A-Z]\{16\}$' | xargs) && \
+  apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 ${LINUX_MINT_KEY}
+
+# 223 MB > 85.2M > 140 MB(artwork)
+# xserver-xephyr wamerican cinnamon-core cinnamon-doc cinnamon-desktop-environment \
+RUN apt.sh \
+    mintlocale mint-themes mint-artwork; \
+  cd /usr/share/backgrounds; rm -rf linuxmint-* cosmos; cd linuxmint; rm -f `ls |grep -v "default\|sele_ring.jpg"`; \
+  cd /usr/share/icons; rm -rf `ls |grep "Mint-X\|Tango\|Human\|ubuntu-mono\|LoginIcons\|Contrast\|mate\|locolor"`; \
+  cd /usr/share/themes; rm -rf `ls |grep "Mint-X\|Tradition\|BlackMATE\|Submarine\|GreenLag\|BlueMenta\|HighContrast"`; \
+  cd /usr/share/locales; rm -rf `ls |grep -v "locale.alias\|zh\|en"`; \
+  cd /usr/share/i18n/locales; rm -rf `ls |grep -v "locale.alias\|zh\|en"`; \
+  # 80M > 42M
+  cd /usr/share/icons/Mint-Y/apps && rm -rf 256* 96*;
+
+# 0.01 Mbs	mint-meta-core
+# 0.01 Mbs	mint-meta-mate
+# 0.01 Mbs	mint-meta-xfce
+# 0.01 Mbs	mint-meta-cinnamon
+# 67.2 MB
+RUN apt.sh mint-meta-cinnamon
+# mintupdate: need by welcome
+RUN apt -y remove \
+mintreport ; cd /usr/bin; rm -f mintupdate*
+
+COPY src/*.service /etc/systemd/system/
+RUN \
+  sed -i "s/gnome-session/cinnamon-session/g" /etc/systemd/system/de-start.service; \
+  systemctl enable de-start;
+
+# HEADLESS
+
+ENV \
+  DISPLAY=":10"
+
+# ENTRYPOINT ["/entry.sh"]
+# CMD ["cinnamon-session"]

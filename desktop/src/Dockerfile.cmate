@@ -1,0 +1,52 @@
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v2
+
+# after mint-meta-mate # mate-desktop-environment-core: 5436B;
+RUN apt.sh mate-desktop-environment-core
+
+# REF: docker-gui > ubt2004-mint-cinna
+# http://packages.linuxmint.com/ # https://mirrors.tuna.tsinghua.edu.cn/linuxmint
+RUN echo "deb https://mirrors.tuna.tsinghua.edu.cn/linuxmint ulyana main upstream import backport">> /etc/apt/sources.list; \
+  LINUX_MINT_KEY=$(apt update 2>&1 | grep -o '[0-9A-Z]\{16\}$' | xargs) && \
+  apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 ${LINUX_MINT_KEY}
+
+# 23.8 MB 
+# /var/lib/dpkg/info/mint-artwork.postinst: 21: glib-compile-schemas: not found
+RUN apt.sh libglib2.0-dev 
+# 152 MB > 225 MB(+mint-meta-mate) 
+# 318 MB(before mate-desk-core) > 249M(after, una)
+# 240 MB(back: ulyana); una: UI选主题，提示Mint-Y未装..
+RUN apt.sh \
+    mintlocale mint-themes \
+    mint-artwork mint-meta-mate; \
+  cd /usr/share/backgrounds; rm -rf linuxmint-* cosmos; cd linuxmint; rm -f `ls |grep -v "default\|sele_ring.jpg"`; \
+  cd /usr/share/icons; rm -rf `ls |grep "Mint-X\|Tango\|Human\|ubuntu-mono\|LoginIcons\|Contrast\|mate\|locolor"`; \
+  cd /usr/share/themes; rm -rf `ls |grep "Mint-X\|Tradition\|BlackMATE\|Submarine\|GreenLag\|BlueMenta\|HighContrast"`; \
+  cd /usr/share/locales; rm -rf `ls |grep -v "locale.alias\|zh\|en"`; \
+  cd /usr/share/i18n/locales; rm -rf `ls |grep -v "locale.alias\|zh\|en"`; \
+  # 80M > 42M
+  cd /usr/share/icons/Mint-Y/apps && rm -rf 256* 96*; \
+  \
+  cd /usr/share/applications; rm -rf `ls |grep "kde"`; \
+  \
+  apt -y remove \
+  mintreport mate-power-manager-common mate-user-guide mate-system-monitor-common \
+    mate-applets-common ; cd /usr/bin; rm -f mintupdate*
+
+# plank
+RUN apt.sh \
+  xdg-user-dirs xdg-desktop-portal \
+  tumbler 
+  # tint2 clipit rofi 
+
+COPY src/*.service /etc/systemd/system/
+RUN \
+  sed -i "s/gnome-session/mate-session/g" /etc/systemd/system/de-start.service; \
+  systemctl enable de-start;
+
+# HEADLESS
+
+ENV \
+  DISPLAY=":10"
+
+# ENTRYPOINT ["/entry.sh"]
+# CMD ["mate-session"]
