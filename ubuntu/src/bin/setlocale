@@ -13,10 +13,10 @@ function setLocale(){
     sleep 1
 
     # LOCALE
-    sed -i -e "s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
-    sed -i -e "s/# ${LANG} ${charset}/${LANG} ${charset}/" /etc/locale.gen
-    locale-gen ${LANG}
-    update-locale LANG=${LANG} LANGUAGE=${LANGUAGE}
+    sudo sed -i -e "s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
+    sudo sed -i -e "s/# ${LANG} ${charset}/${LANG} ${charset}/" /etc/locale.gen
+    sudo locale-gen ${LANG}
+    sudo update-locale LANG=${LANG} LANGUAGE=${LANGUAGE}
     # echo "# " > /etc/default/locale;
 
     echo "==[locale -a]===================================="
@@ -25,5 +25,5 @@ function setLocale(){
     # sleep 2
 }
 test -z "$L" || setLocale
-echo "${TZ}" >/etc/timezone
-ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime
+sudo echo "${TZ}" >/etc/timezone
+sudo ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime
