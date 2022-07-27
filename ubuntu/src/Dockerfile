@@ -1,5 +1,6 @@
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:mint-compile as Xvnc
 FROM scratch as files1
+  # ubt2004: tigervnc-standalone-server 1.10.1+dfsg-3
   COPY --from=Xvnc /tigervnc-pkg/tigervnc-1.12.0.x86_64 /
   COPY --from=Xvnc /rootfs /
 
@@ -10,8 +11,11 @@ FROM scratch as files2
   COPY src/*.sh /
   ADD src/etc /etc
   ADD src/dot /etc/skel
+  ADD src/bin /usr/bin
   ADD src/sv.conf /etc/supervisor/conf.d/xrdp.conf
-  ADD src/bin/ /usr/bin/
+  COPY src/*.service /etc/systemd/system/
+  ADD src/bcs_push.sh /usr/local/webhookd/static/bcs_push.sh
+
 
 FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND noninteractive
@@ -41,41 +45,43 @@ RUN \
   dropbear-bin dropbear-run openssh-sftp-server lftp jq;
 
 # VID, AUD, LOC 87.4 MB
+# xrdp-chansrv: libfdk-aac1 libopus0
 RUN \
   # LOCALE 15.0 MB 
   apt.sh dconf-cli locales tzdata apt-utils fonts-wqy-zenhei \
   # Audio 39.8 MB 
   pulseaudio pavucontrol \
-  # VIDEO: 30.5 MB
-  # libllvm12 已包含 # libgl1-mesa-glx >libgl1-mesa-dri ##ex:  mesa-utils 
-  libgl1-mesa-glx mesa-utils 
-
-
-# APPS 25.7 MB
-RUN \
-  # LOC_APPS="tint2 plank thunar sakura" # clipit; +pnmixer: 159 kB; +sv # 7056 kB
-  apt.sh tumbler gtk2-engines-pixbuf supervisor gnupg \
   \
+  # 343 kB
+  supervisor x11-xkb-utils libfdk-aac1 libopus0 \
+  libsecret-1-0 libnss3 libxtst6 libasound2 xdg-utils \
+  \
+  # APPS 25.7 MB
+  # LOC_APPS="tint2 plank thunar sakura" # clipit; +pnmixer: 159 kB; +sv # 7056 kB
   # LOC_APPS2="gnome-system-monitor engrampa ristretto" # 11.2 MB 
   geany sakura \
   gnome-system-monitor engrampa ristretto \
-  dbus-x11 at-spi2-core language-pack-gnome-zh-hans
+  \
+  # 2422 kB #https://github.com/j8r/dockerfiles
+  xinit xterm fluxbox systemd systemd-sysv
 
-# FULL(icon,ibus,git,flameshot) 49.1 MB
-RUN \
-  #19.642 MB; #APPS2 5.6 MB #LOCALE 13.4 MB
-  # \14.4 MB
-  apt.sh  \
-  # \12.3 MB
-  ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
+ARG FULL=""
+RUN test -z "$FULL" && exit 0 || echo fullInstall;\  
+  # VIDEO: 30.5 MB
+  # libllvm12 已包含 # libgl1-mesa-glx >libgl1-mesa-dri ##ex:  mesa-utils 
+  apt.sh libgl1-mesa-glx mesa-utils libglu1-mesa \
+  \
+  tumbler gtk2-engines-pixbuf gnupg \
+  dbus-x11 at-spi2-core language-pack-gnome-zh-hans \
+  \
+  # FULL(icon,ibus,git,flameshot) 49.1 MB
+  # \12.3 MB (默认不含输入法: IBus/Fcitx)
+  # ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
   # \20.5 MB
   flameshot arandr \
   # \12.6 MB
-  git \
-  # \343 kB
-  libsecret-1-0 libnss3 libxtst6 libasound2 libglu1-mesa xdg-utils \
-  # xrdp-chansrv
-  libfdk-aac1;
+  git;
+  
 
 # ASBRU: 3586 kB (disk: 15.5 MB)
 RUN echo 1;\
@@ -85,21 +91,18 @@ RUN echo 1;\
   cd /usr/share/icons/hicolor/scalable/apps; rm -f asbru-cm.svg; ln -s /usr/local/asbru/res/asbru-logo.svg ./asbru-cm.svg; \
   dpkg -l |grep asbru && exit 0 || exit 1;
 
-# 2422 kB #https://github.com/j8r/dockerfiles
-# +libopus0: /usr/local/xrdp/sbin/xrdp-chansrv
-RUN apt.sh xinit xterm x11-xkb-utils systemd systemd-sysv fluxbox libopus0
-
 # webhookd, noVNC
 RUN cd /tmp; file=webhookd.tar.gz; curl -fSL -k -O https://gitee.com/infrastlabs/fk-webhookd/attach_files/1135812/download/$file; \
-  mkdir -p /usr/local/webhookd; tar -zxvf $file -C /usr/local/webhookd; rm -f $file
-RUN cd /usr/local/webhookd/static; file=v1.3.0.tar.gz; curl -fSL -k -O https://hub.fastgit.xyz/novnc/noVNC/archive/$file; \
-  bash down_vnc.sh; rm -f $file
+  mkdir -p /usr/local/webhookd; tar -zxvf $file -C /usr/local/webhookd; rm -f $file; \
+  \
+  cd /usr/local/webhookd/static; file=v1.3.0.tar.gz; curl -fSL -k -O https://hub.fastgit.xyz/novnc/noVNC/archive/$file; \
+  bash down_vnc.sh; rm -f $file;
 
 # HEADLESS
 COPY --from=files1 / /
 COPY --from=files2 / /
-RUN bash /xconf.sh
-RUN \
+RUN bash /xconf.sh; \
+  \
   cd /lib/systemd/system/sysinit.target.wants/ \
     && rm $(ls | grep -v systemd-tmpfiles-setup); \
     \
@@ -113,18 +116,13 @@ RUN \
     /lib/systemd/system/plymouth* \
     /lib/systemd/system/systemd-update-utmp*; \
     \
-  find / |grep -v "^/sys\|^/proc" |grep systemd |grep ".service$" |grep "supervi" |while read one; do echo $one; rm -f $one; done
-
-COPY src/*.service /etc/systemd/system/
-RUN dpkg-divert --local --rename --add /sbin/udevadm; \
-  ln -s /bin/true /sbin/udevadm; \
-  systemctl enable de-entry; \
-  systemctl enable de-start; \
-  systemctl disable dropbear; \
-  systemctl disable supervisor; \
+  find / |grep -v "^/sys\|^/proc" |grep systemd |grep ".service$" |grep "supervi" |while read one; do echo $one; rm -f $one; done; \
+  \
+  dpkg-divert --local --rename --add /sbin/udevadm; ln -s /bin/true /sbin/udevadm; \
+  systemctl enable de-entry; systemctl enable de-start; \
+  systemctl disable dropbear; systemctl disable supervisor; \
   # systemctl mask supervisor; \
   systemctl disable systemd-resolved; 
-ADD src/bcs_push.sh /usr/local/webhookd/static/bcs_push.sh
 
 ENV \
   # https://gitee.com/hegp/docker-learning/blob/master/%E5%AE%8C%E6%95%B4%E7%B3%BB%E7%BB%9F%E7%9A%84%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C.md
@@ -155,13 +153,10 @@ ENV \
   VNC_LIMIT=1
   # VNC_INIT="21|gnome,22|plama,23|mate,24|cinna,25|xfce,26|flux" \
 
-STOPSIGNAL SIGRTMIN+3
+
+# CMD ["/entry.sh"]
+CMD ["bash", "-c", "setsysenv; exec /lib/systemd/systemd"]
 WORKDIR /home/headless
 EXPOSE 10089/tcp 10081/tcp 10022/tcp
-# CMD ["/entry.sh"]
-# CMD ["/sbin/init"]
-
 VOLUME [ "/sys/fs/cgroup" ]
-# /sbin/init
-# CMD ["/lib/systemd/systemd"]
-CMD ["bash", "-c", "setsysenv; exec /lib/systemd/systemd"]
+STOPSIGNAL SIGRTMIN+3

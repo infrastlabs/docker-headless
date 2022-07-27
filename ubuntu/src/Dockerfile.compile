@@ -3,10 +3,13 @@
 # xorgxrdp-0.2.16 > 0.2.18
 FROM ubuntu:20.04 as stage-base
 ENV DEBIAN_FRONTEND noninteractive
-# domain="mirrors.163.com" //aliyun
-RUN export DOMAIN="mirrors.aliyun.com"; \
-  echo "deb http://${DOMAIN}/ubuntu focal main restricted universe multiverse" > /etc/apt/sources.list \
-  && echo "deb http://${DOMAIN}/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
+# mirrors.tuna.tsinghua.edu.cn
+# mirrors.ustc.edu.cn
+# mirrors.aliyun.com
+# mirrors.163.com
+RUN export DOMAIN="mirrors.ustc.edu.cn"; \
+  echo "deb http://${DOMAIN}/ubuntu-ports focal main restricted universe multiverse" > /etc/apt/sources.list \
+  && echo "deb http://${DOMAIN}/ubuntu-ports focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
   \
   echo 'apt update -qq && apt install -yq --no-install-recommends $@ && apt clean && rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
     && chmod +x /usr/local/bin/apt.sh

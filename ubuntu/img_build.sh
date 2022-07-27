@@ -18,10 +18,16 @@ compile)
     docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile.compile . 
     docker push $repo/$ns/$img
     ;; 
+slim)
+    img="docker-headless:ubt-$ver-slim"
+    # --cache-from $repo/$ns/$img 
+    docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile . 
+    docker push $repo/$ns/$img    
+    ;;
 *)
     img="docker-headless:ubt-$ver"
     # --cache-from $repo/$ns/$img 
-    docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile . 
+    docker build $cache $pull -t $repo/$ns/$img --build-arg FULL=/.. -f src/Dockerfile . 
     docker push $repo/$ns/$img    
     ;;
 esac
