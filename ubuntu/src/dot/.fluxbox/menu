@@ -18,6 +18,10 @@
 [encoding] {UTF-8}
 	[exec]   (♠ stTerm) {stterm} 
 	[exec]   (♠ Run) {fbrun}
+	[exec]   (♠ asbru-cm) {asbru-cm} 
+	[exec]   (♠ gnome-monitor) {gnome-system-monitor} 
+	[exec]   (♠ ristretto) {ristretto} 
+	[exec]   (♠ engrampa) {engrampa} 
 	[separator]
 	[submenu] (Fluxbox menu)
 		[nop] (Custom configs)

@@ -1,11 +1,24 @@
 # ubt
 
+**arm64**
+
+```bash
+[root@arm-ky10-23-2 ~]# docker  run -it --rm --cap-add SYS_ADMIN  --net=host -v /sys/fs/cgroup:/sys/fs/cgroup:rw  --mount type=tmpfs,dst=/run --mount type=tmpfs,dst=/run/lock infrastlabs/docker-headless:ubt-v3-arm
+```
+
 **systemd**
 
 ```bash
 docker  run -it --rm --privileged -v /sys/fs/cgroup:/sys/fs/cgroup \
  --mount type=tmpfs,dst=/run --mount type=tmpfs,dst=/run/lock \
  registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v2 /sbin/init
+
+
+# deb11-gemmibook
+# https://serverfault.com/questions/1053187/systemd-fails-to-run-in-a-docker-container-when-using-cgroupv2-cgroupns-priva
+docker  run -it --rm --cap-add SYS_ADMIN  -p 10281:10081 -p 10289:10089 \
+-v /sys/fs/cgroup:/sys/fs/cgroup:rw  --cgroupns=host --mount type=tmpfs,dst=/run --mount type=tmpfs,dst=/run/lock  \
+registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3-slim
 
 
 # headless @ mac23-199 in ~ |13:55:34  

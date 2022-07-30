@@ -19,7 +19,7 @@
 # (sleep 1.4; xfce4-power-manager) &
 # (sleep 1.2; nm-applet) &
 (sleep 1.0; pnmixer) &
-(sleep 0.8; clipit) &
+# (sleep 0.8; diodon) & #clipit ##both cause rdesktop conn-err
 # thunar --daemon &
 dunst &
 xcompmgr &

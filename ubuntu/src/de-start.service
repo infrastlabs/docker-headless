@@ -20,7 +20,7 @@ Environment=LANGUAGE=zh_CN:en
 
 #sleep 5; wait sv.xvnc start
 WorkingDirectory=/home/headless
-ExecStart=/bin/bash -c "source /.env; setlocale; sleep 5; export XDG_SESSION_TYPE=x11; export XKL_XMODMAP_DISABLE=1; unset SESSION_MANAGER; unset DBUS_SESSION_BUS_ADDRESS; exec dbus-launch --exit-with-session startfluxbox"
+ExecStart=/bin/bash -c "source /.env; setlocale; sleep 10; export XDG_SESSION_TYPE=x11; export XKL_XMODMAP_DISABLE=1; unset SESSION_MANAGER; unset DBUS_SESSION_BUS_ADDRESS; exec dbus-launch --exit-with-session startfluxbox"
 LimitNOFILE=65535
 StandardOutput=journal
 #Restart=always
