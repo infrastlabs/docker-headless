@@ -1,0 +1,117 @@
+# 2021.5.13 > 22.7.22
+# xrdp-0.9.16 > 0.9.19
+# xorgxrdp-0.2.16 > 0.2.18
+FROM ubuntu:20.04 as stage-base
+ENV DEBIAN_FRONTEND noninteractive
+# mirrors.tuna.tsinghua.edu.cn
+# mirrors.ustc.edu.cn
+# mirrors.aliyun.com
+# mirrors.163.com
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+RUN export DOMAIN="mirrors.ustc.edu.cn"; \
+  test -z "$(echo $TARGETPLATFORM |grep arm64)" && target=ubuntu || target=ubuntu-ports; \
+  echo "deb http://${DOMAIN}/$target focal main restricted universe multiverse" > /etc/apt/sources.list \
+  && echo "deb http://${DOMAIN}/$target focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
+  \
+  echo 'apt update -qq && apt install -yq --no-install-recommends $@ && apt clean && rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
+    && chmod +x /usr/local/bin/apt.sh
+
+# BASE
+RUN apt.sh \
+  htop rsync tree tmux lrzsz wget psmisc openssl net-tools \
+  curl sudo iputils-ping procps iproute2 iptables ca-certificates \
+  zip unzip xz-utils
+# BUILD_common 81M
+RUN apt.sh \
+  git autoconf libtool pkg-config gcc g++ make \
+  autoconf m4 intltool build-essential dpkg-dev \
+  build-essential check
+
+WORKDIR /opt
+
+###xrdp, xorgxrdp###############################################
+FROM stage-base as stage-xrdp-xorgxrdp
+RUN apt.sh \
+    git autoconf libtool pkg-config gcc g++ make  libssl-dev libpam0g-dev \
+    libjpeg-dev libx11-dev libxfixes-dev libxrandr-dev  flex bison libxml2-dev \
+    intltool xsltproc xutils-dev python-libxml2 g++ xutils libfuse-dev \
+    libmp3lame-dev nasm libpixman-1-dev xserver-xorg-dev
+RUN apt.sh \
+  libfdk-aac-dev libopus-dev
+#0.9.5 > 0.9.16 > 0.9.19(thunar@gemmi-deb11卡死)
+ENV ver="0.9.16"
+# https://hub.fastgit.org/neutrinolabs/xrdp/wiki/Building-on-Debian-8
+# configure: error: please install libfdk-aac-dev or fdk-aac-devel
+		# --enable-tjpeg \
+# ./configure --prefix=/usr/local/xrdp --enable-fuse --enable-mp3lame --enable-pixman;\
+RUN wget https://hub.fastgit.xyz/neutrinolabs/xrdp/releases/download/v${ver}/xrdp-${ver}.tar.gz; \
+tar -zxf xrdp-${ver}.tar.gz;\
+cd xrdp-${ver};\
+./bootstrap;\
+./configure \
+		--prefix=/usr/local/xrdp \
+		--enable-vsock \
+		--enable-fdkaac \
+		--enable-opus \
+		--enable-fuse \
+		--enable-mp3lame \
+		--enable-pixman \
+		CFLAGS='-Wno-format';\
+make;\
+make install;
+
+#####git clone; xorgxrdp with xrdp --prefix, testOK;
+# gitee.com/g-system/xorgxrdp
+RUN git clone --branch br-0214 https://gitee.com/g-system/xorgxrdp;\
+cd xorgxrdp;\
+./bootstrap;\
+CPPFLAGS="-I/usr/local/xrdp/include"  LDFLAGS="-L/usr/local/xrdp/lib" ./configure;\
+make;\
+sudo make install;
+
+###pulseaudio-module-xrdp###############################################
+# pulse-xrdp: git-latest
+FROM stage-base as stage-pulsexrdp
+#### pulseaudio-module-xrdp >> pulseaudio ver: 10.0
+# RUN git submodule update --init --recursive
+
+# deb-src
+RUN domain="mirrors.163.com" \
+ && echo "deb-src http://$domain/ubuntu focal main restricted universe multiverse" >> /etc/apt/sources.list \
+ && echo "deb-src http://$domain/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list
+RUN apt update && apt install -qy pulseaudio libpulse-dev \
+  autoconf m4 intltool build-essential dpkg-dev
+RUN apt update && apt build-dep -q -y pulseaudio && \
+  cd /opt && apt source pulseaudio && \
+  pulseaudio=$(pulseaudio --version | awk '{print $2}') && \
+  cd /opt/pulseaudio-${pulseaudio} && ./configure
+# RUN pulseaudio=$(pulseaudio --version); echo "pulseaudio: $pulseaudio"
+# hand copy: /opt/pulseaudio-1.11/config.h +src/pulsecore
+RUN cd /opt && git clone https://hub.fastgit.xyz/neutrinolabs/pulseaudio-module-xrdp.git && \
+  cd /opt/pulseaudio-module-xrdp ;\
+  pulseaudio=$(pulseaudio --version | awk '{print $2}') && echo "pulseaudio ver: $pulseaudio" && \
+  ./bootstrap && ./configure PULSE_DIR="/opt/pulseaudio-${pulseaudio}"; \
+  cp -a /opt/pulseaudio-${pulseaudio}/config.h . && cp -a /opt/pulseaudio-${pulseaudio}/src/pulsecore/ .; \
+  make && \
+  cd /opt/pulseaudio-module-xrdp/src/.libs && \
+  install -t "/var/lib/xrdp-pulseaudio-installer" -D -m 644 *.so;
+
+
+
+###merge: xrdp, pulse, tigervnc###############################################
+# 11.9M
+# FROM scratch
+FROM ubuntu:20.04
+WORKDIR /usr/local
+# tigervnc 1.10.1 > 1.12.0 
+# https://udomain.dl.sourceforge.net/project/tigervnc/stable/1.10.1/tigervnc-1.10.1.x86_64.tar.gz
+# COPY > ADD: unpack; pack2: drop tigervnc-1.10.1.x86_64 dir;
+# ENV ver=1.12.0
+# ADD tigervnc-${ver}.x86_64.tar.gz /tigervnc-pkg
+# xrdp
+COPY --from=stage-xrdp-xorgxrdp /usr/local/xrdp /rootfs/usr/local/xrdp
+COPY --from=stage-xrdp-xorgxrdp /usr/lib/xorg/modules /rootfs/usr/lib/xorg/modules
+COPY --from=stage-pulsexrdp /var/lib/xrdp-pulseaudio-installer /rootfs/var/lib/xrdp-pulseaudio-installer
+
+# RUN find /tigervnc-pkg ; find /rootfs

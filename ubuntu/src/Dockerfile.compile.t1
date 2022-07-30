@@ -1,0 +1,18 @@
+FROM ubuntu:20.04 
+ENV DEBIAN_FRONTEND noninteractive
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+RUN echo 1; \
+  export DOMAIN="mirrors.ustc.edu.cn"; \
+  # test "linux/arm64" == "$TARGETPLATFORM" && target=ubuntu-ports || target=ubuntu; \
+  test -z "$(echo $TARGETPLATFORM |grep arm64)" && target=ubuntu || target=ubuntu-ports; \
+  echo "deb http://${DOMAIN}/$target focal main restricted universe multiverse" > /etc/apt/sources.list \
+  && echo "deb http://${DOMAIN}/$target focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
+  \
+  echo 'apt update -qq && apt install -yq --no-install-recommends $@ && apt clean && rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
+    && chmod +x /usr/local/bin/apt.sh
+
+RUN \
+  # I am running on linux/amd64, building for linux/arm64
+  echo "I am running on $BUILDPLATFORM, building for $TARGETPLATFORM" > /buildx-params.log
+# RUN apt update;
