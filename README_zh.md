@@ -29,9 +29,10 @@ SSH   | ssh -p 10022 headless@192.168.0.x | `headless` | -
 
 **(0)源码目录**
 
-- [deb9: 基于Debian的版本(体积小,稳定)](./deb9/src/)
-- [mint: 基于Ubuntu的新版(简单通用,多用户多桌面)](./mint/src/)
-
+- [deb9: 基于Debian的版本(xfce定制:体积小,稳定)](./deb9/src/)
+- [mint: 基于Ubuntu的新版(xfce定制:Xfce4.16, 套用Mint皮肤)](./mint/src/)
+- [ubuntu: Ubuntu基础版(极简:ubt-v3,slim版含音频+fluxbox)](./ubuntu/src/)
+- [desktop: Ubuntu基础版+多桌面(通用:Gnome,Plasma,Cinnamon,Mate,Xfce4))](./desktop/src/)
 
 **(1)密码修改**: 生产禁用默认密码，初始后请修改!!
 
