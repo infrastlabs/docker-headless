@@ -30,6 +30,13 @@ compile)
     # docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile.compile . 
     # docker push $repo/$ns/$img
     ;;
+tiger)
+    repo=registry-1.docker.io
+    img="docker-headless:mint-compile-tiger"
+    plat="--platform linux/amd64,linux/arm64"
+    docker buildx build $plat --push -t $repo/$ns/$img -f src/Dockerfile.tiger . 
+    # docker push $repo/$ns/$img
+    ;;       
 *)
     repo=registry-1.docker.io
     img="docker-headless:ubt-$ver-arm"

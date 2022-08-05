@@ -18,6 +18,16 @@ compile)
     docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile.compile . 
     docker push $repo/$ns/$img
     ;; 
+tiger)
+    img="docker-headless:mint-compile-tiger"
+    docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile.tiger . 
+    docker push $repo/$ns/$img
+    ;;    
+tiger21)
+    img="docker-headless:mint-compile-tiger-v21"
+    docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile.tiger-v21 . 
+    docker push $repo/$ns/$img
+    ;;     
 slim)
     img="docker-headless:ubt-$ver-slim"
     # --cache-from $repo/$ns/$img 

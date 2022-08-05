@@ -57,3 +57,52 @@ Couldn't move remaining userspace processes, ignoring: Input/output error
 [  OK  ] Reached target Multi-User System.
 [  OK  ] Reached target Graphical Interface.
 ```
+
+**tigervnc**
+
+```bash
+# org's x86_64 binary
+root@e981b479d4d5:/tigervnc-pkg/tigervnc-1.12.0.x86_64# ls -lh usr/bin/
+total 26M
+-rwxr-xr-x 1 984 980  13M Nov  9  2021 Xvnc
+-rwxr-xr-x 1 984 980 1.2M Nov  9  2021 vncconfig
+-rwxr-xr-x 1 984 980 124K Nov  9  2021 vncpasswd
+-rwxr-xr-x 1 984 980 6.8M Nov  9  2021 vncviewer
+-rwxr-xr-x 1 984 980 4.9M Nov  9  2021 x0vncserver
+
+# compile ref-default
+root@af89f9cbc925:/rootfs/usr/local/tigervnc/bin# ls -lh
+total 33M
+-rwxr-xr-x 1 root root 16M Aug  5 05:16 Xvfb
+-rwxr-xr-x 1 root root 18M Aug  5 05:16 Xvnc
+
+# --disable-static
+# deps: apt install libjpeg8 libunwind8 libpixman-1-0 libxfont2 libxau6 libxdmcp6 libgl1 --no-install-recommends
+root@e981b479d4d5:/rootfs/usr/local/tigervnc/bin# ls -lh
+total 33M
+-rwxr-xr-x 1 root root 16M Aug  5 05:58 Xvfb
+-rwxr-xr-x 1 root root 18M Aug  5 05:58 Xvnc
+
+# --enable-xvfb > --disable-xvfb #不生成xvfb
+root@b4cc6e929d11:/rootfs/usr/local/tigervnc/bin# ls -lh
+total 18M
+-rwxr-xr-x 1 root root 18M Aug  5 06:21 Xvnc
+```
+
+- tiger@master ---- xorg-v21.1.1
+
+```bash
+# compile err
+configure: error: Package requirements (fixesproto >= 6.0 damageproto >= 1.1 xcmiscproto >= 1.2.0 xtrans >= 1.3.5 bigreqsproto >= 1.1.0 xproto >= 7.0.31 randrproto >= 1.6.0 renderproto >= 0.11 xextproto >= 7.2.99.901 inputproto >= 2.3.99.1 kbproto >= 1.0.3 fontsproto >= 2.1.3 pixman-1 >= 0.27.2 libxcvt videoproto compositeproto >= 0.4 recordproto >= 1.13.99.1 scrnsaverproto >= 1.1 resourceproto >= 1.2.0 dri3proto presentproto >= 1.2 xineramaproto xkbfile  pixman-1 >= 0.27.2 xfont2 >= 2.0.0 xau libsystemd >= 209 xshmfence >= 1.1 xdmcp) were not met:
+
+Requested 'fixesproto >= 6.0' but version of FixesProto is 5.0
+Requested 'inputproto >= 2.3.99.1' but version of InputProto is 2.3.2
+No package 'libxcvt' found
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables XSERVERCFLAGS_CFLAGS
+and XSERVERCFLAGS_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+```
