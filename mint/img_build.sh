@@ -7,7 +7,7 @@ ns=infrastlabs
 # cache="--no-cache"
 # pull="--pull"
 
-ver=v5 # latest
+ver=v6 # latest
 case "$1" in
 hub)
     repoHub=docker.io
