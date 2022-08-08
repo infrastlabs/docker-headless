@@ -34,6 +34,49 @@ RUN apt.sh mint-y-icons mint-themes; \
   cd /usr/share/icons/Mint-Y/apps && rm -rf 256* 96*; 
   # cd /usr/share/applications; rm -rf `ls |grep "kde"`;     
 
+# fcitx 5923KB
+# ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi
+RUN apt -y remove ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi; 
+  # apt.sh fcitx-bin fcitx-table fcitx-rime
+# 305 kB
+#sogouDeps: apt.sh装少依赖：无法出trayIcon
+# RUN apt.sh fcitx fcitx-frontend-gtk2 fcitx-frontend-gtk3 fcitx-frontend-qt5 fcitx-module-x11 im-config
+#有trayIcon,但是gedit,termital都无法录中文。。; rime重配置有错误提示；fcitx有阶段频繁重启现象
+# 配置UI: +fcitx-config-gtk
+RUN apt update; apt -y install fcitx-bin fcitx-table fcitx-config-gtk \
+  fcitx fcitx-frontend-gtk2 fcitx-frontend-gtk3 fcitx-frontend-qt5 fcitx-module-x11 im-config
+# try fcitx5: fcitx5可手动启; qt5依赖大; 暂无法打开配置页；
+# none: kde-config-fcitx5
+# RUN apt update; apt -y install fcitx5 \
+# fcitx5-chinese-addons \
+# fcitx5-frontend-gtk3 fcitx5-frontend-gtk2 \
+# fcitx5-frontend-qt5 
+
+
+# 15.3 kB
+RUN apt.sh lsb-release
+# deps: fcitx 4.x
+ADD sogoupinyin_4.0.1.2800_x86_64.deb /tmp/
+RUN dpkg -i /tmp/sogoupinyin_4.0.1.2800_x86_64.deb
+RUN apt update; apt -y install fcitx-rime
+
+# 基于：fcitx双拼、 拼音是可用的了
+# 2. 安装输入法依赖 https://shurufa.sogou.com/linux/guide
+RUN apt update; apt -y  install libqt5qml5 libqt5quick5 libqt5quickwidgets5 qml-module-qtquick2
+RUN apt update; apt -y  install libgsettings-qt1
+# needed by sogou: fcitx -r for debug
+RUN apt update; apt -y  install libxss1
+
+  # xconf.sh: ibus env
+  # echo "export XMODIFIERS=@im=ibus" >> /etc/profile;\
+  # echo "export GTK_IM_MODULE=ibus" >> /etc/profile;\
+  # echo "export QT_IM_MODULE=ibus" >> /etc/profile;\
+RUN sed -i "s/ibus/fcitx/g" /etc/profile; \
+  echo "export INPUT_METHOD=fcitx" >> /etc/profile;\
+  echo "export SDL_IM_MODULE=fcitx" >> /etc/profile;\
+  echo "export GLFW_IM_MODULE=ibus" >> /etc/profile;
+ADD src/*.txt /
+
 # HEADLESS
 # .mint-art 调整过的
 ADD --chown=headless:headless src/xf /home/headless

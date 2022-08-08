@@ -18,6 +18,8 @@ hub)
     docker push $ns/$img
     ;;
 *)
+    file=sogoupinyin_4.0.1.2800_x86_64.deb
+    test -s "$file" || curl -O https://ime.sogouimecdn.com/202208081957/72cdf6131e248391c874cb05d0e8401b/dl/gzindex/1656597217/$file
     img="docker-headless:mint-$ver"
     # --cache-from $repo/$ns/$img 
     docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile . 
