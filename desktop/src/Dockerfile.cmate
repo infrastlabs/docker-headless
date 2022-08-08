@@ -1,4 +1,4 @@
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v2
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3
 
 # after mint-meta-mate # mate-desktop-environment-core: 5436B;
 RUN apt.sh mate-desktop-environment-core

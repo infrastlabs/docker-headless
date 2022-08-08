@@ -1,4 +1,4 @@
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v2
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3
 
 # ubuntu-desktop 128 MB
 RUN apt.sh ubuntu-desktop; \

@@ -1,4 +1,4 @@
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v2
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3
 
 # kubuntu-desktop 273 MB # 7054 kB #plasma-desktop 已装
 # https://github.com/ms-jpq/kde-in-docker/blob/daddy/base/bionic/Dockerfile #nautilus > dolphin

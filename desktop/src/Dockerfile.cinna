@@ -1,4 +1,4 @@
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v2
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3
 
 # cinna-desktop 139 MB 
 RUN apt.sh cinnamon cinnamon-l10n gnome-icon-theme
