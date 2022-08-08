@@ -1,0 +1,97 @@
+version: '2.4'
+services:
+  gnome:
+    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:gnome
+    restart: unless-stopped
+    ports:
+      - "10181:10081"
+      - "10189:10089"
+      - "10122:10022"
+    cap_add:
+      - SYS_BOOT 
+      - SYS_ADMIN         
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    volumes: 
+      - /sys/fs/cgroup:/sys/fs/cgroup 
+      - /_ext:/_ext
+      - /:/mnt      
+
+  plasma:
+    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:plas
+    restart: unless-stopped
+    privileged: true #plasma
+    ports:
+      - "10281:10081"
+      - "10289:10089"
+      - "10222:10022"
+    cap_add:
+      - SYS_BOOT 
+      - SYS_ADMIN         
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    volumes: 
+      - /sys/fs/cgroup:/sys/fs/cgroup 
+      - /_ext:/_ext
+      - /:/mnt  
+
+  cinna:
+    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:cinna
+    restart: unless-stopped
+    ports:
+      - "10381:10081"
+      - "10389:10089"
+      - "10322:10022"
+    cap_add:
+      - SYS_BOOT 
+      - SYS_ADMIN         
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    volumes: 
+      - /sys/fs/cgroup:/sys/fs/cgroup 
+      - /_ext:/_ext
+      - /:/mnt  
+
+  cmate:
+    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:cmate
+    restart: unless-stopped
+    ports:
+      - "10481:10081"
+      - "10489:10089"
+      - "10422:10022"
+    cap_add:
+      - SYS_BOOT 
+      - SYS_ADMIN         
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    volumes: 
+      - /sys/fs/cgroup:/sys/fs/cgroup 
+      - /_ext:/_ext
+      - /:/mnt  
+
+  cxfce:
+    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:cxfce
+    restart: unless-stopped
+    ports:
+      - "10581:10081"
+      - "10589:10089"
+      - "10522:10022"
+    cap_add:
+      - SYS_BOOT 
+      - SYS_ADMIN         
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    volumes: 
+      - /sys/fs/cgroup:/sys/fs/cgroup 
+      - /_ext:/_ext
+      - /:/mnt  
