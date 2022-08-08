@@ -1,4 +1,4 @@
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v2
 
 # APPS+ #clipit> diodon
 RUN \
@@ -34,51 +34,62 @@ RUN apt.sh mint-y-icons mint-themes; \
   cd /usr/share/icons/Mint-Y/apps && rm -rf 256* 96*; 
   # cd /usr/share/applications; rm -rf `ls |grep "kde"`;     
 
-# fcitx
+# fcitx 5923KB
 # ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi
-# RUN apt -y remove ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi; 
-
-# 2868 kB ##img:78.095 MB
-# 配置UI: +fcitx-config-gtk; #有trayIcon,但是gedit,termital都无法录中文。。; rime重配置有错误提示；fcitx有阶段频繁重启现象(libxss1)
+RUN apt -y remove ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi; 
+  # apt.sh fcitx-bin fcitx-table fcitx-rime
+# 305 kB
+#sogouDeps: apt.sh装少依赖：无法出trayIcon
+# RUN apt.sh fcitx fcitx-frontend-gtk2 fcitx-frontend-gtk3 fcitx-frontend-qt5 fcitx-module-x11 im-config
+#有trayIcon,但是gedit,termital都无法录中文。。; rime重配置有错误提示；fcitx有阶段频繁重启现象
+# 配置UI: +fcitx-config-gtk
 RUN apt update; apt -y install fcitx-bin fcitx-table fcitx-config-gtk \
   fcitx fcitx-frontend-gtk2 fcitx-frontend-gtk3 fcitx-frontend-qt5 fcitx-module-x11 im-config
-# 15.3 kB
-# libxss1: needed by sogou, fcitx -r for debug
-RUN apt.sh lsb-release libxss1
+# try fcitx5: fcitx5可手动启; qt5依赖大; 暂无法打开配置页；
+# none: kde-config-fcitx5
+# RUN apt update; apt -y install fcitx5 \
+# fcitx5-chinese-addons \
+# fcitx5-frontend-gtk3 fcitx5-frontend-gtk2 \
+# fcitx5-frontend-qt5 
 
+
+# 15.3 kB
+RUN apt.sh lsb-release
 # deps: fcitx 4.x
 ADD sogoupinyin_4.0.1.2800_x86_64.deb /tmp/
-# 125.002 MB ##TODO init when start
 RUN dpkg -i /tmp/sogoupinyin_4.0.1.2800_x86_64.deb
+RUN apt update; apt -y install fcitx-rime
+
+# 基于：fcitx双拼、 拼音是可用的了
 # 2. 安装输入法依赖 https://shurufa.sogou.com/linux/guide
-RUN apt.sh libqt5qml5 libqt5quick5 libqt5quickwidgets5 qml-module-qtquick2 libgsettings-qt1
-# RUN apt.sh fcitx-rime
+RUN apt update; apt -y  install libqt5qml5 libqt5quick5 libqt5quickwidgets5 qml-module-qtquick2
+RUN apt update; apt -y  install libgsettings-qt1
+# needed by sogou: fcitx -r for debug
+RUN apt update; apt -y  install libxss1
 
 
-# img: 11.338 MB #software-properties-common ##add-apt-repository ppa:docky-core/ppa
-# RUN apt.sh software-properties-common
+# sudo add-apt-repository ppa:docky-core/ppa
+# software-properties-common ##sudo add-apt-repository ppa:ricotz/docky
+RUN apt.sh software-properties-common
 
   # xconf.sh: ibus env
   # echo "export XMODIFIERS=@im=ibus" >> /etc/profile;\
   # echo "export GTK_IM_MODULE=ibus" >> /etc/profile;\
   # echo "export QT_IM_MODULE=ibus" >> /etc/profile;\
-RUN sed -i "s/ibus/fcitx/g" /etc/profile; 
-  # echo "export INPUT_METHOD=fcitx" >> /etc/profile;\
-  # echo "export SDL_IM_MODULE=fcitx" >> /etc/profile;\
-  # echo "export GLFW_IM_MODULE=ibus" >> /etc/profile;
+RUN sed -i "s/ibus/fcitx/g" /etc/profile; \
+  echo "export INPUT_METHOD=fcitx" >> /etc/profile;\
+  echo "export SDL_IM_MODULE=fcitx" >> /etc/profile;\
+  echo "export GLFW_IM_MODULE=ibus" >> /etc/profile;
 
 # HEADLESS
 # .mint-art 调整过的
 ADD --chown=headless:headless src/xf /home/headless
 ADD --chown=headless:headless src/.mint-artwork-xfce /home/headless
-Add src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
 # replace: de@sv.conf
 ADD src/sv.conf /etc/supervisor/conf.d/xrdp.conf
 
 # TODO #-libopus0: /usr/local/xrdp/sbin/xrdp-chansrv
 RUN cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*; \
-  # replace bg with: xfce-blue.jpg
-  # cat /usr/share/backgrounds/xfce/xfce-blue.jpg > /usr/share/backgrounds/xfce/xfce-teal.jpg; 
-  wget -qO /usr/share/backgrounds/xfce/xfce-teal.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png;
+  apt.sh libopus0
 
 CMD ["/entry.sh"]
