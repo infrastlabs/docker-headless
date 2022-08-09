@@ -1,9 +1,40 @@
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3-slim
+
+RUN \  
+  # VIDEO: 30.5 MB
+  # libllvm12 已包含 # libgl1-mesa-glx >libgl1-mesa-dri ##ex:  mesa-utils 
+  apt.sh libgl1-mesa-glx mesa-utils libglu1-mesa \
+  \
+  tumbler gtk2-engines-pixbuf gnupg \
+  dbus-x11 at-spi2-core language-pack-gnome-zh-hans \
+  \
+  # FULL(icon,ibus,git,flameshot) 49.1 MB
+  # \12.3 MB (默认不含输入法: IBus/Fcitx)
+  # ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
+  # \20.5 MB
+  flameshot arandr \
+  # \12.6 MB
+  git;
 
 # APPS+ #clipit> diodon
 RUN \
   apt.sh tint2 plank rofi \
   diodon pnmixer lxappearance
+
+# 2868 kB ##img:78.095 MB
+# 配置UI: +fcitx-config-gtk; #有trayIcon,但是gedit,termital都无法录中文。。; rime重配置有错误提示；fcitx有阶段频繁重启现象(libxss1)
+# RUN echo 123; apt update; apt -y install fcitx-bin fcitx-table fcitx-config-gtk \
+#   fcitx fcitx-frontend-gtk2 fcitx-frontend-gtk3 fcitx-frontend-qt5 fcitx-module-x11 im-config
+#   --fcitx-pinyin
+RUN apt.sh fcitx fcitx-bin fcitx-config-common fcitx-config-gtk fcitx-data \
+  fcitx-frontend-all fcitx-frontend-gtk2 fcitx-frontend-gtk3 \
+  fcitx-frontend-qt5 fcitx-module-dbus fcitx-module-kimpanel fcitx-module-lua \
+  fcitx-module-x11 fcitx-modules fcitx-table fcitx-ui-classic
+
+# 15.3 kB #输入法依赖 https://shurufa.sogou.com/linux/guide
+# libxss1: needed by sogou, fcitx -r for debug
+RUN apt.sh lsb-release libxss1 im-config \
+  libqt5qml5 libqt5quick5 libqt5quickwidgets5 qml-module-qtquick2 libgsettings-qt1
 
 # 2536 kB
 # REF: docker-gui > ubt2004-mint-cinna
@@ -38,30 +69,18 @@ RUN apt.sh mint-y-icons mint-themes; \
 # ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi
 # RUN apt -y remove ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi; 
 
-# 2868 kB ##img:78.095 MB
-# 配置UI: +fcitx-config-gtk; #有trayIcon,但是gedit,termital都无法录中文。。; rime重配置有错误提示；fcitx有阶段频繁重启现象(libxss1)
-RUN apt update; apt -y install fcitx-bin fcitx-table fcitx-config-gtk \
-  fcitx fcitx-frontend-gtk2 fcitx-frontend-gtk3 fcitx-frontend-qt5 fcitx-module-x11 im-config
-# 15.3 kB
-# libxss1: needed by sogou, fcitx -r for debug
-RUN apt.sh lsb-release libxss1
-
 # deps: fcitx 4.x
-ADD sogoupinyin_4.0.1.2800_x86_64.deb /tmp/
+ADD sogoupinyin_4.0.1.2800_x86_64.deb /.bundle/
 # 125.002 MB ##TODO init when start
-RUN dpkg -i /tmp/sogoupinyin_4.0.1.2800_x86_64.deb
-# 2. 安装输入法依赖 https://shurufa.sogou.com/linux/guide
-RUN apt.sh libqt5qml5 libqt5quick5 libqt5quickwidgets5 qml-module-qtquick2 libgsettings-qt1
+# RUN dpkg -i /tmp/sogoupinyin_4.0.1.2800_x86_64.deb
 # RUN apt.sh fcitx-rime
+
 
 
 # img: 11.338 MB #software-properties-common ##add-apt-repository ppa:docky-core/ppa
 # RUN apt.sh software-properties-common
 
-  # xconf.sh: ibus env
-  # echo "export XMODIFIERS=@im=ibus" >> /etc/profile;\
-  # echo "export GTK_IM_MODULE=ibus" >> /etc/profile;\
-  # echo "export QT_IM_MODULE=ibus" >> /etc/profile;\
+# xconf.sh: ibus env
 RUN sed -i "s/ibus/fcitx/g" /etc/profile; 
   # echo "export INPUT_METHOD=fcitx" >> /etc/profile;\
   # echo "export SDL_IM_MODULE=fcitx" >> /etc/profile;\
@@ -81,4 +100,4 @@ RUN cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* fla
   # cat /usr/share/backgrounds/xfce/xfce-blue.jpg > /usr/share/backgrounds/xfce/xfce-teal.jpg; 
   wget -qO /usr/share/backgrounds/xfce/xfce-teal.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png;
 
-CMD ["/entry.sh"]
+CMD ["bash", "-c", "dpkg -i /.bundle/sogoupinyin_4.0.1.2800_x86_64.deb; /entry.sh"]
