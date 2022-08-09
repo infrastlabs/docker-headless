@@ -23,16 +23,15 @@
  -- | 连接 | 密码 | 只读密码 
 --- | ---  | ---  | ---
 noVnc | http://192.168.0.x:10081 | `headless` | `View123` 
-Audio | http://192.168.0.x:10082 |     -      | - 
 RDP   | 192.168.0.x:10089        | `headless` | - 
 SSH   | ssh -p 10022 headless@192.168.0.x | `headless` | - 
 
 **(0)源码目录**
 
-- [deb9: 基于Debian的版本(xfce定制:体积小,稳定)](./deb9/src/)
-- [mint: 基于Ubuntu的新版(xfce定制:Xfce4.16, 套用Mint皮肤)](./mint/src/)
-- [ubuntu: Ubuntu基础版(极简:ubt-v3,slim版含音频+fluxbox)](./ubuntu/src/)
-- [desktop: Ubuntu基础版+多桌面(通用:Gnome,Plasma,Cinnamon,Mate,Xfce4))](./desktop/src/)
+- [deb9: 基于Debian的版本(xfce定制:体积小,稳定)](./deb9/)
+- [mint: 基于Ubuntu的新版(xfce定制:Xfce4.16, 套用Mint皮肤)](./mint/)
+- [ubuntu: Ubuntu基础版(极简:含核心远程组件，内置fluxbox)](./ubuntu/)
+- [desktop: Ubuntu多桌面(通用:Gnome,Plasma,Cinnamon,Mate,Xfce4))](./desktop/)
 
 **(1)密码修改**: 生产禁用默认密码，初始后请修改!!
 
@@ -45,8 +44,7 @@ echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /
 
 **(2)使用帮助**: 
 
-- [云桌面功能简介](./_doc/mannual/01-CloudDesktop.md)
-- [Next TODO](./_doc/mannual/b0-todo.md)
+- [云桌面功能简介](./_doc/mannual/01-CloudDesktop.md) &nbsp; [TODO](./_doc/mannual/b0-todo.md)
 - [1.如何设置为中文或其它语言？](./_doc/mannual/b1-locale.md)
 - [2.双屏连接，远程剪切板、音频如何使用？](./_doc/mannual/b2-rdp.md)
 - [3.如何WEB访问远程桌面？](./_doc/mannual/b3-vnc.md)

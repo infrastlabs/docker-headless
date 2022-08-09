@@ -1,5 +1,25 @@
 # ubt
 
+- 镜像: 包含x86_64, arm64两个体系的镜像
+- 版本: 分为标准版，slim版(不含3D显卡，输入法，Flameshot, Git)
+- 集成systemd(2M), 以仿真实际Linux桌面发行版
+- 基础能力
+  - tigervnc
+  - xrdp, pulse
+  - webhookd, noVNC
+  - misc, 多语言，显卡/输入法，常用软件
+
+```bash
+docker run -it --rm -p 11081:10081 -p 11089:10089 \
+  registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3-slim /entry.sh
+
+# systemd
+docker run -it --rm -p 11081:10081 -p 11089:10089 \
+  --tmpfs /run --tmpfs /run/lock --tmpfs /tmp   --privileged \
+  -v /_ext:/_ext -v /sys/fs/cgroup:/sys/fs/cgroup \
+  registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3-slim
+```
+
 **arm64**
 
 ```bash
@@ -9,16 +29,16 @@
 **systemd**
 
 ```bash
-docker  run -it --rm --privileged -v /sys/fs/cgroup:/sys/fs/cgroup \
+docker  run -it --rm -p 10481:10081 --cap-add SYS_ADMIN -v /sys/fs/cgroup:/sys/fs/cgroup \
  --mount type=tmpfs,dst=/run --mount type=tmpfs,dst=/run/lock \
- registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v2 /sbin/init
+ registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3
 
 
 # deb11-gemmibook
 # https://serverfault.com/questions/1053187/systemd-fails-to-run-in-a-docker-container-when-using-cgroupv2-cgroupns-priva
 docker  run -it --rm --cap-add SYS_ADMIN  -p 10281:10081 -p 10289:10089 \
 -v /sys/fs/cgroup:/sys/fs/cgroup:rw  --cgroupns=host --mount type=tmpfs,dst=/run --mount type=tmpfs,dst=/run/lock  \
-registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3-slim
+registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3-slim /sbin/init
 
 
 # headless @ mac23-199 in ~ |13:55:34  
