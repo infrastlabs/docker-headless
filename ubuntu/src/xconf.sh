@@ -59,6 +59,10 @@ $RUN \
   echo "export GTK_IM_MODULE=ibus" >> /etc/profile;\
   echo "export QT_IM_MODULE=ibus" >> /etc/profile;\
   \
+  echo "export XMODIFIERS=@im=ibus" >> /.env;\
+  echo "export GTK_IM_MODULE=ibus" >> /.env;\
+  echo "export QT_IM_MODULE=ibus" >> /.env;\
+  \
   # dconf: ibus, plank, engrampa; dconf dump / > xx.ini
   mkdir -p /etc/dconf/db;\
   su - headless -c "dbus-launch dconf reset -f /; dbus-launch dconf load / < /home/headless/dconf.ini; ";\

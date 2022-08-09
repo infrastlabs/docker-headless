@@ -98,6 +98,16 @@ RUN cd /tmp; file=webhookd.tar.gz; curl -fSL -k -O https://gitee.com/infrastlabs
   cd /usr/local/webhookd/static; file=v1.3.0.tar.gz; curl -fSL -k -O https://hub.fastgit.xyz/novnc/noVNC/archive/$file; \
   bash down_vnc.sh; rm -f $file;
 
+# 1750 kB ##hsetroot> fbsetbg?
+# hsetroot -fill /home/opsky/Downloads/bizhi.jpg
+# feh --bg-scale /path/to/image.file
+# TODO fluxEnv: +plank, +xcompositor; <fluxPanel's menuCustomize>
+RUN apt.sh feh hsetroot
+RUN mkdir -p /usr/share/backgrounds/xfce; \
+  # echo "\$full \$full|/usr/share/backgrounds/xfce/xfce-teal.jpg|style|:10.0" > /usr/share/fluxbox/styles/ubuntu-light/lastwallpaper; \
+  wget -qO /usr/share/images/fluxbox/ubuntu-light.png https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png;
+
+
 # HEADLESS
 COPY --from=files1 / /
 COPY --from=files2 / /
