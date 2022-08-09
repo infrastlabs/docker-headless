@@ -20,12 +20,12 @@ compile)
     ;; 
 tiger)
     img="docker-headless:mint-compile-tiger"
-    docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile.tiger . 
+    docker build $cache $pull -t $repo/$ns/$img -f src/arm.Dockerfile.tiger . 
     docker push $repo/$ns/$img
     ;;    
 tiger21)
     img="docker-headless:mint-compile-tiger-v21"
-    docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile.tiger-v21 . 
+    docker build $cache $pull -t $repo/$ns/$img -f src/arm.Dockerfile.tiger-v21 . 
     docker push $repo/$ns/$img
     ;;     
 slim)
