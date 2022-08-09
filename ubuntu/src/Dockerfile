@@ -76,7 +76,7 @@ RUN test -z "$FULL" && exit 0 || echo fullInstall;\
   \
   # FULL(icon,ibus,git,flameshot) 49.1 MB
   # \12.3 MB (默认不含输入法: IBus/Fcitx)
-  # ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
+  ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
   # \20.5 MB
   flameshot arandr \
   # \12.6 MB
