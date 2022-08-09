@@ -36,28 +36,13 @@ RUN export DOMAIN="mirrors.ustc.edu.cn"; mkdir -p /tmp/docky/deps; cd /tmp/docky
   wget http://archive.ubuntu.com/ubuntu/pool/universe/g/gnome-sharp2/libgconf2.0-cil_2.24.2-4_all.deb;
   # sudo apt-get install ./*.deb
 RUN mkdir -p /tmp/docky; cd /tmp/docky; \
-  # wget http://archive.ubuntu.com/ubuntu/pool/universe/g/gnome-keyring-sharp/libgnome-keyring1.0-cil_1.0.0-5_amd64.deb; \
-  # wget http://archive.ubuntu.com/ubuntu/pool/universe/g/gnome-sharp2/libgconf2.0-cil_2.24.2-4_all.deb; \
   wget http://archive.ubuntu.com/ubuntu/pool/universe/d/docky/docky_2.2.1.1-1_all.deb;
   # sudo apt-get install ./docky_2.2.1.1-1_all.deb
-# docky deps: 14.6M
-# err-noPkg: libgconf2.0-cil libgnome-keyring1.0-cil 
-# run-err: DBus not find..
+# docky deps: 14.6M #err-noPkg: libgconf2.0-cil libgnome-keyring1.0-cil  #nonSysd-run-err: DBus not find.
 RUN apt.sh mono-runtime libdbus-glib2.0-cil libdbus2.0-cil libgkeyfile1.0-cil libglib2.0-cil libgtk2.0-cil \
   libmono-addins0.2-cil libmono-cairo4.0-cil libmono-corlib4.5-cil libmono-posix4.0-cil libmono-sharpzip4.84-cil libmono-system-core4.0-cil \
   libmono-system-web4.0-cil libmono-system-xml-linq4.0-cil libmono-system-xml4.0-cil libmono-system4.0-cil libnotify0.4-cil libwnck22 gconf2
 # docky_2.2.0-2_all.deb	2013-11-19 19:03 	592K
-    # The following packages have unmet dependencies:
-    #  docky : Depends: libgnomedesktop2.20-cil (>= 2.26.0) but it is not installable
-    #          Depends: libmono-corlib4.0-cil (>= 2.10.1) but it is not installable
-    #          Depends: librsvg2-2.18-cil (>= 2.26.0) but it is not installable
-    #          Depends: libwnck2.20-cil (>= 2.26.0) but it is not installable
-    #          Recommends: dockmanager but it is not installable
-# RUN apt.sh libgnomedesktop2.20-cil libmono-corlib4.0-cil librsvg2-2.18-cil libwnck2.20-cil
-#   # E: Couldn't find any package by glob 'libgnomedesktop2.20-cil'
-#   # E: Package 'libmono-corlib4.0-cil' has no installation candidate
-#   # E: Couldn't find any package by glob 'librsvg2-2.18-cil'
-#   # E: Couldn't find any package by glob 'libwnck2.20-cil'
 # docky_2.2.1.1-1_all.deb	2015-09-03 09:23 	609K
 # http://archive.ubuntu.com/ubuntu/pool/universe/d/docky/
 RUN cd /tmp/docky/deps; apt -y install ./*.deb; \
