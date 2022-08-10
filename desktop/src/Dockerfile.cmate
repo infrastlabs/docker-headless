@@ -16,8 +16,8 @@ RUN apt.sh libglib2.0-dev
 # 318 MB(before mate-desk-core) > 249M(after, una)
 # 240 MB(back: ulyana); una: UI选主题，提示Mint-Y未装..
 RUN apt.sh \
-    mintlocale mint-themes \
-    mint-artwork mint-meta-mate; \
+    mintlocale mint-themes mint-artwork \
+    mint-meta-mate; \
   cd /usr/share/backgrounds; rm -rf linuxmint-* cosmos; cd linuxmint; rm -f `ls |grep -v "default\|sele_ring.jpg"`; \
   cd /usr/share/icons; rm -rf `ls |grep "Mint-X\|Tango\|Human\|ubuntu-mono\|LoginIcons\|Contrast\|mate\|locolor"`; \
   cd /usr/share/themes; rm -rf `ls |grep "Mint-X\|Tradition\|BlackMATE\|Submarine\|GreenLag\|BlueMenta\|HighContrast"`; \
@@ -25,7 +25,6 @@ RUN apt.sh \
   cd /usr/share/i18n/locales; rm -rf `ls |grep -v "locale.alias\|zh\|en"`; \
   # 80M > 42M
   cd /usr/share/icons/Mint-Y/apps && rm -rf 256* 96*; \
-  \
   cd /usr/share/applications; rm -rf `ls |grep "kde"`; \
   \
   apt -y remove \

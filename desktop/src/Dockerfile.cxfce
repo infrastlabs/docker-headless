@@ -9,22 +9,32 @@ RUN \
   apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 ${LINUX_MINT_KEY}; \
   apt clean && rm -rf /var/lib/apt/lists/*;
 
+# apt install xubuntu-desktop #apt.sh xfce4-desktop?
+# xfce4-panel
 RUN apt.sh xfce4-settings xfce4-session xfwm4 xfdesktop4 xfce4-panel \
   xfce4-notifyd
-
-# clipit 
-RUN apt.sh thunar tumbler tint2 rofi \
+# oth, plugins #|clipit tint2 rofi
+RUN apt.sh thunar tumbler \
   xfce4-pulseaudio-plugin \
   xfce4-whiskermenu-plugin xfce4-taskmanager
 
 # 23.8 MB > 18.9M
-RUN apt.sh mint-y-icons mint-themes; \
+# mint-meta-xfce: .mint-artwork-xfce??
+# RUN apt.sh mint-y-icons mint-themes; \
+RUN apt.sh \
+  mintlocale mint-themes mint-artwork \
+  mint-meta-xfce; \
+  cd /usr/share/backgrounds; rm -rf linuxmint-* cosmos; cd linuxmint; rm -f `ls |grep -v "default\|sele_ring.jpg"`; \
   cd /usr/share/icons; rm -rf `ls |grep "Mint-X\|Humanity\|Ubuntu-Mono\|LoginIcons"`; \
   cd /usr/share/themes; rm -rf `ls |grep -v "Mint-Y"`; \
   cd /usr/share/locales; rm -rf `ls |grep -v "locale.alias\|zh\|en"`; \
   cd /usr/share/i18n/locales; rm -rf `ls |grep -v "locale.alias\|zh\|en"`; \
   # 80M > 42M
-  cd /usr/share/icons/Mint-Y/apps && rm -rf 256* 96*; 
+  cd /usr/share/icons/Mint-Y/apps && rm -rf 256* 96*; \
+  cd /usr/share/applications; rm -rf `ls |grep "kde"`; \
+  \
+  apt -y remove \
+  mintreport ; cd /usr/bin; rm -f mintupdate*
 
 
 COPY src/*.service /etc/systemd/system/
@@ -32,8 +42,9 @@ RUN \
   sed -i "s/gnome-session/xfce4-session/g" /etc/systemd/system/de-start.service; \
   systemctl enable de-start;
 
-# HEADLESS
+# HEADLESS 不使用定制项，官方原滋味
 ADD --chown=headless:headless src/.mint-artwork-xfce /home/headless
+# ADD --chown=headless:headless src/.mint-artwork-xfce/.config/autostart /home/headless/.config/autostart
 
 ENV \
   # mintwelcome
