@@ -83,7 +83,7 @@ RUN \
 
 ARG FULL=""
 # TODO: full瘦身: ibus-rime librime-data-wubi启动时安装;
-  # Need to get 71.5 MB of archives.
+  # Need to get 71.5 MB of archives. >> layer: 113M
   # After this operation, 699 MB of additional disk space will be used.
 RUN test -z "$FULL" && exit 0 || echo fullInstall;\  
   # VIDEO: 30.5 MB
