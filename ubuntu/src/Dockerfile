@@ -70,7 +70,7 @@ RUN \
   gnome-system-monitor engrampa ristretto \
   \
   # 2422 kB #https://github.com/j8r/dockerfiles
-  # 默认自带：xterm fluxbox (便于调试)
+  # 默认自带：xterm fluxbox (便于调试) #TODO: fluxbox from src's compile
   xinit xterm fluxbox systemd systemd-sysv; \
   \
 # ASBRU: 3586 kB (disk: 15.5 MB)

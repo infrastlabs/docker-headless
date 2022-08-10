@@ -23,6 +23,7 @@ $RUN \
   chmod +x /*.sh \
   && echo "welcome! HeadlessBox." > /etc/motd \
   && ln -s /usr/bin/vim.tiny /usr/bin/vt \
+  && ln -s /usr/bin/supervisorctl /usr/bin/sv \
   && rm -f /bin/sh && ln -s /bin/bash /bin/sh \
   && echo "alias ll='ls -lF'; alias la='ls -A'; alias l='ls -CF';" >> /home/$user/.bashrc
 

@@ -18,7 +18,8 @@ function oneVnc(){
 
     # SV
     echo """
-[program:xvnc$N-$name1]
+#[program:xvnc$N-$name1]
+[program:xvnc]
 environment=DISPLAY=:$N,HOME=/home/$user1
 priority=35
 user=$user1
@@ -39,7 +40,7 @@ command=/xvnc.sh pulse $N
 redirect_stderr=true
 
 [program:parec]
-environment=DISPLAY=:$N,HOME=/home/$user1
+environment=DISPLAY=:$N,HOME=/home/$user1,PORT_VNC=$PORT_VNC
 priority=37
 user=$user1
 command=/xvnc.sh xrec $N

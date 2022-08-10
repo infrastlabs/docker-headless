@@ -1,8 +1,9 @@
 #!/bin/bash
+cmd=$1
 offsetLimitIndex=$2
 offsetLimitIndex=${offsetLimitIndex:-99}
 
-case "$1" in
+case "$cmd" in
 xvnc)
  #chansrv
     export DISPLAY=:$offsetLimitIndex #:2
@@ -14,10 +15,11 @@ pulse)
     port=$(expr 4700 + $offsetLimitIndex) #4713
     mkdir -p /tmp/.headless; pa="/tmp/.headless/pulse-$port.pa"
     cat /etc/pulse/default.pa > $pa; sed -i "s/4700/$port/g" $pa
-    pulseaudio --exit-idle-time=-1 -nF $pa
+    exec pulseaudio --exit-idle-time=-1 -nF $pa
     ;;    
 xrec)
     # sv: environment=DISPLAY=:10,HOME=/home/headless
+    echo "PORT_VNC: $PORT_VNC"
     echo "sleep 2.5" && sleep 2.5 #wait
 
     src="-d xrdp-sink.monitor"
