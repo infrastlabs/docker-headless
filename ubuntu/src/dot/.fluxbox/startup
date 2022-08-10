@@ -19,7 +19,7 @@
 # (sleep 1.4; xfce4-power-manager) &
 # (sleep 1.2; nm-applet) &
 (sleep 1.0; pnmixer) &
-# (sleep 0.8; diodon) & #clipit ##both cause rdesktop conn-err
+(sleep 0.8; clipit) & #clipit/diodon ##both cause rdesktop conn-err?
 # thunar --daemon &
 dunst &
 xcompmgr &
@@ -56,9 +56,6 @@ fi
 
 # +feh
 # feh --no-fehbg --bg-scale ~/.fluxbox/res/wallpapers_slax_wallpaper.jpg 
-# feh --no-fehbg --bg-scale /usr/share/backgrounds/xfce/xfce-teal.jpg
-# root's oper
-# echo "\$full \$full|/usr/share/backgrounds/xfce/xfce-teal.jpg|style|:10.0" > /usr/share/fluxbox/styles/ubuntu-light/lastwallpaper
 # (sleep 0.1; ibus-daemon -drx) &
 ibus-daemon -drx #backend
 

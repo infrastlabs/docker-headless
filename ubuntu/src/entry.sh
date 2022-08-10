@@ -28,24 +28,24 @@ command=/xvnc.sh xvnc $N
 #stdout_logfile_maxbytes=0
 redirect_stderr=true
 
-# [program:xrec$N-$name1]
-# environment=DISPLAY=:$N,HOME=/home/$user1
-# priority=36
-# user=$user1
-# command=/xvnc.sh xrec $N
-# stdout_logfile=/dev/fd/1
-# stdout_logfile_maxbytes=0
-# redirect_stderr=true
+[program:pulse]
+environment=DISPLAY=:$N,HOME=/home/$user1
+priority=36
+user=$user1
+command=/xvnc.sh pulse $N
+#stdout_logfile=/dev/null
+#stdout_logfile=/dev/fd/1
+#stdout_logfile_maxbytes=0
+redirect_stderr=true
 
- 
-#[program:parec]
-#environment=DISPLAY=:10,HOME=/home/headless
-#priority=35
-#user=headless
-#command=/usr/local/webhookd/static/bcs_push.sh xrec vncID
-## stdout_logfile=/dev/null
-## stdout_logfile_maxbytes=0
-#redirect_stderr=true
+[program:parec]
+environment=DISPLAY=:$N,HOME=/home/$user1
+priority=37
+user=$user1
+command=/xvnc.sh xrec $N
+stdout_logfile=/dev/fd/1
+stdout_logfile_maxbytes=0
+redirect_stderr=true
 
     """ > /etc/supervisor/conf.d/xvnc$N.conf
 }

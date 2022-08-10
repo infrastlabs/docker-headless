@@ -1,24 +1,31 @@
 FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:mint-compile as Xvnc
 FROM scratch as files1
   # ubt2004: tigervnc-standalone-server 1.10.1+dfsg-3
-  COPY --from=Xvnc /tigervnc-pkg/tigervnc-1.12.0.x86_64 /
-  COPY --from=Xvnc /rootfs /
+  COPY --from=Xvnc /tigervnc-pkg/tigervnc-1.12.0.x86_64 /rootfs/
+  COPY --from=Xvnc /rootfs /rootfs/
 
-FROM scratch as files2
+FROM ubuntu:20.04 as files2
+  RUN apt update && apt -y install curl
+  # webhookd, noVNC
+  RUN cd /tmp; file=webhookd.tar.gz; curl -fSL -k -O https://gitee.com/infrastlabs/fk-webhookd/attach_files/1135812/download/$file; \
+    hookd=/rootfs/usr/local/webhookd; mkdir -p $hookd; tar -zxvf $file -C $hookd; rm -f $file; \
+    \
+    cd /rootfs/usr/local/webhookd/static; file=v1.3.0.tar.gz; curl -fSL -k -O https://hub.fastgit.xyz/novnc/noVNC/archive/$file; \
+    bash down_vnc.sh; rm -f $file;  
   # Add src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
   # COPY src/f/dconf.ini /usr/share/dconf.ini 
   # 
-  COPY src/*.sh /
-  ADD src/etc /etc
-  ADD src/dot /etc/skel
-  ADD src/bin /usr/bin
-  ADD src/sv.conf /etc/supervisor/conf.d/xrdp.conf
-  COPY src/*.service /etc/systemd/system/
-  ADD src/bcs_push.sh /usr/local/webhookd/static/bcs_push.sh
-
+  COPY src/*.sh /rootfs/
+  ADD src/etc /rootfs/etc
+  ADD src/dot /rootfs/etc/skel
+  ADD src/bin /rootfs/usr/bin
+  ADD src/sv.conf /rootfs/etc/supervisor/conf.d/xrdp.conf
+  COPY src/*.service /rootfs/etc/systemd/system/
 
 FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND noninteractive
+# use cat > excludes: 再少一层
+COPY src/excludes /etc/dpkg/dpkg.cfg.d/excludes
 # mirrors.tuna.tsinghua.edu.cn
 # mirrors.ustc.edu.cn
 # mirrors.aliyun.com
@@ -28,12 +35,10 @@ RUN export DOMAIN="mirrors.ustc.edu.cn"; \
   && echo "deb http://${DOMAIN}/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
   \
   echo 'apt update -qq && apt install -yq --no-install-recommends $@ && apt clean && rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
-    && chmod +x /usr/local/bin/apt.sh
- 
-COPY src/excludes /etc/dpkg/dpkg.cfg.d/excludes
-
+    && chmod +x /usr/local/bin/apt.sh; \
+  \
 # MISC 15.1 MB
-RUN \
+# RUN \
   # \2487 kB
   apt.sh wget ca-certificates \
   # \5529 kB 
@@ -45,10 +50,12 @@ RUN \
   dropbear-bin dropbear-run openssh-sftp-server lftp jq;
 
 # VID, AUD, LOC 87.4 MB
+# 预装软件: geany sakura ristretto sys-monitor engrampa asbru
 # xrdp-chansrv: libfdk-aac1 libopus0
+# strip: binutils
 RUN \
   # LOCALE 15.0 MB 
-  apt.sh dconf-cli locales tzdata apt-utils fonts-wqy-zenhei \
+  apt.sh dconf-cli locales tzdata binutils apt-utils fonts-wqy-zenhei \
   # Audio 39.8 MB 
   pulseaudio pavucontrol \
   \
@@ -63,9 +70,21 @@ RUN \
   gnome-system-monitor engrampa ristretto \
   \
   # 2422 kB #https://github.com/j8r/dockerfiles
-  xinit xterm fluxbox systemd systemd-sysv
+  # 默认自带：xterm fluxbox (便于调试)
+  xinit xterm fluxbox systemd systemd-sysv; \
+  \
+# ASBRU: 3586 kB (disk: 15.5 MB)
+# RUN echo 1;\
+  curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash; \
+  apt.sh asbru-cm; rm -f /etc/apt/sources.list.d/asbru-cm-release.list; \
+  mv /opt/asbru /usr/local; rm -f /usr/bin/asbru-cm; ln -s /usr/local/asbru/asbru-cm /usr/bin/; \
+  cd /usr/share/icons/hicolor/scalable/apps; rm -f asbru-cm.svg; ln -s /usr/local/asbru/res/asbru-logo.svg ./asbru-cm.svg; \
+  dpkg -l |grep asbru && exit 0 || exit 1;  
 
 ARG FULL=""
+# TODO: full瘦身: ibus-rime librime-data-wubi启动时安装;
+  # Need to get 71.5 MB of archives.
+  # After this operation, 699 MB of additional disk space will be used.
 RUN test -z "$FULL" && exit 0 || echo fullInstall;\  
   # VIDEO: 30.5 MB
   # libllvm12 已包含 # libgl1-mesa-glx >libgl1-mesa-dri ##ex:  mesa-utils 
@@ -75,7 +94,7 @@ RUN test -z "$FULL" && exit 0 || echo fullInstall;\
   dbus-x11 at-spi2-core language-pack-gnome-zh-hans \
   \
   # FULL(icon,ibus,git,flameshot) 49.1 MB
-  # \12.3 MB (默认不含输入法: IBus/Fcitx)
+  # \12.3 MB (默认输入法: IBus)
   ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
   # \20.5 MB
   flameshot arandr \
@@ -83,40 +102,18 @@ RUN test -z "$FULL" && exit 0 || echo fullInstall;\
   git;
   
 
-# ASBRU: 3586 kB (disk: 15.5 MB)
-RUN echo 1;\
-  curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash; \
-  apt.sh asbru-cm; rm -f /etc/apt/sources.list.d/asbru-cm-release.list; \
-  mv /opt/asbru /usr/local; rm -f /usr/bin/asbru-cm; ln -s /usr/local/asbru/asbru-cm /usr/bin/; \
-  cd /usr/share/icons/hicolor/scalable/apps; rm -f asbru-cm.svg; ln -s /usr/local/asbru/res/asbru-logo.svg ./asbru-cm.svg; \
-  dpkg -l |grep asbru && exit 0 || exit 1;
-
-# webhookd, noVNC
-RUN cd /tmp; file=webhookd.tar.gz; curl -fSL -k -O https://gitee.com/infrastlabs/fk-webhookd/attach_files/1135812/download/$file; \
-  mkdir -p /usr/local/webhookd; tar -zxvf $file -C /usr/local/webhookd; rm -f $file; \
-  \
-  cd /usr/local/webhookd/static; file=v1.3.0.tar.gz; curl -fSL -k -O https://hub.fastgit.xyz/novnc/noVNC/archive/$file; \
-  bash down_vnc.sh; rm -f $file;
-
 # Can't load shared library libQt5Core.so.5: https://www.mmuaa.com/post/8d7ef275515c19a4.html
 # apt install binutils
 # strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5
 
-# 1750 kB ##hsetroot> fbsetbg?
-# hsetroot -fill /home/opsky/Downloads/bizhi.jpg
-# feh --bg-scale /path/to/image.file
-# TODO fluxEnv: +plank, +xcompositor; <fluxPanel's menuCustomize>
-RUN apt.sh feh hsetroot
-RUN mkdir -p /usr/share/backgrounds/xfce; \
-  # echo "\$full \$full|/usr/share/backgrounds/xfce/xfce-teal.jpg|style|:10.0" > /usr/share/fluxbox/styles/ubuntu-light/lastwallpaper; \
-  wget -qO /usr/share/images/fluxbox/ubuntu-light.png https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png;
-
-
 # HEADLESS
-COPY --from=files1 / /
-COPY --from=files2 / /
+COPY --from=files1 /rootfs /
+COPY --from=files2 /rootfs /
 RUN bash /xconf.sh; \
+  # resolv-err: qt@centos7
+  strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5; \
   \
+  # systemd1
   cd /lib/systemd/system/sysinit.target.wants/ \
     && rm $(ls | grep -v systemd-tmpfiles-setup); \
     \
@@ -130,6 +127,7 @@ RUN bash /xconf.sh; \
     /lib/systemd/system/plymouth* \
     /lib/systemd/system/systemd-update-utmp*; \
     \
+  # systemd2
   find / |grep -v "^/sys\|^/proc" |grep systemd |grep ".service$" |grep "supervi" |while read one; do echo $one; rm -f $one; done; \
   \
   dpkg-divert --local --rename --add /sbin/udevadm; ln -s /bin/true /sbin/udevadm; \
@@ -149,6 +147,8 @@ ENV \
   # XDG_CURRENT_DESKTOP=XFCE \
   TERM=xterm \
   SHELL=/bin/bash \
+  # 默认约定
+  DISPLAY=":10" \
   L="zh_CN" \
   TZ="Asia/Shanghai" \
   \

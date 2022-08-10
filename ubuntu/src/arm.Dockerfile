@@ -15,7 +15,7 @@ FROM scratch as files2
   ADD src/bin /usr/bin
   ADD src/sv.conf /etc/supervisor/conf.d/xrdp.conf
   COPY src/*.service /etc/systemd/system/
-  ADD src/bcs_push.sh /usr/local/webhookd/static/bcs_push.sh
+  # ADD src/bcs_push.sh /usr/local/webhookd/static/bcs_push.sh
 
 
 FROM ubuntu:20.04
