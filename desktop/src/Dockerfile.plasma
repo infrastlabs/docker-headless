@@ -6,6 +6,9 @@ RUN apt.sh kubuntu-desktop dolphin konsole
 
 COPY src/*.service /etc/systemd/system/
 RUN \
+  # 图标风格不搭
+  rm -f /home/headless/Desktop/pavucontrol.desktop; \
+  \
   sed -i "s/gnome-session/startplasma-x11/g" /etc/systemd/system/de-start.service; \
   systemctl enable de-start;
 
