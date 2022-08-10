@@ -22,9 +22,9 @@
 (sleep 0.8; clipit) & #clipit/diodon ##both cause rdesktop conn-err?
 # thunar --daemon &
 dunst &
-# xcompmgr &
 # http://t.zoukankan.com/huapox-p-3516155.html
 xcompmgr -Ss -n -Cc -fF -I-10 -O-10 -D1 -t-3 -l-4 -r4 &
+# xcompmgr &
 plank &
 sleep 2 && sakura & #stterm #directRun: topPosition HideBar
 

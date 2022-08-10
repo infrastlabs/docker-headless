@@ -95,3 +95,22 @@ services:
       - /sys/fs/cgroup:/sys/fs/cgroup 
       - /_ext:/_ext
       - /:/mnt  
+
+  flux:
+    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:flux
+    restart: unless-stopped
+    ports:
+      - "10681:10081"
+      - "10689:10089"
+      - "10622:10022"
+    cap_add:
+      - SYS_BOOT 
+      - SYS_ADMIN         
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    volumes: 
+      - /sys/fs/cgroup:/sys/fs/cgroup 
+      - /_ext:/_ext
+      - /:/mnt  

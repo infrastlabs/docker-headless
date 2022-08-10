@@ -1,0 +1,15 @@
+! The following line will prevent styles from setting the background.
+# background: none
+session.screen0.slit.placement: RightCenter
+
+#Example settings for font name, size, etc., for menu and toolbar
+
+# menu.hilite.font: Dejavu sans-12
+menu.hilite.font: PT Sans-11:regular 
+menu.frame.font: PT Sans-11:regular 
+menu.title.font: PT Sans-11:regular 
+toolbar.clock.font: PT Sans-11:bold 
+toolbar.workspace.font: PT Sans-11:regular 
+toolbar.iconbar.focused.font: PT Sans-11:regular 
+toolbar.iconbar.unfocused.font: PT Sans-11:regular 
+window.font: Lato-9
