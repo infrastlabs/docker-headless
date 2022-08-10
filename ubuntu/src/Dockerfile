@@ -98,6 +98,10 @@ RUN cd /tmp; file=webhookd.tar.gz; curl -fSL -k -O https://gitee.com/infrastlabs
   cd /usr/local/webhookd/static; file=v1.3.0.tar.gz; curl -fSL -k -O https://hub.fastgit.xyz/novnc/noVNC/archive/$file; \
   bash down_vnc.sh; rm -f $file;
 
+# Can't load shared library libQt5Core.so.5: https://www.mmuaa.com/post/8d7ef275515c19a4.html
+# apt install binutils
+# strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5
+
 # 1750 kB ##hsetroot> fbsetbg?
 # hsetroot -fill /home/opsky/Downloads/bizhi.jpg
 # feh --bg-scale /path/to/image.file
