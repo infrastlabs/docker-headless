@@ -24,11 +24,6 @@ cxfce)
     docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile.cxfce . 
     docker push $repo/$ns/$img
     ;;  
-gnome)
-    img="docker-headless:gnome"
-    docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile.gnome . 
-    docker push $repo/$ns/$img 
-    ;;     
 plas)
     img="docker-headless:plas"
     docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile.plasma . 
@@ -68,8 +63,8 @@ hub)
     img="docker-headless:plas"; docker tag $repo/$ns/$img $ns/$img; docker push $ns/$img
     ;;    
 *)
-    img="docker-headless:flux"
-    docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile.flux . 
-    docker push $repo/$ns/$img
+    img="docker-headless:gnome"
+    docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile.gnome . 
+    docker push $repo/$ns/$img 
     ;;
 esac

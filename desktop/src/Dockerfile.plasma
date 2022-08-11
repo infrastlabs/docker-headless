@@ -11,6 +11,7 @@ RUN \
   sed -i "s/startfluxbox/startplasma-x11/g" /etc/systemd/system/de-start.service;
 
 # HEADLESS
+ADD --chown=headless:headless src/.config /home/headless/.config
 
 ENV \
   DISPLAY=":10"

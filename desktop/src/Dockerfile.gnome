@@ -6,11 +6,20 @@ RUN apt.sh ubuntu-desktop; \
 
 # TODO: 当前为默认iconTheme
 # +nautilus: 950 kB 
-RUN apt.sh nautilus; \
+RUN apt.sh \
+  # gnome-tweak-tool papirus-icon-theme \
+  nautilus; \
+  apt -y remove update-manager software-properties-common xterm; \
+  \
   sed -i "s/startfluxbox/gnome-session/g" /etc/systemd/system/de-start.service; \
-  wget -qO /usr/share/backgrounds/warty-final-ubuntu.png https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png;
+  wget -qO /usr/share/backgrounds/warty-final-ubuntu.png https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png; 
+  # \
+  # wget https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
+  # dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb; \
+  # dpkg -l |grep bunsen && exit 0 || exit 1;  
 
 # HEADLESS
+ADD --chown=headless:headless src/.config /home/headless/.config
 
 ENV \
   XDG_SESSION_TYPE=x11 \

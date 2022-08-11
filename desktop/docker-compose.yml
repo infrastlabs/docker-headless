@@ -3,6 +3,7 @@ services:
   gnome:
     image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:gnome
     restart: unless-stopped
+    shm_size: 1g
     ports:
       - "10181:10081"
       - "10189:10089"
@@ -22,6 +23,7 @@ services:
   plasma:
     image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:plas
     restart: unless-stopped
+    shm_size: 1g
     privileged: true #plasma
     ports:
       - "10281:10081"
@@ -42,6 +44,7 @@ services:
   cinna:
     image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:cinna
     restart: unless-stopped
+    shm_size: 1g
     ports:
       - "10381:10081"
       - "10389:10089"
@@ -61,6 +64,7 @@ services:
   cmate:
     image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:cmate
     restart: unless-stopped
+    shm_size: 1g
     ports:
       - "10481:10081"
       - "10489:10089"
@@ -80,29 +84,11 @@ services:
   cxfce:
     image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:cxfce
     restart: unless-stopped
+    shm_size: 1g
     ports:
       - "10581:10081"
       - "10589:10089"
       - "10522:10022"
-    cap_add:
-      - SYS_BOOT 
-      - SYS_ADMIN         
-    tmpfs:
-      - /run
-      - /run/lock
-      - /tmp
-    volumes: 
-      - /sys/fs/cgroup:/sys/fs/cgroup 
-      - /_ext:/_ext
-      - /:/mnt  
-
-  flux:
-    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:flux
-    restart: unless-stopped
-    ports:
-      - "10681:10081"
-      - "10689:10089"
-      - "10622:10022"
     cap_add:
       - SYS_BOOT 
       - SYS_ADMIN         
