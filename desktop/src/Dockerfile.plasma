@@ -5,7 +5,7 @@ FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3
 RUN apt.sh kubuntu-desktop dolphin konsole
 
 RUN \
-  # 图标风格不搭
+  # KDE环境: pavucontrol图标丑出天际
   rm -f /home/headless/Desktop/pavucontrol.desktop; \
   \
   sed -i "s/startfluxbox/startplasma-x11/g" /etc/systemd/system/de-start.service;
