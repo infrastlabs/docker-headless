@@ -7,7 +7,7 @@ ns=infrastlabs
 # cache="--no-cache"
 # pull="--pull"
 
-ver=v3 # latest
+ver=v4 # latest
 case "$1" in
 compile)
     vncver=1.12.0 ## udomain > jaist
