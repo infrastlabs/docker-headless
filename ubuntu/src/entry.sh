@@ -43,9 +43,10 @@ redirect_stderr=true
 environment=DISPLAY=:$N,HOME=/home/$user1,PORT_VNC=$PORT_VNC
 priority=37
 user=$user1
-command=/xvnc.sh xrec $N
-stdout_logfile=/dev/fd/1
-stdout_logfile_maxbytes=0
+command=/xvnc.sh parec $N
+##systemd: stdout cause error
+#stdout_logfile=/dev/fd/1
+#stdout_logfile_maxbytes=0
 redirect_stderr=true
 
     """ > /etc/supervisor/conf.d/xvnc$N.conf

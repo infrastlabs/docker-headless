@@ -17,7 +17,7 @@ pulse)
     cat /etc/pulse/default.pa > $pa; sed -i "s/4700/$port/g" $pa
     exec pulseaudio --exit-idle-time=-1 -nF $pa
     ;;    
-xrec)
+parec)
     # sv: environment=DISPLAY=:10,HOME=/home/headless
     echo "PORT_VNC: $PORT_VNC"
     echo "sleep 2.5" && sleep 2.5 #wait
