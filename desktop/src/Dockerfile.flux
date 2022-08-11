@@ -21,11 +21,6 @@ RUN apt.sh hsetroot xcompmgr plank dunst pnmixer clipit; \
 # 1422 kB
 RUN apt.sh lxappearance thunar
 
-COPY src/*.service /etc/systemd/system/
-RUN \
-  sed -i "s/gnome-session/startfluxbox/g" /etc/systemd/system/de-start.service; \
-  systemctl enable de-start;
-
 ADD --chown=headless:headless src/.flux /home/headless
 RUN \cp /home/headless/clear3d.theme /usr/share/plank/themes/Default/dock.theme; \
   rm -f /home/headless/clear3d.theme;

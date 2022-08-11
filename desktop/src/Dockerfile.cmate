@@ -37,10 +37,8 @@ RUN apt.sh \
   tumbler 
   # tint2 clipit rofi 
 
-COPY src/*.service /etc/systemd/system/
 RUN \
-  sed -i "s/gnome-session/mate-session/g" /etc/systemd/system/de-start.service; \
-  systemctl enable de-start;
+  sed -i "s/startfluxbox/mate-session/g" /etc/systemd/system/de-start.service;
 
 # HEADLESS
 

@@ -3,10 +3,8 @@ FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3
 # ubuntu-desktop 128 MB
 RUN apt.sh ubuntu-desktop; \
   apt -y remove gdm3  gvfs*
-
-COPY src/*.service /etc/systemd/system/
 RUN \
-  systemctl enable de-start;
+  sed -i "s/startfluxbox/gnome-session/g" /etc/systemd/system/de-start.service;
 
 # HEADLESS
 

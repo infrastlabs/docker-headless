@@ -37,10 +37,8 @@ RUN apt.sh \
   mintreport ; cd /usr/bin; rm -f mintupdate*
 
 
-COPY src/*.service /etc/systemd/system/
 RUN \
-  sed -i "s/gnome-session/xfce4-session/g" /etc/systemd/system/de-start.service; \
-  systemctl enable de-start;
+  sed -i "s/startfluxbox/xfce4-session/g" /etc/systemd/system/de-start.service; 
 
 # HEADLESS 不使用定制项，官方原滋味
 ADD --chown=headless:headless src/.mint-artwork-xfce /home/headless
