@@ -45,7 +45,28 @@ elm)
     img="docker-headless:elm"
     docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile.elm . 
     docker push $repo/$ns/$img
-    ;;   
+    ;;
+all)
+    sh img_build.sh
+    sh img_build.sh cinna
+    sh img_build.sh cmate
+    sh img_build.sh cxfce
+    # 
+    sh img_build.sh gnome
+    sh img_build.sh plas
+    ;;    
+hub)
+    repoHub=docker.io
+    echo "${DOCKER_REGISTRY_PW_dockerhub}" |docker login --username=${DOCKER_REGISTRY_USER_dockerhub} --password-stdin $repoHub
+    # SLIM
+    img="docker-headless:flux"; docker tag $repo/$ns/$img $ns/$img; docker push $ns/$img
+    img="docker-headless:cinna"; docker tag $repo/$ns/$img $ns/$img; docker push $ns/$img
+    img="docker-headless:cmate"; docker tag $repo/$ns/$img $ns/$img; docker push $ns/$img
+    img="docker-headless:cxfce"; docker tag $repo/$ns/$img $ns/$img; docker push $ns/$img
+    # 
+    img="docker-headless:gnome"; docker tag $repo/$ns/$img $ns/$img; docker push $ns/$img
+    img="docker-headless:plas"; docker tag $repo/$ns/$img $ns/$img; docker push $ns/$img
+    ;;    
 *)
     img="docker-headless:flux"
     docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile.flux . 
