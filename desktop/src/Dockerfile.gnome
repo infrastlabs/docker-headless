@@ -3,8 +3,12 @@ FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3
 # ubuntu-desktop 128 MB
 RUN apt.sh ubuntu-desktop; \
   apt -y remove gdm3  gvfs*
-RUN \
-  sed -i "s/startfluxbox/gnome-session/g" /etc/systemd/system/de-start.service;
+
+# TODO: 当前为默认iconTheme
+# +nautilus: 950 kB 
+RUN apt.sh nautilus; \
+  sed -i "s/startfluxbox/gnome-session/g" /etc/systemd/system/de-start.service; \
+  wget -qO /usr/share/backgrounds/warty-final-ubuntu.png https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png;
 
 # HEADLESS
 
