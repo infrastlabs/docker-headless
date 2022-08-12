@@ -5,7 +5,10 @@ FROM scratch as files1
   COPY --from=Xvnc /rootfs /rootfs/
 
 FROM ubuntu:20.04 as files2
-  RUN apt update && apt -y install curl
+  RUN export DOMAIN="mirrors.ustc.edu.cn"; \
+  echo "deb http://${DOMAIN}/ubuntu focal main restricted universe multiverse" > /etc/apt/sources.list \
+  && echo "deb http://${DOMAIN}/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
+  apt update && apt -y install curl
   # webhookd, noVNC
   RUN cd /tmp; file=webhookd.tar.gz; curl -fSL -k -O https://gitee.com/infrastlabs/fk-webhookd/attach_files/1135812/download/$file; \
     hookd=/rootfs/usr/local/webhookd; mkdir -p $hookd; tar -zxvf $file -C $hookd; rm -f $file; \
