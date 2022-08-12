@@ -1,0 +1,44 @@
+version: '2.4'
+services:
+  deb9:
+    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:full
+    restart: unless-stopped
+    shm_size: 1g
+    ports:
+      - "11081:10081"
+      - "11089:10089"
+      - "11022:10022"
+    environment:
+      - SSH_PASS=headless
+      - VNC_PASS=headless
+      - VNC_PASS_RO=View123
+      - TZ=Asia/Shanghai
+      - L=zh_CN
+    volumes: 
+      - /_ext:/_ext
+      - /:/mnt      
+
+  mint:
+    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:mint-v6
+    restart: unless-stopped
+    shm_size: 1g
+    privileged: true #plasma
+    ports:
+      - "12081:10081"
+      - "12089:10089"
+      - "12022:10022"
+    volumes: 
+      - /_ext:/_ext
+      - /:/mnt  
+
+  flux:
+    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:mint-v6-slim
+    restart: unless-stopped
+    shm_size: 1g
+    ports:
+      - "13081:10081"
+      - "13089:10089"
+      - "13022:10022"
+    volumes: 
+      - /_ext:/_ext
+      - /:/mnt  

@@ -1,4 +1,4 @@
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3-slim
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v4-slim
 
 RUN \  
   # VIDEO: 30.5 MB
@@ -16,16 +16,7 @@ RUN \
   # \12.6 MB
   git;
 
-# APPS+ #clipit> diodon
-RUN \
-  apt.sh tint2 plank rofi \
-  diodon pnmixer lxappearance
-
-# 2868 kB ##img:78.095 MB
-# 配置UI: +fcitx-config-gtk; #有trayIcon,但是gedit,termital都无法录中文。。; rime重配置有错误提示；fcitx有阶段频繁重启现象(libxss1)
-# RUN echo 123; apt update; apt -y install fcitx-bin fcitx-table fcitx-config-gtk \
-#   fcitx fcitx-frontend-gtk2 fcitx-frontend-gtk3 fcitx-frontend-qt5 fcitx-module-x11 im-config
-#   --fcitx-pinyin
+# 2868 kB #fcitx ##img:78.095 MB
 RUN apt.sh fcitx fcitx-bin fcitx-config-common fcitx-config-gtk fcitx-data \
   fcitx-frontend-all fcitx-frontend-gtk2 fcitx-frontend-gtk3 \
   fcitx-frontend-qt5 fcitx-module-dbus fcitx-module-kimpanel fcitx-module-lua \
@@ -36,68 +27,55 @@ RUN apt.sh fcitx fcitx-bin fcitx-config-common fcitx-config-gtk fcitx-data \
 RUN apt.sh lsb-release libxss1 im-config \
   libqt5qml5 libqt5quick5 libqt5quickwidgets5 qml-module-qtquick2 libgsettings-qt1
 
-# 2536 kB
-# REF: docker-gui > ubt2004-mint-cinna
-# http://packages.linuxmint.com/ # https://mirrors.tuna.tsinghua.edu.cn/linuxmint
-RUN \
-  echo "deb https://mirrors.tuna.tsinghua.edu.cn/linuxmint una main upstream import backport">> /etc/apt/sources.list; \
-  LINUX_MINT_KEY=$(apt update 2>&1 | grep -o '[0-9A-Z]\{16\}$' | xargs) && \
-  echo "LINUX_MINT_KEY: $LINUX_MINT_KEY"; \
-  apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 ${LINUX_MINT_KEY}; \
-  apt clean && rm -rf /var/lib/apt/lists/*;
 
+# APPS+ #+clipit/-diodon
+# #add-apt-repository: software-properties-common
+RUN \
+  apt.sh tint2 plank rofi \
+  clipit pnmixer lxappearance
+
+# 2536 kB
+# # REF: docker-gui > ubt2004-mint-cinna
+# # http://packages.linuxmint.com/ # https://mirrors.tuna.tsinghua.edu.cn/linuxmint
+# RUN \
+#   echo "deb https://mirrors.tuna.tsinghua.edu.cn/linuxmint una main upstream import backport">> /etc/apt/sources.list; \
+#   LINUX_MINT_KEY=$(apt update 2>&1 | grep -o '[0-9A-Z]\{16\}$' | xargs) && \
+#   echo "LINUX_MINT_KEY: $LINUX_MINT_KEY"; \
+#   apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 ${LINUX_MINT_KEY}; \
+#   apt clean && rm -rf /var/lib/apt/lists/*;
 # 18.9 MB > 14.3 MB
 # LOC_XFCE="xfce4-settings xfce4-session xfwm4 xfdesktop4" # deps: cpp cpp-9
 RUN apt.sh xfce4-settings xfce4-session xfwm4 xfdesktop4 \
   xfce4-notifyd thunar
 
-# 70.5 MB --
-# mint-x-icons # clean: /usr/share
-RUN apt.sh mint-y-icons mint-themes; \
-# RUN \
-  # cd /usr/share/xfce4/backdrops; rm -f `ls |grep -v "linuxmint.jpg"`; \
-  # cd /usr/share/backgrounds; rm -rf linuxmint*; rm -f xfce/{xfce-strips,xfce-verticals}.png; \
-  cd /usr/share/icons && rm -rf `ls |grep "Mint-X\|Humanity\|Ubuntu-Mono\|LoginIcons"`; \
-  cd /usr/share/themes && rm -rf `ls |grep -v "Mint-Y"`; \
-  cd /usr/share/locales && rm -rf `ls |grep -v "locale.alias\|zh\|en"`; \
-  cd /usr/share/i18n/locales && rm -rf `ls |grep -v "locale.alias\|zh\|en"`; \
-  # 80M > 42M
-  cd /usr/share/icons/Mint-Y/apps && rm -rf 256* 96*; 
-  # cd /usr/share/applications; rm -rf `ls |grep "kde"`;     
+# papirus-icon-theme
+RUN apt.sh papirus-icon-theme greybird-gtk-theme; \
+  rm -f /usr/share/backgrounds/greybird.svg; \
+  \
+  wget https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
+  dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb; \
+  dpkg -l |grep bunsen && exit 0 || exit 1;  
+  # \
+  # sed -i "s^value=\"gnome\"^value=\"Papirus-Bunsen-grey\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml;
 
-# fcitx
-# ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi
-# RUN apt -y remove ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi; 
-
-# deps: fcitx 4.x
+# deps: fcitx 4.x: init when start; TODO fcitx-rime
 ADD sogoupinyin_4.0.1.2800_x86_64.deb /.bundle/
-# 125.002 MB ##TODO init when start
 # RUN dpkg -i /tmp/sogoupinyin_4.0.1.2800_x86_64.deb
-# RUN apt.sh fcitx-rime
-
-
-
-# img: 11.338 MB #software-properties-common ##add-apt-repository ppa:docky-core/ppa
-# RUN apt.sh software-properties-common
-
-# xconf.sh: ibus env
-RUN sed -i "s/ibus/fcitx/g" /etc/profile; 
-  # echo "export INPUT_METHOD=fcitx" >> /etc/profile;\
-  # echo "export SDL_IM_MODULE=fcitx" >> /etc/profile;\
-  # echo "export GLFW_IM_MODULE=ibus" >> /etc/profile;
 
 # HEADLESS
 # .mint-art 调整过的
 ADD --chown=headless:headless src/xf /home/headless
 ADD --chown=headless:headless src/.mint-artwork-xfce /home/headless
-Add src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
-# replace: de@sv.conf
+ADD src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
 ADD src/sv.conf /etc/supervisor/conf.d/xrdp.conf
 
-# TODO #-libopus0: /usr/local/xrdp/sbin/xrdp-chansrv
 RUN cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*; \
-  # replace bg with: xfce-blue.jpg
-  # cat /usr/share/backgrounds/xfce/xfce-blue.jpg > /usr/share/backgrounds/xfce/xfce-teal.jpg; 
-  wget -qO /usr/share/backgrounds/xfce/xfce-teal.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png;
-
+  \
+  # from ubt-v4-slim
+  strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5; \
+  sed -i "s/ibus/fcitx/g" /etc/profile; \
+  wget -qO /usr/share/backgrounds/xfce/xfce-teal.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png; \
+  \
+  sed -i "s^value=\"Mint-Y\"^value=\"Papirus-Bunsen-grey\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml; \
+  sed -i "s^OSH_THEME=\"font\"^OSH_THEME=\"axin\"^g" /home/headless/.bashrc; 
 CMD ["bash", "-c", "dpkg -i /.bundle/sogoupinyin_4.0.1.2800_x86_64.deb; /entry.sh"]

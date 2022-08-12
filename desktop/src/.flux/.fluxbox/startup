@@ -23,9 +23,10 @@
 # thunar --daemon &
 dunst &
 # http://t.zoukankan.com/huapox-p-3516155.html
-# xcompmgr -Ss -n -Cc -fF -I-10 -O-10 -D1 -t-3 -l-4 -r4 &
+xcompmgr -Ss -n -Cc -fF -I-10 -O-10 -D1 -t-3 -l-4 -r4 &
 # xcompmgr &
-plank &
+# compton --config ~/.compton.conf&
+#plank &
 sleep 2 && sakura & #stterm #directRun: topPosition HideBar
 
 # Change your keymap:
@@ -43,7 +44,6 @@ sleep 2 && sakura & #stterm #directRun: topPosition HideBar
 # # xfce4-power-manager&
 # setxkbmap se&
 # # xfce4-volumed-pulse&
-compton --config ~/.compton.conf&
 # # nitrogen --restore&
 # dropboxd&
 # volumeicon&
@@ -59,7 +59,7 @@ fi
 # +feh
 # feh --no-fehbg --bg-scale ~/.fluxbox/res/wallpapers_slax_wallpaper.jpg 
 # (sleep 0.1; ibus-daemon -drx) &
-ibus-daemon -drx #backend
+#ibus-daemon -drx #backend
 
 # And last but not least we start fluxbox.
 # Because it is the last app you have to run it with ''exec'' before it.

@@ -19,7 +19,7 @@
 	#[exec]   (♠ stTerm) {stterm} 
 	#[exec]   (♠ Run) {fbrun}
 	[exec] (● Sakura) {sakura}
-	[exec] (● Thunar) {thunar}
+	#[exec] (● Thunar) {thunar}
 	[exec] (● Geany) {geany}
 	[exec]   (♠ Ristretto) {ristretto} 
 	[exec]   (♠ Asbru-cm) {asbru-cm} 
@@ -66,7 +66,7 @@
 		[exit] (○ Exit)
 	[end]
 	# ●http://www.fhdq.net/
-	[exec] (● Lxappearance) {lxappearance}
+	#[exec] (● Lxappearance) {lxappearance}
 	[exec] (♫ Pavucontrol) {pavucontrol}
 	[exec] (♫ Qmmp) {qmmp}
 	[exec] (♣ Google Chrome) {google-chrome-stable}
