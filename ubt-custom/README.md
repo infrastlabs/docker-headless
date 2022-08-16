@@ -1,10 +1,10 @@
 # mint
 
-从../ubuntu[ubt-v4-slim]继承的定制版，基于mint源安装xfce4.16, 皮肤效果对标deb9，试用项：Fcitx.sogou输入法
+从../ubuntu[core-v4-slim]继承的定制版，基于mint源安装xfce4.16, 皮肤效果对标deb9，试用项：Fcitx.sogou输入法
 
 - 从deb9演进(debian9 > ubuntu2004), mint主题+xfce4.16+tint2+plank
-- 复用基础镜像 `FROM docker-headless:ubt-v2`
-- mint,flux二合一： 考虑多用户，可选桌面..
+- 复用基础镜像 `FROM docker-headless:core-v4-slim`
+- ~~mint,flux二合一： 考虑多用户，可选桌面..~~
 
 ```bash
 # 10022, 10089, 10081
@@ -59,11 +59,12 @@ pulseaudio 13.99.1
 
 ## 问题记录
 
+- ~~pnmixerIcon无显示（出现过一次带themeIcon的，deb9下为原生图标）配置项非系统图标> 再系统图标可显示(papirus)~~
+- ~~设置默认bunsen-papirus图标/greybird主题/greybird-compact窗体~~（4.16部分不能按compact效果显示，thunar还可以; > ubt20装xfce414）
+- ~~sogou: ctrl+space切换，默认非五笔模式~~.
+- 
 - rdp长时会断开
 - pulse写入满buf后，pavucontrol连不上(191_cent7_多开才有? home_pve5.2下正常)
-- ~~pnmixerIcon无显示（出现过一次带themeIcon的，deb9下为原生图标）~~ 配置项非系统图标> 再系统图标可显示(papirus)
-- ~~设置默认bunsen-papirus图标/greybird主题/greybird-compact窗体~~（4.16部分不能按compact效果显示，thunar还可以; > ubt20装xfce414）
-- sogou: ctrl+space切换，默认非五笔模式.
 
 ```bash
 # xfdesk/thunar@gemmi-deb11卡死
@@ -71,7 +72,7 @@ pulseaudio 13.99.1
 kill -9 `ps -ef |grep xfdesk |grep -v grep  |awk '{print }'` && xfdesktop
 
 #xrdp:0.9.5 > 0.9.16 > 0.9.19(导致xfdesk/thunar@gemmi-deb11卡死)
-docker  run -v $(pwd)/xrdp:/usr/local/xrdp02 -it --rm --net=host -e VNC_OFFSET=10 -e PORT_RDP=10099 -v $(pwd)/sv2.conf:/etc/supervisor/conf.d/xrdp.conf registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:mint-v31
+docker  run -v $(pwd)/xrdp:/usr/local/xrdp02 -it --rm --net=host -e VNC_OFFSET=10 -e PORT_RDP=10099 -v $(pwd)/sv2.conf:/etc/supervisor/conf.d/sv.conf registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:mint-v31
 
 
 # audio

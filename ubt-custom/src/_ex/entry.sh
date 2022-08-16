@@ -46,14 +46,14 @@ function setXserver(){
 
     # setPorts; sed port=.* || env_ctReset
     sed -i "s^port=3389^port=${PORT_RDP}^g" /etc/xrdp/xrdp.ini
-    sed -i "s/EFRp 22/EFRp ${PORT_SSH}/g" /etc/supervisor/conf.d/xrdp.conf #sv.conf
+    sed -i "s/EFRp 22/EFRp ${PORT_SSH}/g" /etc/supervisor/conf.d/sv.conf #sv.conf
     # sesman
     # SES_PORT=$(echo "${PORT_RDP%??}50") #ref PORT_RDP, replace last 2 char
     SES_PORT=$(($PORT_RDP + 100))
     sed -i "s/ListenPort=3350/ListenPort=${SES_PORT}/g" /etc/xrdp/sesman.ini
     # xvnc0-de
     port0=$(expr 0 + $VNC_OFFSET)
-    sed -i "s/_DISPLAY_/$port0/" /etc/supervisor/conf.d/xrdp.conf
+    sed -i "s/_DISPLAY_/$port0/" /etc/supervisor/conf.d/sv.conf
     oneVnc "$port0" "headless" #sv
 
     # SSH_PASS VNC_PASS VNC_PASS_RO
