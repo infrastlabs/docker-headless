@@ -1,20 +1,19 @@
-# Docker云桌面（docker-healess）
+# Docker云桌面（docker-headless）
 
-[![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/slim)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)
 [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/latest)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)
-[![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/full)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)
 [![Docker Pulls](https://img.shields.io/docker/pulls/infrastlabs/docker-headless.svg)](https://hub.docker.com/r/infrastlabs/docker-headless)
 [![Last commit](https://img.shields.io/github/last-commit/infrastlabs/docker-headless.svg)](https://www.github.com/infrastlabs/docker-headless)
 [![GitHub issues](https://img.shields.io/github/issues/infrastlabs/docker-headless.svg)](https://www.github.com/infrastlabs/docker-headless/issues)
 
-开源Docker的远程开发/办公运维的桌面环境 (Debian+XRDP/NOVNC+XFCE4)
+Multi-Desktop with `XRDP/NOVNC/PulseAudio` based on `Ubuntu20.04`, Formatting a HeadlessBox/Cloud Desktop.
 
-- 支持双屏显示，远程声音
-- SSH连接,RDP远程,WEB浏览器访问(novnc)
-- 多语言本土化，中文输入法(五笔/拼音)
-- 桌面：Xfce4, Mate, Fluxbox, ..（默认: xfce4）
-- 发行版：Debian9/10/11, Ubuntu1804/2004, .. （默认: debian9）
-- 精简小巧 `丐版: 95M(无音频面板)`, `豪华版: 167M(latest默认,无本土化)`, `旗舰版: 287M`
+- Screen shared with both RDP/noVnc. (ReadWrite/ReadOnly)
+- MultiScreen support. (mstsc+xrdp+tigervnc)
+- Audio support. (xrdp+pulseaudio/noVNC+broadcast)
+- Locale/TZ support. 中文输入法(五笔/拼音)
+- Desktop apps: ibus-rime/fcitx-sogou, flameshot, PAC.
+- 精简小巧 `core: 170.53 MB(fluxbox)`, `latest: 277.48 MB(ibus,xfce4.14)`, `sogou: 354.15 MB(fcitx)`
+
 
 ## 快速开始
 
@@ -26,12 +25,46 @@ noVnc | http://192.168.0.x:10081 | `headless` | `View123`
 RDP   | 192.168.0.x:10089        | `headless` | - 
 SSH   | ssh -p 10022 headless@192.168.0.x | `headless` | - 
 
+**镜像清单**
+
+ TAG | 发行版 | 桌面 | 输入法 | 启动器 | 镜像 |推荐|说明 
+--- | --- | ---  | ---  | --- | --- | --- | ---
+latest |Ubuntu| xfce | ibus  | supervisor | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/latest)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|定制,体积小
+sogou  |Ubuntu| xfce | fcitx | supervisor | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/sogou)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|搜狗输入法
+core   |Ubuntu| flux | ibus  | supervisor | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/core)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★☆|配置层,调试用
+---|---|---|---|---|---|---
+gnome   |Ubuntu| gnome | ibus  | systemd | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/gnome)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|兼容性好
+plas   |Kubuntu| plasma | ibus  | systemd | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/plas)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★☆|设置左侧黑块
+cinna   |Mint| cinnamon | ibus  | systemd | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/cinna)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★☆|显卡驱动提示
+cmate   |Mint| mate | ibus  | systemd | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/cmate)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|体验良好
+cxfce   |Mint| xfce | ibus  | systemd | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/cxfce)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|新版xfce
+
+```bash
+# supvervisor
+docker  run -it --rm -p 10081:10081 -p 10089:10089 \
+  infrastlabs/docker-headless:sogou
+
+# systemd启动
+docker  run -it --rm -p 10081:10081 -p 10089:10089 \
+  --tmpfs /run --tmpfs /run/lock --tmpfs /tmp \
+  --cap-add SYS_BOOT --cap-add SYS_ADMIN \
+  -v /sys/fs/cgroup:/sys/fs/cgroup \
+  infrastlabs/docker-headless:gnome
+```
+
+**小孩才选择，你全要？**
+
+- 定制版[docker-compose.yml](./ubt-custom/docker-compose.yml) latest,sogou,core 三组
+- 多桌面[docker-compose.yml](./ubt-desktop/docker-compose.yml) gnome,plas,cinna,cmate,cxfce 五组
+
+![](https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/mannual/res/01rdp-double-screen.png)
+
 **(0)源码目录**
 
-- [deb9: 基于Debian的版本(xfce定制:体积小,稳定)](./deb9/)
-- [mint: 基于Ubuntu的新版(xfce定制:Xfce4.16, 套用Mint皮肤)](./mint/)
-- [ubuntu: Ubuntu基础版(极简:含核心远程组件，内置fluxbox)](./ubuntu/)
-- [desktop: Ubuntu多桌面(通用:Gnome,Plasma,Cinnamon,Mate,Xfce4))](./desktop/)
+- [deb9: 基于Debian9的版本 (xfce定制:体积小,稳定)](./deb9/)
+- [ubt-core: Ubuntu基础版 (极简:含核心远程组件，内置fluxbox)](./ubt-core/)
+- [ubt-custom: 新版Ubuntu20.04 (xfce定制:Xfce4.14, 对标deb9, 搜狗输入法)](./ubt-custom/)
+- [ubt-desktop: 多桌面 (通用:Gnome,Plasma,Cinnamon,Mate,Xfce4)](./ubt-desktop/)
 
 **(1)密码修改**: 生产禁用默认密码，初始后请修改!!
 
@@ -53,8 +86,6 @@ echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /
 - [6.如何使用Ubuntu, Mate，KDE等其它桌面](./_doc/mannual/b6-desktop.md) (多桌面,网关模式)
 - [Detail明细说明](./detail.md) （快捷键、环境变量、系统应用）
 
-
-![](https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/mannual/res/01rdp-double-screen.png)
 
 **(3)生产部署指引**: 
 
@@ -81,7 +112,8 @@ wget https://npm.taobao.org/mirrors/node/v14.20.0/node-v14.20.0-linux-x64.tar.xz
 xz -d node-v14.20.0-linux-x64.tar.xz #tar.xz消失
 tar -xvf node-v14.20.0-linux-x64.tar
 
-cat >> /etc/profile <<EOF
+# cat >> /etc/profile <<EOF
+cat <<EOF |sudo tee -a /etc/profile
 # NODE
 NODE_HOME=/_ext/down/node-v14.20.0-linux-x64
 PATH=\$NODE_HOME/bin:\$PATH
@@ -99,7 +131,8 @@ EOF
 # wget https://vscode.cdn.azure.cn/stable/91899dcef7b8110878ea59626991a18c8a6a1b3e/code_1.47.3-1595520028_amd64.deb
 # wget https://vscode.cdn.azure.cn/stable/c3f126316369cd610563c75b1b1725e0679adfb3/code_1.58.2-1626302803_amd64.deb
 wget https://vscode.cdn.azure.cn/stable/6cba118ac49a1b88332f312a8f67186f7f3c1643/code_1.61.2-1634656828_amd64.deb
-wget https://download.jetbrains.8686c.com/idea/ideaIC-2016.3.8-no-jdk.tar.gz
+#wget https://download.jetbrains.8686c.com/idea/ideaIC-2016.3.8-no-jdk.tar.gz
+wget https://download.jetbrains.com.cn/idea/ideaIC-2016.3.8-no-jdk.tar.gz
 ```
 
 ![](_doc/mannual/res/02/ide2-vscode.png)
@@ -111,6 +144,8 @@ wps, chrome/firefox
 ```bash
 # 火狐/谷歌浏览器
 sudo apt -y install firefox-esr chromium #chromium-driver
+# 网易云音乐
+wget https://d1.music.126.net/dmusic/netease-cloud-music_1.2.1_amd64_ubuntu_20190428.deb
 # WPS三件套
 # https://blog.csdn.net/u012939880/article/details/89439647 #wps_symbol_fonts.zip
 wget https://wdl1.cache.wps.cn/wps/download/ep/Linux2019/10161/wps-office_11.1.0.10161_amd64.deb

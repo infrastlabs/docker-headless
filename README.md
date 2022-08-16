@@ -1,19 +1,18 @@
-# docker-healess
+# docker-headless
 
-[![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/slim)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)
 [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/latest)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)
-[![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/full)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)
 [![Docker Pulls](https://img.shields.io/docker/pulls/infrastlabs/docker-headless.svg)](https://hub.docker.com/r/infrastlabs/docker-headless)
 [![Last commit](https://img.shields.io/github/last-commit/infrastlabs/docker-headless.svg)](https://www.github.com/infrastlabs/docker-headless)
 [![GitHub issues](https://img.shields.io/github/issues/infrastlabs/docker-headless.svg)](https://www.github.com/infrastlabs/docker-headless/issues)
 
-By `XRDP/NOVNC` with `XFCE4` based on `Debian`, Formatting a HeadlessBox/Cloud Desktop.
+Multi-Desktop with `XRDP/NOVNC/PulseAudio` based on `Ubuntu20.04`, Formatting a HeadlessBox/Cloud Desktop.
 
 - Screen shared with both RDP/noVnc. (ReadWrite/ReadOnly)
 - MultiScreen support. (mstsc+xrdp+tigervnc)
-- Audio support. (xrdp+pulseaudio)
+- Audio support. (xrdp+pulseaudio/noVNC+broadcast)
 - Locale/TZ support.
-- Desktop apps: ibus-rime, flameshot, PAC.
+- Desktop apps: ibus-rime/fcitx-sogou, flameshot, PAC.
+- Slim image: `core: 170.53 MB(fluxbox)`, `latest: 277.48 MB(ibus,xfce4.14)`, `sogou: 354.15 MB(fcitx)`
 
 ## QuickStart
 
@@ -25,6 +24,33 @@ noVnc | https://192.168.0.x:10081 | `headless` | `View123`
 Audio | http://192.168.0.x:10082  |     -      | - 
 RDP   | 192.168.0.x:10089         | `headless` | - 
 SSH   | ssh -p 10022 headless@192.168.0.x | `headless` | - 
+
+**Tags**
+
+ TAG | Distro | DESK | INPUT | STARTER | IMAGE |Star|Descrition 
+--- | --- | ---  | ---  | --- | --- | --- | ---
+latest |Ubuntu| xfce | ibus  | supervisor | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/latest)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|Customize,Lightweight
+sogou  |Ubuntu| xfce | fcitx | supervisor | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/sogou)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|sogouInput
+core   |Ubuntu| flux | ibus  | supervisor | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/core)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★☆|ConfigureLayer,Debug
+---|---|---|---|---|---|---
+gnome   |Ubuntu| gnome | ibus  | systemd | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/gnome)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|Best Compatible
+plas   |Kubuntu| plasma | ibus  | systemd | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/plas)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★☆|Black area with Settings
+cinna   |Mint| cinnamon | ibus  | systemd | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/cinna)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★☆|VideoCard Notify
+cmate   |Mint| mate | ibus  | systemd | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/cmate)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|GoodExperience
+cxfce   |Mint| xfce | ibus  | systemd | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/cxfce)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|Xfce 4.16
+
+```bash
+# supvervisor
+docker  run -it --rm -p 10081:10081 -p 10089:10089 \
+  infrastlabs/docker-headless:sogou
+
+# systemd启动
+docker  run -it --rm -p 10081:10081 -p 10089:10089 \
+  --tmpfs /run --tmpfs /run/lock --tmpfs /tmp \
+  --cap-add SYS_BOOT --cap-add SYS_ADMIN \
+  -v /sys/fs/cgroup:/sys/fs/cgroup \
+  infrastlabs/docker-headless:gnome
+```
 
 **(1)resetPass**: non-production usage with default password!!
 
@@ -63,32 +89,33 @@ Quick start with Locale: `docker run -it --rm --shm-size 1g -e VNC_OFFSET=20 -e 
 # JAVA
 sudo apt -y install openjdk-8-jdk openjdk-8-source && sudo apt -y install maven 
 # GO
-wget https://studygolang.com/dl/golang/go1.13.15.linux-amd64.tar.gz
-tar -zxf go1.13.15.linux-amd64.tar.gz; mv go go1.13.15.linux-amd64
+goVer=go1.17.8 #go1.16.15 #go1.13.15
+wget https://studygolang.com/dl/golang/$goVer.linux-amd64.tar.gz
+tar -zxf $goVer.linux-amd64.tar.gz; mv go $goVer.linux-amd64
+rm -f godev; ln -s $goVer.linux-amd64 godev #link godev
 # NODE
-wget https://npm.taobao.org/mirrors/node/v14.13.1/node-v14.13.1-linux-x64.tar.xz
-xz -d node-v14.13.1-linux-x64.tar.xz #tar.xz消失
-tar -xvf node-v14.13.1-linux-x64.tar
+wget https://npm.taobao.org/mirrors/node/v14.20.0/node-v14.20.0-linux-x64.tar.xz
+xz -d node-v14.20.0-linux-x64.tar.xz #tar.xz消失
+tar -xvf node-v14.20.0-linux-x64.tar
 
-cat >> /etc/profile <<EOF
+# cat >> /etc/profile <<EOF
+cat <<EOF |sudo tee -a /etc/profile
 # NODE
-NODE_HOME=/_ext/down/node-v14.13.1-linux-x64
-PATH=\$PATH:\$NODE_HOME/bin
+NODE_HOME=/_ext/down/node-v14.20.0-linux-x64
+PATH=\$NODE_HOME/bin:\$PATH
 export NODE_HOME PATH
 # GO
-GO_HOME=/_ext/down/go1.13.15.linux-amd64
+GO_HOME=/_ext/down/godev
 GOPATH=/_ext/gopath
-PATH=\$PATH:\$GO_HOME/bin:\$GOPATH/bin
+PATH=\$GO_HOME/bin:\$GOPATH/bin:\$PATH
 export GO_HOME GOPATH PATH
 export GO111MODULE=on
 export GOPROXY=https://goproxy.cn
 EOF
 
 #IDE: vscode, ideaIC
-# wget https://vscode.cdn.azure.cn/stable/91899dcef7b8110878ea59626991a18c8a6a1b3e/code_1.47.3-1595520028_amd64.deb
-# wget https://vscode.cdn.azure.cn/stable/c3f126316369cd610563c75b1b1725e0679adfb3/code_1.58.2-1626302803_amd64.deb
 wget https://vscode.cdn.azure.cn/stable/6cba118ac49a1b88332f312a8f67186f7f3c1643/code_1.61.2-1634656828_amd64.deb
-wget https://download.jetbrains.8686c.com/idea/ideaIC-2016.3.8-no-jdk.tar.gz
+wget https://download.jetbrains.com.cn/idea/ideaIC-2016.3.8-no-jdk.tar.gz
 ```
 
 ![](_doc/mannual/res/02/ide2-vscode.png)
