@@ -161,8 +161,7 @@ ENV \
   # VNC_INIT="21|gnome,22|plama,23|mate,24|cinna,25|xfce,26|flux" \
 
 
-# CMD ["/entry.sh"]
-CMD ["bash", "-c", "setsysenv; exec /lib/systemd/systemd"]
+CMD ["/entry.sh"]
 WORKDIR /home/headless
 EXPOSE 10089/tcp 10081/tcp 10022/tcp
 VOLUME [ "/sys/fs/cgroup" ]
