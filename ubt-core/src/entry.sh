@@ -52,6 +52,18 @@ stdout_logfile_backups  = 10
 redirect_stderr=true
 
     """ > /etc/supervisor/conf.d/xvnc$N.conf
+    echo """
+[program:$xn-de]
+#,LANG=zh_CN.UTF-8,LANGUAGE=zh_CN:en #cur: 不加没中文
+environment=DISPLAY=:$N,HOME=/home/headless,USER=headless,SHELL=/bin/bash,TERM=xterm,LANG=zh_CN.UTF-8,LANGUAGE=zh_CN:en
+priority=45
+user=headless
+command=bash -c \"env |grep -v PASS; source /.env; exec startfluxbox\"
+stdout_logfile=/var/log/supervisor/$xn-de.log
+stdout_logfile_maxbytes = 50MB
+stdout_logfile_backups  = 10
+redirect_stderr=true    
+    """ > /etc/supervisor/conf.d/x$N-de.conf
 }
 # oneVnc "$id" "$name"
 function setXserver(){
@@ -67,9 +79,15 @@ function setXserver(){
     SES_PORT=$(($PORT_RDP + 100))
     sed -i "s/ListenPort=3350/ListenPort=${SES_PORT}/g" /etc/xrdp/sesman.ini
     # xvnc0-de
-    port0=$(expr 0 + $VNC_OFFSET)
-    sed -i "s/_DISPLAY_/$port0/" /etc/supervisor/conf.d/sv.conf
+    port0=$(expr 0 + $VNC_OFFSET) #vnc: 5900+10
+    # sed -i "s/_DISPLAY_/$port0/" /etc/supervisor/conf.d/sv.conf
     oneVnc "$port0" "headless" #sv
+
+    # clearPass: if not default
+    if [ "headless" != "$VNC_PASS" ]; then
+        sed -i "s/password=askheadless/password=ask/g" /etc/xrdp/xrdp.ini
+        sed -i "s/value=\"headless\"/value=\"\"/g" /usr/local/webhookd/static/index.html
+    fi
 
     # SSH_PASS VNC_PASS VNC_PASS_RO
     lock=/.initpw.lock
@@ -119,6 +137,20 @@ env | grep -Ev '^(.*PASS.*|PWD|OLDPWD|HOME|USER|SHELL|TERM|([^=]*(PASSWORD|SECRE
 # CONF
 test -f /home/headless/.ICEauthority && chmod 644 /home/headless/.ICEauthority #mate err
 
+# setsysenv #/usr/bin/setsysenv: /.env
+: > /.env
+env |grep -v '_PASS$\|^SHELL\|^HOSTNAME\|^HOME\|^PWD\|^SHLVL\|^TERM\|^PATH\|^DEBIAN_FRONTEND' |while read one; 
+do 
+    sudo echo export $one >> /.env; 
+done
+
+# startCMD
+test -z "$START_SESSION" || sed -i "s/startfluxbox/$START_SESSION/g" /etc/systemd/system/de-start.service
+test -z "$START_SESSION" || sed -i "s/startfluxbox/$START_SESSION/g" /etc/supervisor/conf.d/x$VNC_OFFSET-de.conf
+
 cnt=0.1
 echo "sleep $cnt" && sleep $cnt;
-exec supervisord -n
+test -z "$START_SYSTEMD" || rm -f /etc/supervisor/conf.d/x$VNC_OFFSET-de.conf
+test -z "$START_SYSTEMD" && exec supervisord -n || exec /lib/systemd/systemd
+
+# test up
