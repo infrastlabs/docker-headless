@@ -4,7 +4,6 @@ Description=x11 server
 [Service]
 Type=simple
 User=root
-ExecStart=/bin/bash -c "source /.env; exec bash /entry.sh"
- 
+ExecStart=/bin/bash -c "source /.env; exec supervisord -n"
 [Install]
 WantedBy=multi-user.target
