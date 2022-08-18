@@ -39,7 +39,7 @@ tiger)
     ;;       
 *)
     repo=registry-1.docker.io
-    img="docker-headless:ubt-$ver-arm"
+    img="docker-headless:core-$ver-arm"
     # --cache-from $repo/$ns/$img 
     plat="--platform linux/amd64,linux/arm64"
     # docker build $cache $pull -t $repo/$ns/$img --build-arg FULL=/.. -f src/arm.Dockerfile . 
