@@ -14,14 +14,17 @@
 # - To prevent any other app from overwriting your menu
 #   you can change the menu name in ~/.fluxbox/init to:
 #     session.menuFile: ~/.fluxbox/my-menu
-[begin] (Slackware)
+[begin] (FLUXBOX)
 [encoding] {UTF-8}
-	[exec]   (♠ stTerm) {stterm} 
-	[exec]   (♠ Run) {fbrun}
-	[exec]   (♠ asbru-cm) {asbru-cm} 
-	[exec]   (♠ gnome-monitor) {gnome-system-monitor} 
-	[exec]   (♠ ristretto) {ristretto} 
-	[exec]   (♠ engrampa) {engrampa} 
+	#[exec]   (♠ stTerm) {stterm} 
+	#[exec]   (♠ Run) {fbrun}
+	[exec] (● Sakura) {sakura}
+	#[exec] (● Thunar) {thunar}
+	[exec] (● Geany) {geany}
+	[exec]   (♠ Ristretto) {ristretto} 
+	[exec]   (♠ Asbru-cm) {asbru-cm} 
+	[exec]   (♠ Engrampa) {engrampa} 
+	[exec]   (♠ Gnome-monitor) {gnome-system-monitor} 
 	[separator]
 	[submenu] (Fluxbox menu)
 		[nop] (Custom configs)
@@ -63,12 +66,9 @@
 		[exit] (○ Exit)
 	[end]
 	# ●http://www.fhdq.net/
-	[exec] (● Sakura) {sakura}
-	[exec] (● Thunar) {thunar}
-	[exec] (● Geany) {geany}
-	[exec] (♫ Qmmp) {qmmp}
+	#[exec] (● Lxappearance) {lxappearance}
 	[exec] (♫ Pavucontrol) {pavucontrol}
-	[exec] (● Lxappearance) {lxappearance}
+	[exec] (♫ Qmmp) {qmmp}
 	[exec] (♣ Google Chrome) {google-chrome-stable}
 	[exec] (♣ VPN) {vpnui}
 	# [exec] (⚫ Urxvt) {urxvt -bg "#000000" -fg "#FFFFFF" +sb -fn "xft:Dejavu Sans Mono:pixelsize=12" -uc -bd "#000000" -geometry 60x20 -letsp -1}
