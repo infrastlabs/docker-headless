@@ -1,6 +1,7 @@
 # 2021.5.13 > 22.7.22
-# xrdp-0.9.16 > 0.9.19
+# xrdp-0.9.16 > 0.9.19 (v0.9.16: chansrv_xvnc要求)
 # xorgxrdp-0.2.16 > 0.2.18
+# xrpd> Xvnc (不用xrdpxorg,Xorg); xrdp-chansrv > Xvnc模式: 要求xrdp版本> 0.9.16(deb9为0.9.5, ubt2004为0.9.12, 需编译); 
 FROM ubuntu:20.04 as stage-base
 ENV DEBIAN_FRONTEND noninteractive
 # mirrors.tuna.tsinghua.edu.cn
@@ -8,8 +9,8 @@ ENV DEBIAN_FRONTEND noninteractive
 # mirrors.aliyun.com
 # mirrors.163.com
 RUN export DOMAIN="mirrors.ustc.edu.cn"; \
-  echo "deb http://${DOMAIN}/ubuntu-ports focal main restricted universe multiverse" > /etc/apt/sources.list \
-  && echo "deb http://${DOMAIN}/ubuntu-ports focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
+  echo "deb http://${DOMAIN}/ubuntu focal main restricted universe multiverse" > /etc/apt/sources.list \
+  && echo "deb http://${DOMAIN}/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
   \
   echo 'apt update -qq && apt install -yq --no-install-recommends $@ && apt clean && rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
     && chmod +x /usr/local/bin/apt.sh
@@ -28,7 +29,7 @@ RUN apt.sh \
 WORKDIR /opt
 
 ###xrdp, xorgxrdp###############################################
-FROM stage-base as stage-xrdp-xorgxrdp
+FROM stage-base as stage-xrdp
 RUN apt.sh \
     git autoconf libtool pkg-config gcc g++ make  libssl-dev libpam0g-dev \
     libjpeg-dev libx11-dev libxfixes-dev libxrandr-dev  flex bison libxml2-dev \
@@ -59,13 +60,13 @@ make;\
 make install;
 
 #####git clone; xorgxrdp with xrdp --prefix, testOK;
-# gitee.com/g-system/xorgxrdp
-RUN git clone --branch br-0214 https://gitee.com/g-system/xorgxrdp;\
-cd xorgxrdp;\
-./bootstrap;\
-CPPFLAGS="-I/usr/local/xrdp/include"  LDFLAGS="-L/usr/local/xrdp/lib" ./configure;\
-make;\
-sudo make install;
+# # gitee.com/g-system/xorgxrdp
+# RUN git clone --branch br-0214 https://gitee.com/g-system/xorgxrdp;\
+# cd xorgxrdp;\
+# ./bootstrap;\
+# CPPFLAGS="-I/usr/local/xrdp/include"  LDFLAGS="-L/usr/local/xrdp/lib" ./configure;\
+# make;\
+# sudo make install;
 
 ###pulseaudio-module-xrdp###############################################
 # pulse-xrdp: git-latest
@@ -74,9 +75,9 @@ FROM stage-base as stage-pulsexrdp
 # RUN git submodule update --init --recursive
 
 # deb-src
-RUN domain="mirrors.163.com" \
- && echo "deb-src http://$domain/ubuntu focal main restricted universe multiverse" >> /etc/apt/sources.list \
- && echo "deb-src http://$domain/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list
+RUN export DOMAIN="mirrors.ustc.edu.cn"; \
+ echo "deb-src http://$DOMAIN/ubuntu focal main restricted universe multiverse" >> /etc/apt/sources.list \
+ && echo "deb-src http://$DOMAIN/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list
 RUN apt update && apt install -qy pulseaudio libpulse-dev \
   autoconf m4 intltool build-essential dpkg-dev
 RUN apt update && apt build-dep -q -y pulseaudio && \
@@ -85,7 +86,7 @@ RUN apt update && apt build-dep -q -y pulseaudio && \
   cd /opt/pulseaudio-${pulseaudio} && ./configure
 # RUN pulseaudio=$(pulseaudio --version); echo "pulseaudio: $pulseaudio"
 # hand copy: /opt/pulseaudio-1.11/config.h +src/pulsecore
-RUN cd /opt && git clone https://hub.fastgit.xyz/neutrinolabs/pulseaudio-module-xrdp.git && \
+RUN cd /opt && git clone --branch v0.5 https://hub.fastgit.xyz/neutrinolabs/pulseaudio-module-xrdp.git && \
   cd /opt/pulseaudio-module-xrdp ;\
   pulseaudio=$(pulseaudio --version | awk '{print $2}') && echo "pulseaudio ver: $pulseaudio" && \
   ./bootstrap && ./configure PULSE_DIR="/opt/pulseaudio-${pulseaudio}"; \
@@ -103,12 +104,8 @@ FROM ubuntu:20.04
 WORKDIR /usr/local
 # tigervnc 1.10.1 > 1.12.0 
 # https://udomain.dl.sourceforge.net/project/tigervnc/stable/1.10.1/tigervnc-1.10.1.x86_64.tar.gz
-# COPY > ADD: unpack; pack2: drop tigervnc-1.10.1.x86_64 dir;
-ENV ver=1.12.0
-ADD tigervnc-${ver}.x86_64.tar.gz /tigervnc-pkg
 # xrdp
-COPY --from=stage-xrdp-xorgxrdp /usr/local/xrdp /rootfs/usr/local/xrdp
-COPY --from=stage-xrdp-xorgxrdp /usr/lib/xorg/modules /rootfs/usr/lib/xorg/modules
+COPY --from=stage-xrdp /usr/local/xrdp /rootfs/usr/local/xrdp
+# COPY --from=stage-xrdp /usr/lib/xorg/modules /rootfs/usr/lib/xorg/modules
 COPY --from=stage-pulsexrdp /var/lib/xrdp-pulseaudio-installer /rootfs/var/lib/xrdp-pulseaudio-installer
-
-RUN find /tigervnc-pkg ; find /rootfs
+RUN find /rootfs
