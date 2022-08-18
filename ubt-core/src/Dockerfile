@@ -73,8 +73,9 @@ path-include /usr/share/locale/zh_CN/*" > /etc/dpkg/dpkg.cfg.d/excludes; \
     && chmod +x /usr/local/bin/apt.sh; \
   \
   # adwaita first(clear icons)
-  apt.sh adwaita-icon-theme; \
-  cd /usr/share/icons; rm -rf Humanity* ubuntu-mono* hicolor LoginIcons Tango; \
+  # notes: 影响通用版的系统体验(gnome列表图，小图标..)
+  # apt.sh adwaita-icon-theme; \
+  # cd /usr/share/icons; rm -rf Humanity* ubuntu-mono* hicolor LoginIcons Tango; \
   \
 # MISC 15.1 MB
 # RUN \
@@ -146,7 +147,9 @@ RUN test -z "$FULL" && exit 0 || echo fullInstall;\
   git; \
   # flameshot_qt;
   strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5; \
-  rm -f /usr/lib/x86_64-linux-gnu/libLLVM-12.so.1; 
+  # needed by gnome(or: session跑不起来exit 1)
+  # rm -f /usr/lib/x86_64-linux-gnu/libLLVM-12.so.1; \
+  echo "finished."
 # deb9_xrdp_v0.9.5; ubt20_xrd_v0.9.12; xvnc_xrdp_chansrv(compile): > 0.9.16;
 # RUN apt.sh xrdp;
 
@@ -155,6 +158,7 @@ RUN test -z "$FULL" && exit 0 || echo fullInstall;\
 # apt install binutils
 # strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5
 
+# TODO: 拆分包体与配置项两块，免频繁变动基础包
 # HEADLESS
 COPY --from=files1 /rootfs /
 COPY --from=files2 /rootfs /
