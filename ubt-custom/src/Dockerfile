@@ -5,11 +5,20 @@ FROM ubuntu:20.04 as files1
   ADD src/.mint-artwork-xfce /rootfs_home_headless
   # 
   ADD src/clear3d.theme /rootfs/usr/share/plank/themes/Default/dock.theme
-  ADD src/sv.conf /rootfs/etc/supervisor/conf.d/sv.conf
   RUN find /rootfs* |wc; \
     cd /rootfs_home_headless/Desktop; chmod +x *.desktop
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core-v4-slim
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core-v4 as core
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v4-slim
 RUN \  
+  export DOMAIN="mirrors.aliyun.com"; \
+  echo "deb http://${DOMAIN}/ubuntu focal main restricted universe multiverse" > /etc/apt/sources.list \
+  && echo "deb http://${DOMAIN}/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
+  \
+  # adwaita first(clear icons)
+  # notes: 影响通用版的系统体验(gnome列表图，小图标..) >>在前面layer已装 在最后做清理
+  # apt.sh adwaita-icon-theme; \
+  # cd /usr/share/icons; rm -rf Humanity* ubuntu-mono* hicolor LoginIcons Tango; \
+# RUN \  
   # VIDEO: 30.5 MB
   # libllvm12 已包含 # libgl1-mesa-glx >libgl1-mesa-dri ##ex:  mesa-utils 
   apt.sh libgl1-mesa-glx mesa-utils libglu1-mesa \
@@ -26,7 +35,7 @@ RUN \
   git; \
   # flameshot_qt;
   strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5; \
-  # clear big lib: 88M (qt: flameshot,sogoupinyin) > img: -27M
+  # LLVM(定制版这里删调它,除gnome,cinna其它de无影响); clear big lib: 88M (qt: flameshot,sogoupinyin) > img: -27M
   rm -f /usr/lib/x86_64-linux-gnu/libLLVM-12.so.1; 
 
 # 2868 kB #fcitx ##img:78.095 MB
@@ -62,15 +71,18 @@ RUN apt.sh papirus-icon-theme greybird-gtk-theme; \
   \
   wget https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
   dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb; \
-  cd /usr/share/icons && rm -rf Papirus-Bunsen-Dark-bluegrey Papirus-Bunsen-Dark-grey; \
+  cd /usr/share/icons && rm -rf Papirus-Bunsen-Dark-bluegrey Papirus-Bunsen-Dark-grey Papirus-Dark Papirus-Light ePapirus; \
   \
-  cd /usr/share/icons && rm -rf ubuntu-mono* hicolor locolor gnome Tango bloom \
-    Papirus-Dark Papirus-Light ePapirus; \
   # Papirus left: 16x(clipit:21M) 64x(desktop:21M)
-  cd /usr/share/icons/Papirus && rm -rf 18x* 22x* 24x* 32x*  48x* ; \
-  ls -lh /usr/share/icons/Papirus; \
+  # cd /usr/share/icons/Papirus && rm -rf 18x* 22x* 24x* 32x*  48x* ; \
+  # ls -lh /usr/share/icons/Papirus; \
   \
   dpkg -l |grep bunsen && exit 0 || exit 1;
+
+# core
+COPY --from=core /rootfs_bin /
+COPY --from=core /rootfs_conf /
+RUN bash /xconf.sh
 
 # HEADLESS
 COPY --from=files1 /rootfs /
@@ -80,12 +92,23 @@ RUN cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* fla
   sed -i "s/ibus/fcitx/g" /etc/profile; \
   wget -qO /usr/share/backgrounds/xfce/xfce-teal.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png; \
   \
-  # ohmybash
-  su - headless -c "$(curl -fsSL https://gitee.com/g-system/oh-my-bash/raw/sam-custom/tools/install.sh)"; \
-  rm -rf /home/headless/.oh-my-bash/.git; \
-  # danger!
-  bash -c 'cd /home/headless/.oh-my-bash/themes && rm -rf `ls |grep -v "axin\|sh$"` || echo "onmybash not exist, skip clear"'; \
+  # 清理ubt自带图标, keep项: hicolor 
+  # locolor gnome bloom
+  cd /usr/share/icons && rm -rf Humanity* ubuntu-mono* LoginIcons Tango; \
   \
-  sed -i "s^value=\"Mint-Y\"^value=\"Papirus-Bunsen-grey\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml; \
-  sed -i "s^OSH_THEME=\"font\"^OSH_THEME=\"axin\"^g" /home/headless/.bashrc; 
-CMD ["bash", "-c", "dpkg -l |grep 'sogoupinyin' || dpkg -i /.bundle/sogoupinyin_4.0.1.2800_x86_64.deb; /entry.sh"]
+  # # ohmybash (xconf.sh有了)
+  # su - headless -c "$(curl -fsSL https://gitee.com/g-system/oh-my-bash/raw/sam-custom/tools/install.sh)"; \
+  # rm -rf /home/headless/.oh-my-bash/.git; \
+  # # danger!
+  # bash -c 'cd /home/headless/.oh-my-bash/themes && rm -rf `ls |grep -v "axin\|sh$"` || echo "onmybash not exist, skip clear"'; \
+  # sed -i "s^OSH_THEME=\"font\"^OSH_THEME=\"axin\"^g" /home/headless/.bashrc; \
+  \
+  sed -i "s^value=\"Mint-Y\"^value=\"Papirus-Bunsen-grey\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml;
+
+
+ENV \
+  START_SESSION=xfce4-session \
+  # TODO无此变量时..，有则便于调试
+  DISPLAY=":10"
+WORKDIR /home/headless
+CMD ["bash", "-c", "dpkg -l |grep 'sogoupinyin' || dpkg -i /.bundle/sogoupinyin_4.0.1.2800_x86_64.deb; exec /entry.sh"]

@@ -24,8 +24,9 @@ hub)
     img="docker-headless:ubt20-$ver"
     # --cache-from $repo/$ns/$img 
     docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile . 
-    docker push $repo/$ns/$img    
+    test "false" == "$IMG_PUSH" || docker push $repo/$ns/$img    
     img2=docker-headless:ubt20
-    docker tag $repo/$ns/$img $repo/$ns/$img2; docker push $repo/$ns/$img2
+    docker tag $repo/$ns/$img $repo/$ns/$img2; 
+    test "false" == "$IMG_PUSH" || docker push $repo/$ns/$img2
     ;;
 esac
