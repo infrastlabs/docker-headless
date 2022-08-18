@@ -1,6 +1,0 @@
-#!/bin/sh
-
-env |grep -v '^SHELL\|^HOSTNAME\|^HOME\|^PWD\|^SHLVL\|^TERM\|^PATH\|^DEBIAN_FRONTEND' |while read one; 
-do 
-    sudo echo export $one >> /.env; 
-done
