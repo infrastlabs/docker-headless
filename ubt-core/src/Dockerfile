@@ -1,8 +1,22 @@
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:mint-compile as Xvnc
-FROM scratch as files1
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core-compile as Xvnc
+# FROM scratch as files1
+FROM ubuntu:20.04 as files1
   # ubt2004: tigervnc-standalone-server 1.10.1+dfsg-3
-  COPY --from=Xvnc /tigervnc-pkg/tigervnc-1.12.0.x86_64 /rootfs/
   COPY --from=Xvnc /rootfs /rootfs/
+  # COPY --from=Xvnc /rootfs/var/lib/xrdp-pulseaudio-installer /rootfs/var/lib/xrdp-pulseaudio-installer/
+  # COPY --from=Xvnc /tigervnc-pkg/tigervnc-1.12.0.x86_64 /rootfs/
+  # 
+  # tigervnc 1.10.1 > 1.12.0 
+  # https://udomain.dl.sourceforge.net/project/tigervnc/stable/1.10.1/tigervnc-1.10.1.x86_64.tar.gz
+  ENV ver=1.10.1
+  # ENV ver=1.12.0
+  ADD tigervnc-${ver}.x86_64.tar.gz /tigervnc-pkg
+  RUN mkdir -p /rootfs/usr/bin /rootfs/usr/lib64/xorg; cd /tigervnc-pkg/tigervnc-${ver}.x86_64/; \
+    \cp -a usr/bin/Xvnc /rootfs/usr/bin/Xvnc; \
+    \cp -a usr/bin/vncpasswd /rootfs/usr/bin/vncpasswd; \
+    \cp -a usr/lib64/swrast_dri.so /rootfs/usr/lib64/swrast_dri.so; \
+    mkdir -p /rootfs/usr/lib/dri; ln -s /usr/lib64/swrast_dri.so /rootfs/usr/lib/dri/; \
+    \cp -a usr/lib64/xorg/protocol.txt /rootfs/usr/lib64/xorg/protocol.txt
 
 FROM ubuntu:20.04 as files2
   RUN export DOMAIN="mirrors.ustc.edu.cn"; \
@@ -10,7 +24,9 @@ FROM ubuntu:20.04 as files2
   && echo "deb http://${DOMAIN}/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
   apt update && apt -y install curl
   # webhookd, noVNC
-  RUN cd /tmp; file=webhookd.tar.gz; curl -fSL -k -O https://gitee.com/infrastlabs/fk-webhookd/attach_files/1135812/download/$file; \
+  # https://gitee.com/infrastlabs/fk-webhookd/releases/download/v22.08.18/webhookd.tar.gz
+  RUN echo 1; \
+    cd /tmp; file=webhookd.tar.gz; curl -fSL -k -O https://gitee.com/infrastlabs/fk-webhookd/releases/download/v22.08.18/$file; \
     hookd=/rootfs/usr/local/webhookd; mkdir -p $hookd; tar -zxvf $file -C $hookd; rm -f $file; \
     \
     cd /rootfs/usr/local/webhookd/static; file=v1.3.0.tar.gz; curl -fSL -k -O https://hub.fastgit.xyz/novnc/noVNC/archive/$file; \
@@ -22,13 +38,15 @@ FROM ubuntu:20.04 as files2
   ADD src/etc /rootfs/etc
   ADD src/dot /rootfs/etc/skel
   ADD src/bin /rootfs/usr/bin
-  ADD src/sv.conf /rootfs/etc/supervisor/conf.d/xrdp.conf
+  ADD src/sv.conf /rootfs/etc/supervisor/conf.d/sv.conf
   COPY src/*.service /rootfs/etc/systemd/system/
+  RUN cd /rootfs/usr/bin; chmod +x *; \
+    cd /rootfs/etc/skel/Desktop; chmod +x *.desktop
 
 FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND noninteractive
 # use cat > excludes: 再少一层
-COPY src/excludes /etc/dpkg/dpkg.cfg.d/excludes
+# COPY src/excludes /etc/dpkg/dpkg.cfg.d/excludes
 # mirrors.tuna.tsinghua.edu.cn
 # mirrors.ustc.edu.cn
 # mirrors.aliyun.com
@@ -36,9 +54,27 @@ COPY src/excludes /etc/dpkg/dpkg.cfg.d/excludes
 RUN export DOMAIN="mirrors.ustc.edu.cn"; \
   echo "deb http://${DOMAIN}/ubuntu focal main restricted universe multiverse" > /etc/apt/sources.list \
   && echo "deb http://${DOMAIN}/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
+    \
+  # default:echo -e;
+  echo "path-exclude /usr/share/doc/*\n\
+path-exclude /usr/share/man/*\n\
+path-exclude /usr/share/locale/*\n\
+path-exclude /usr/share/info/*\n\
+path-exclude /usr/share/help/*\n\
+path-exclude /usr/share/lintian/*\n\
+#path-exclude /usr/share/zoneinfo/*\n\
+#path-exclude /usr/share/i18n/*\n\
+# XKB: Failed to compile keymap
+# path-exclude /usr/share/X11/*\n\
+path-include /usr/share/locale/zh_CN/*" > /etc/dpkg/dpkg.cfg.d/excludes; \
+  cat /etc/dpkg/dpkg.cfg.d/excludes; \
   \
   echo 'apt update -qq && apt install -yq --no-install-recommends $@ && apt clean && rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
     && chmod +x /usr/local/bin/apt.sh; \
+  \
+  # adwaita first(clear icons)
+  apt.sh adwaita-icon-theme; \
+  cd /usr/share/icons; rm -rf Humanity* ubuntu-mono* hicolor LoginIcons Tango; \
   \
 # MISC 15.1 MB
 # RUN \
@@ -63,7 +99,9 @@ RUN \
   pulseaudio pavucontrol \
   \
   # 343 kB
-  supervisor x11-xkb-utils libfdk-aac1 libopus0 \
+  # +xrdp 0.9.12 (compile: 0.9.16/19)
+  supervisor \
+  x11-xkb-utils libfdk-aac1 libopus0 \
   libsecret-1-0 libnss3 libxtst6 libasound2 xdg-utils \
   \
   # APPS 25.7 MB
@@ -75,6 +113,9 @@ RUN \
   # 2422 kB #https://github.com/j8r/dockerfiles
   # 默认自带：xterm fluxbox (便于调试) #TODO: fluxbox from src's compile
   xinit xterm fluxbox systemd systemd-sysv; \
+  cd /usr/share/fluxbox/nls && rm -rf `ls |grep -v "^C$\|zh_CN"` ; \
+  cd /usr/share/fluxbox/styles && rm -rf `ls |grep -v "ubuntu-light"` ; \
+  find /usr/share/fluxbox/; \
   \
 # ASBRU: 3586 kB (disk: 15.5 MB)
 # RUN echo 1;\
@@ -102,8 +143,13 @@ RUN test -z "$FULL" && exit 0 || echo fullInstall;\
   # \20.5 MB
   flameshot arandr \
   # \12.6 MB
-  git;
-  
+  git; \
+  # flameshot_qt;
+  strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5; \
+  rm -f /usr/lib/x86_64-linux-gnu/libLLVM-12.so.1; 
+# deb9_xrdp_v0.9.5; ubt20_xrd_v0.9.12; xvnc_xrdp_chansrv(compile): > 0.9.16;
+# RUN apt.sh xrdp;
+
 
 # Can't load shared library libQt5Core.so.5: https://www.mmuaa.com/post/8d7ef275515c19a4.html
 # apt install binutils
@@ -112,32 +158,7 @@ RUN test -z "$FULL" && exit 0 || echo fullInstall;\
 # HEADLESS
 COPY --from=files1 /rootfs /
 COPY --from=files2 /rootfs /
-RUN bash /xconf.sh; \
-  # resolv-err: qt@centos7
-  strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5; \
-  \
-  # systemd1
-  cd /lib/systemd/system/sysinit.target.wants/ \
-    && rm $(ls | grep -v systemd-tmpfiles-setup); \
-    \
-  rm -f /lib/systemd/system/multi-user.target.wants/* \
-    /etc/systemd/system/*.wants/* \
-    /lib/systemd/system/local-fs.target.wants/* \
-    /lib/systemd/system/sockets.target.wants/*udev* \
-    /lib/systemd/system/sockets.target.wants/*initctl* \
-    /lib/systemd/system/basic.target.wants/* \
-    /lib/systemd/system/anaconda.target.wants/* \
-    /lib/systemd/system/plymouth* \
-    /lib/systemd/system/systemd-update-utmp*; \
-    \
-  # systemd2
-  find / |grep -v "^/sys\|^/proc" |grep systemd |grep ".service$" |grep "supervi" |while read one; do echo $one; rm -f $one; done; \
-  \
-  dpkg-divert --local --rename --add /sbin/udevadm; ln -s /bin/true /sbin/udevadm; \
-  systemctl enable de-entry; systemctl enable de-start; \
-  systemctl disable dropbear; systemctl disable supervisor; \
-  # systemctl mask supervisor; \
-  systemctl disable systemd-resolved; 
+RUN bash /xconf.sh
 
 ENV \
   # https://gitee.com/hegp/docker-learning/blob/master/%E5%AE%8C%E6%95%B4%E7%B3%BB%E7%BB%9F%E7%9A%84%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C.md

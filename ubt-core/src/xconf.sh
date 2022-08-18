@@ -3,10 +3,12 @@ rm -f /xconf.sh
 
 ##########################################
 # xrdp-link
-$RUN export xrdp=/usr/local/xrdp; \
+$RUN export xrdp=/usr/local/xrdp;
+if [ -s "$xrdp/sbin/xrdp" ]; then
   ln -s $xrdp/sbin/xrdp /usr/sbin/; ln -s $xrdp/sbin/xrdp-sesman /usr/sbin/;\
   ln -s $xrdp/sbin/xrdp-chansrv /usr/sbin/; ln -s $xrdp/bin/xrdp-keygen /usr/bin/;
   mkdir -p /etc/xrdp && xrdp-keygen xrdp auto #/etc/xrdp/rsakeys.ini
+fi
 
 ##########################################
 $RUN \
@@ -37,7 +39,7 @@ $RUN \
     \
     mkdir -p  /usr/share/man/man1/; \
     su - headless -c "mkdir -p /home/headless/.config/plank/dock1/launchers"; \
-    su - headless -c "wget https://m3.8js.net//20210522/tashanhe-shiqishune.mp3";
+    echo "curl mp3.." && su - headless -c "curl -O https://m3.8js.net//20210522/tashanhe-shiqishune.mp3";
 
 ##AUDIO###########################
 # Setup D-Bus; ;
@@ -56,10 +58,12 @@ $RUN \
   chown -R headless:headless /home/headless/.config; \
   \
   # ibus env
+  # 冗余? 复用/.env?
   echo "export XMODIFIERS=@im=ibus" >> /etc/profile;\
   echo "export GTK_IM_MODULE=ibus" >> /etc/profile;\
   echo "export QT_IM_MODULE=ibus" >> /etc/profile;\
   \
+  # 独立/.env每次entry都重生成;
   echo "export XMODIFIERS=@im=ibus" >> /.env;\
   echo "export GTK_IM_MODULE=ibus" >> /.env;\
   echo "export QT_IM_MODULE=ibus" >> /.env;\
@@ -69,10 +73,35 @@ $RUN \
   su - headless -c "dbus-launch dconf reset -f /; dbus-launch dconf load / < /home/headless/dconf.ini; ";\
   dbus-launch dconf update;
 
+# SYSTEMD
+$RUN \
+  # systemd1
+  cd /lib/systemd/system/sysinit.target.wants/ \
+    && rm $(ls | grep -v systemd-tmpfiles-setup); \
+    \
+  rm -f /lib/systemd/system/multi-user.target.wants/* \
+    /etc/systemd/system/*.wants/* \
+    /lib/systemd/system/local-fs.target.wants/* \
+    /lib/systemd/system/sockets.target.wants/*udev* \
+    /lib/systemd/system/sockets.target.wants/*initctl* \
+    /lib/systemd/system/basic.target.wants/* \
+    /lib/systemd/system/anaconda.target.wants/* \
+    /lib/systemd/system/plymouth* \
+    /lib/systemd/system/systemd-update-utmp*; \
+    \
+  # systemd2
+  cd /; find `ls |grep -v "^sys\|^proc"` |grep systemd |grep ".service$" |grep "supervi" |while read one; do echo $one; rm -f $one; done; \
+  \
+  dpkg-divert --local --rename --add /sbin/udevadm; ln -s /bin/true /sbin/udevadm; \
+  systemctl enable de-entry; systemctl enable de-start; \
+  systemctl disable dropbear; systemctl disable supervisor; \
+  # systemctl mask supervisor; \
+  systemctl disable systemd-resolved; 
+
 # LOCALE, OHMYBASH, SETTINGS
 $RUN \
   # ohmybash
-  su - headless -c "$(curl -fsSL https://gitee.com/g-system/oh-my-bash/raw/sam-custom/tools/install.sh)"; \
+  echo "curl oh-my-bash.." && su - headless -c "$(curl -fsSL https://gitee.com/g-system/oh-my-bash/raw/sam-custom/tools/install.sh)"; \
   rm -rf /home/headless/.oh-my-bash/.git; 
   # danger!
   bash -c 'cd /home/headless/.oh-my-bash/themes && rm -rf `ls |grep -v "axin\|sh$"` || echo "onmybash not exist, skip clear"'; \
