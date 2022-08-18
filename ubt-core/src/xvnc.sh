@@ -7,7 +7,8 @@ case "$cmd" in
 xvnc)
  #chansrv
     export DISPLAY=:$offsetLimitIndex #:2
-    /usr/local/xrdp/sbin/xrdp-chansrv &
+    # /usr/local/xrdp/sbin/xrdp-chansrv &
+    xrdp-chansrv &
     # default: Xvnc :99 -BlacklistThreshold=5 -BlacklistTimeout=10
     exec Xvnc -ac $DISPLAY -listen tcp -rfbauth=/etc/xrdp/vnc_pass -depth 16 -BlacklistThreshold=3 -BlacklistTimeout=1
     ;;
