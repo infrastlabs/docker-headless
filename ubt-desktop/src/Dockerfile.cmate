@@ -1,4 +1,5 @@
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core-v4 as core
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v4
 
 # after mint-meta-mate # mate-desktop-environment-core: 5436B;
 RUN apt.sh mate-desktop-environment-core
@@ -37,13 +38,17 @@ RUN apt.sh \
   tumbler 
   # tint2 clipit rofi 
 
-RUN \
-  sed -i "s/startfluxbox/mate-session/g" /etc/systemd/system/de-start.service;
+# CORE
+COPY --from=core /rootfs_bin /
+COPY --from=core /rootfs_conf /
+RUN bash /xconf.sh
 
 # HEADLESS
 
 ENV \
+  # mintwelcome
+  XDG_CURRENT_DESKTOP=MATE \
+  START_SESSION=mate-session \
+  START_SYSTEMD=true \
   DISPLAY=":10"
-
-# ENTRYPOINT ["/entry.sh"]
-# CMD ["mate-session"]
+WORKDIR /home/headless

@@ -1,9 +1,14 @@
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core-v4 as core
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v4
 
 # REF: docker-gui > ubt2004-mint-cinna
 # http://packages.linuxmint.com/
 # https://mirrors.tuna.tsinghua.edu.cn/linuxmint
 RUN \
+  export DOMAIN="mirrors.aliyun.com"; \
+  echo "deb http://${DOMAIN}/ubuntu focal main restricted universe multiverse" > /etc/apt/sources.list \
+  && echo "deb http://${DOMAIN}/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
+  \
   echo "deb https://mirrors.tuna.tsinghua.edu.cn/linuxmint una main upstream import backport">> /etc/apt/sources.list; \
   LINUX_MINT_KEY=$(apt update 2>&1 | grep -o '[0-9A-Z]\{16\}$' | xargs) && \
   apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 ${LINUX_MINT_KEY}; \
@@ -36,18 +41,21 @@ RUN apt.sh \
   apt -y remove \
   mintreport ; cd /usr/bin; rm -f mintupdate*
 
+# CORE
+COPY --from=core /rootfs_bin /
+COPY --from=core /rootfs_conf /
+RUN bash /xconf.sh
 
-RUN \
-  sed -i "s/startfluxbox/xfce4-session/g" /etc/systemd/system/de-start.service; 
 
 # HEADLESS 不使用定制项，官方原滋味
 ADD --chown=headless:headless src/.mint-artwork-xfce /home/headless
 # ADD --chown=headless:headless src/.mint-artwork-xfce/.config/autostart /home/headless/.config/autostart
+RUN cd /home/headless/Desktop; chmod +x *.desktop
 
 ENV \
   # mintwelcome
   XDG_CURRENT_DESKTOP=XFCE \
+  START_SESSION=xfce4-session \
+  START_SYSTEMD=true \
   DISPLAY=":10"
-
-# ENTRYPOINT ["/entry.sh"]
-# CMD ["xfce4-session"]
+WORKDIR /home/headless

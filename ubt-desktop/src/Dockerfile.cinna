@@ -1,4 +1,5 @@
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core-v4 as core
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v4
 
 # cinna-desktop 139 MB 
 RUN apt.sh cinnamon cinnamon-l10n gnome-icon-theme
@@ -32,13 +33,18 @@ RUN apt.sh \
   apt -y remove \
   mintreport ; cd /usr/bin; rm -f mintupdate*
 
-RUN \
-  sed -i "s/startfluxbox/cinnamon-session/g" /etc/systemd/system/de-start.service;
+# CORE
+COPY --from=core /rootfs_bin /
+COPY --from=core /rootfs_conf /
+RUN bash /xconf.sh
 
 # HEADLESS
 
 ENV \
+  # mintwelcome
+  XDG_CURRENT_DESKTOP=CINNAMON \
+  START_SESSION=cinnamon-session \
+  START_SYSTEMD=true \
   DISPLAY=":10"
-
-# ENTRYPOINT ["/entry.sh"]
-# CMD ["cinnamon-session"]
+# without LLVM: 花屏
+# CMD ["bash", "-c", "rm -f /usr/lib/x86_64-linux-gnu/libLLVM-12.so.1; exec /entry.sh"]

@@ -1,20 +1,30 @@
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core-v4 as core
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v4
 
 # kubuntu-desktop 273 MB # 7054 kB #plasma-desktop 已装
 # https://github.com/ms-jpq/kde-in-docker/blob/daddy/base/bionic/Dockerfile #nautilus > dolphin
-RUN apt.sh kubuntu-desktop dolphin konsole
+RUN \
+  export DOMAIN="mirrors.aliyun.com"; \
+  echo "deb http://${DOMAIN}/ubuntu focal main restricted universe multiverse" > /etc/apt/sources.list \
+  && echo "deb http://${DOMAIN}/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
+  \
+  apt.sh kubuntu-desktop dolphin konsole
+
+# CORE
+COPY --from=core /rootfs_bin /
+COPY --from=core /rootfs_conf /
+RUN bash /xconf.sh
 
 RUN \
   # KDE环境: pavucontrol图标丑出天际
-  rm -f /home/headless/Desktop/pavucontrol.desktop; \
-  \
-  sed -i "s/startfluxbox/startplasma-x11/g" /etc/systemd/system/de-start.service;
+  rm -f /home/headless/Desktop/pavucontrol.desktop;
 
 # HEADLESS
 ADD --chown=headless:headless src/.config /home/headless/.config
 
 ENV \
+  START_SESSION=startplasma-x11 \
+  START_SYSTEMD=true \
   DISPLAY=":10"
 
-# ENTRYPOINT ["/entry.sh"]
 # CMD ["plasma_session"]

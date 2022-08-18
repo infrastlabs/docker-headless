@@ -1,7 +1,18 @@
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core-v4 as core
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v4
+
+# mirrors.tuna.tsinghua.edu.cn
+# mirrors.ustc.edu.cn
+# mirrors.aliyun.com
+# mirrors.163.com
 
 # ubuntu-desktop 128 MB
-RUN apt.sh ubuntu-desktop; \
+RUN \
+  export DOMAIN="mirrors.aliyun.com"; \
+  echo "deb http://${DOMAIN}/ubuntu focal main restricted universe multiverse" > /etc/apt/sources.list \
+  && echo "deb http://${DOMAIN}/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
+  \
+  apt.sh ubuntu-desktop; \
   apt -y remove gdm3  gvfs*
 
 # TODO: 当前为默认iconTheme
@@ -9,14 +20,20 @@ RUN apt.sh ubuntu-desktop; \
 RUN apt.sh \
   # gnome-tweak-tool papirus-icon-theme \
   nautilus; \
-  apt -y remove update-manager software-properties-common xterm; \
-  \
-  sed -i "s/startfluxbox/gnome-session/g" /etc/systemd/system/de-start.service; \
+  apt -y remove update-manager software-properties-common xterm;
+
+# CORE
+COPY --from=core /rootfs_bin /
+COPY --from=core /rootfs_conf /
+RUN bash /xconf.sh
+
+RUN \
   wget -qO /usr/share/backgrounds/warty-final-ubuntu.png https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png; 
   # \
   # wget https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
   # dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb; \
   # dpkg -l |grep bunsen && exit 0 || exit 1;  
+
 
 # HEADLESS
 ADD --chown=headless:headless src/.config /home/headless/.config
@@ -27,7 +44,7 @@ ENV \
   \
   # PULSE_SERVER="tcp:localhost:4731" \
   # DISPLAY="localhost:31" \
+  START_SESSION=gnome-session \
+  START_SYSTEMD=true \
   DISPLAY=":10"
-
-# ENTRYPOINT ["/entry.sh"]
-# CMD ["gnome-session"]
+WORKDIR /home/headless
