@@ -11,19 +11,27 @@
 
 ```bash
 docker run -it --rm -p 11081:10081 -p 11089:10089 \
-  registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3-slim /entry.sh
+  infrastlabs/docker-headless:core-v4-slim /entry.sh
 
 # systemd
 docker run -it --rm -p 11081:10081 -p 11089:10089 \
   --tmpfs /run --tmpfs /run/lock --tmpfs /tmp   --privileged \
   -v /_ext:/_ext -v /sys/fs/cgroup:/sys/fs/cgroup \
-  registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3-slim
+  infrastlabs/docker-headless:core-v4-slim
 ```
+
+**TODO**
+
+- entry.sh
+  - ~~x10-de.conf 自动生成~~
+  - ~~setsysenv_drop, grep -v _PASS$~~
+  - ~~START_SESSION~~
+- 特点脑图: 无头模式,本地化,核心能力,层缓存,约定/配置项,用例分享
 
 **arm64**
 
 ```bash
-[root@arm-ky10-23-2 ~]# docker  run -it --rm --cap-add SYS_ADMIN  --net=host -v /sys/fs/cgroup:/sys/fs/cgroup:rw  --mount type=tmpfs,dst=/run --mount type=tmpfs,dst=/run/lock infrastlabs/docker-headless:ubt-v3-arm
+[root@arm-ky10-23-2 ~]# docker  run -it --rm --cap-add SYS_ADMIN  --net=host -v /sys/fs/cgroup:/sys/fs/cgroup:rw  --mount type=tmpfs,dst=/run --mount type=tmpfs,dst=/run/lock infrastlabs/docker-headless:core-v4-arm
 ```
 
 **systemd**
@@ -31,14 +39,14 @@ docker run -it --rm -p 11081:10081 -p 11089:10089 \
 ```bash
 docker  run -it --rm -p 10481:10081 --cap-add SYS_ADMIN -v /sys/fs/cgroup:/sys/fs/cgroup \
  --mount type=tmpfs,dst=/run --mount type=tmpfs,dst=/run/lock \
- registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3
+ infrastlabs/docker-headless:core-v4
 
 
 # deb11-gemmibook
 # https://serverfault.com/questions/1053187/systemd-fails-to-run-in-a-docker-container-when-using-cgroupv2-cgroupns-priva
 docker  run -it --rm --cap-add SYS_ADMIN  -p 10281:10081 -p 10289:10089 \
 -v /sys/fs/cgroup:/sys/fs/cgroup:rw  --cgroupns=host --mount type=tmpfs,dst=/run --mount type=tmpfs,dst=/run/lock  \
-registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt-v3-slim /sbin/init
+infrastlabs/docker-headless:core-v4-slim /sbin/init
 
 
 # headless @ mac23-199 in ~ |13:55:34  
