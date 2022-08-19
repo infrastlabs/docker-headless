@@ -1,10 +1,17 @@
 version: '2.4'
 services:
-  ubt20:
-    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt20-v6
+  default:
+    image: infrastlabs/docker-headless:latest
     restart: unless-stopped
+    # https://docs.docker.com/compose/compose-file/compose-file-v2/#healthcheck
+    healthcheck:
+      test: ["CMD", "bash", "-c", "supervisorctl status |grep -v 'RUNNING' && exit 1 || exit 0 "]
+      interval: 5s
+      timeout: 3s 
+      retries: 3
+      start_period: 5s
     shm_size: 1g
-    privileged: true #
+    privileged: true
     ports:
       - "11081:10081"
       - "11089:10089"
@@ -13,53 +20,53 @@ services:
       - /_ext:/_ext
       - /:/mnt  
 
-  deb10:
-    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:deb10t-v4-slim
+  sogou:
+    image: infrastlabs/docker-headless:sogou
     restart: unless-stopped
+    # https://docs.docker.com/compose/compose-file/compose-file-v2/#healthcheck
+    healthcheck:
+      test: ["CMD", "bash", "-c", "supervisorctl status |grep -v 'RUNNING' && exit 1 || exit 0 "]
+      interval: 5s
+      timeout: 3s 
+      retries: 3
+      start_period: 5s
     shm_size: 1g
+    privileged: true #
     ports:
       - "12081:10081"
       - "12089:10089"
-      - "12022:10022"      
+      - "12022:10022"
     volumes: 
       - /_ext:/_ext
       - /:/mnt  
 
   core:
-    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core-v4-slim
+    image: infrastlabs/docker-headless:core
     restart: unless-stopped
+    # https://docs.docker.com/compose/compose-file/compose-file-v2/#healthcheck
+    healthcheck:
+      test: ["CMD", "bash", "-c", "supervisorctl status |grep -v 'RUNNING' && exit 1 || exit 0 "]
+      interval: 5s
+      timeout: 3s 
+      retries: 3
+      start_period: 5s
     shm_size: 1g
-    privileged: true #
+    privileged: true
     ports:
       - "13081:10081"
       - "13089:10089"
       - "13022:10022"
-    cap_add:
-      - SYS_BOOT 
-      - SYS_ADMIN         
-    tmpfs:
-      - /run
-      - /run/lock
-      - /tmp
-    volumes: 
-      - /sys/fs/cgroup:/sys/fs/cgroup 
-      - /_ext:/_ext
-      - /:/mnt  
-
-  deb9:
-    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:full
-    restart: unless-stopped
-    shm_size: 1g
-    ports:
-      - "14081:10081"
-      - "14089:10089"
-      - "14022:10022"
     environment:
       - SSH_PASS=headless
       - VNC_PASS=headless
       - VNC_PASS_RO=View123
       - TZ=Asia/Shanghai
       - L=zh_CN
+    cap_add:
+      - SYS_BOOT 
+      - SYS_ADMIN
+      # https://github.com/docker-archive/libcontainer/blob/master/SPEC.md#security
+      # $ cat ct_caps.txt2  |cut -d' ' -f1 |grep -v "^$" |sort |sed "s/CAP_/- /g"    
     volumes: 
       - /_ext:/_ext
       - /:/mnt      
