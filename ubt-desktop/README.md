@@ -24,11 +24,15 @@ docker  run -it --rm -p 10081:10081 -p 10089:10089 \
   --tmpfs /run --tmpfs /run/lock --tmpfs /tmp \
   --cap-add SYS_BOOT --cap-add SYS_ADMIN \
   -v /sys/fs/cgroup:/sys/fs/cgroup \
-registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:gnome
+infrastlabs/docker-headless:gnome
 
 # plasma: 需要privileged 否则start_kdeinit: Operation not permitted
-docker  run -it --rm -p 11081:10081 -p 11089:10089   --tmpfs /run --tmpfs /run/lock --tmpfs /tmp   --privileged   -v /sys/fs/cgroup:/sys/fs/cgroup registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:plas
+docker  run -it --rm -p 11081:10081 -p 11089:10089   --tmpfs /run --tmpfs /run/lock --tmpfs /tmp   --privileged   -v /sys/fs/cgroup:/sys/fs/cgroup infrastlabs/docker-headless:plas
 ```
+
+**TODO**
+
+- gnome: ibus-daemon -drx; tray图标才出来
 
 ## 问题记录
 
