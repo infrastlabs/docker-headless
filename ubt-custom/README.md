@@ -72,12 +72,12 @@ pulseaudio 13.99.1
 kill -9 `ps -ef |grep xfdesk |grep -v grep  |awk '{print }'` && xfdesktop
 
 #xrdp:0.9.5 > 0.9.16 > 0.9.19(导致xfdesk/thunar@gemmi-deb11卡死)
-docker  run -v $(pwd)/xrdp:/usr/local/xrdp02 -it --rm --net=host -e VNC_OFFSET=10 -e PORT_RDP=10099 -v $(pwd)/sv2.conf:/etc/supervisor/conf.d/sv.conf registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:mint-v31
+docker  run -v $(pwd)/xrdp:/usr/local/xrdp02 -it --rm --net=host -e VNC_OFFSET=10 -e PORT_RDP=10099 -v $(pwd)/sv2.conf:/etc/supervisor/conf.d/sv.conf infrastlabs/docker-headless:mint-v31
 
 
 # audio
-docker run -it --rm  -p 10092:10022 -p 10099:10089 -p 10091:10081 -e VNC_OFFSET=10  registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:mint-v3
-# docker run -it --rm --net=host -e PORT_SSH=10092 -e PORT_RDP=10099 -e PORT_VNC=10091 -e VNC_OFFSET=10  registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:mint-v3
+docker run -it --rm  -p 10092:10022 -p 10099:10089 -p 10091:10081 -e VNC_OFFSET=10  infrastlabs/docker-headless:mint-v3
+# docker run -it --rm --net=host -e PORT_SSH=10092 -e PORT_RDP=10099 -e PORT_VNC=10091 -e VNC_OFFSET=10  infrastlabs/docker-headless:mint-v3
 
 http://172.16.xx.xx:10091/vnc/
 
