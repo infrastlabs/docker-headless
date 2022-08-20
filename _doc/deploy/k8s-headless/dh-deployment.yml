@@ -20,7 +20,7 @@ spec:
       #- name: regsecret
       containers:
       - name: headless
-        image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:full
+        image: infrastlabs/docker-headless:full
         imagePullPolicy: Always
         # command: ['sh', '-c']
         # args:

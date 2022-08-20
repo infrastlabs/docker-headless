@@ -5,7 +5,7 @@ networks:
       name: ${FAT_NETWORK}      
 services:
   box:
-    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless
+    image: infrastlabs/docker-headless
     container_name: ${FAT_BOXNAME}
     hostname: ${FAT_BOXNAME}
     restart: always
