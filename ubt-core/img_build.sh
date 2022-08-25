@@ -10,31 +10,31 @@ ns=infrastlabs
 ver=v5 # only: base-v5, base-v5-slim
 case "$1" in
 compile)
+    # TigerVNC 1.12.0 |10 Nov 2021
+    old=$(pwd); cd src/arm
+    ver="0.9.16"
+    file=xrdp-${ver}.tar.gz; test -s $file || curl -k -O -fSL https://github.com/neutrinolabs/xrdp/releases/download/v${ver}/$file
+    # tiger
+    file=xorg-server-1.20.7.tar.bz2; test -s $file || curl -k -O -fSL https://www.x.org/pub/individual/xserver/$file #6.1M
+    file=tigervnc-1.12.0.tar.gz; test -s $file || curl -k -O -fSL https://github.com/TigerVNC/tigervnc/archive/v1.12.0/$file #1.5M
+    # curl -O -fsSL https://www.linuxfromscratch.org/patches/blfs/svn/tigervnc-1.12.0-configuration_fixes-1.patch
+    cd $old;
+
     img="docker-headless:core-compile"
     docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile.compile . 
     docker push $repo/$ns/$img
     ;; 
-# tiger)
-#     img="docker-headless:mint-compile-tiger"
-#     docker build $cache $pull -t $repo/$ns/$img -f src/arm.Dockerfile.tiger . 
-#     docker push $repo/$ns/$img
-#     ;;    
-# tiger21)
-#     img="docker-headless:mint-compile-tiger-v21"
-#     docker build $cache $pull -t $repo/$ns/$img -f src/arm.Dockerfile.tiger-v21 . 
-#     docker push $repo/$ns/$img
-#     ;;     
 hub)
     repoHub=docker.io
     echo "${DOCKER_REGISTRY_PW_dockerhub}" |docker login --username=${DOCKER_REGISTRY_USER_dockerhub} --password-stdin $repoHub
-    # SLIM
+    # core
     img="docker-headless:core" && echo -e "\n\nimg: $img"
     docker tag $repo/$ns/$img $ns/$img; docker push $ns/$img
-    # 
-    img="docker-headless:base-$ver" && echo -e "\n\nimg: $img"
-    docker tag $repo/$ns/$img $ns/$img; docker push $ns/$img
-    img="docker-headless:base-$ver-slim" && echo -e "\n\nimg: $img"
-    docker tag $repo/$ns/$img $ns/$img; docker push $ns/$img
+    # base
+    # img="docker-headless:base-$ver" && echo -e "\n\nimg: $img"
+    # docker tag $repo/$ns/$img $ns/$img; docker push $ns/$img
+    # img="docker-headless:base-$ver-slim" && echo -e "\n\nimg: $img"
+    # docker tag $repo/$ns/$img $ns/$img; docker push $ns/$img
     ;;    
 slim)
     img="docker-headless:base-$ver-slim"
@@ -48,18 +48,18 @@ base)
     docker push $repo/$ns/$img 
     ;;
 *)
-    vncVer=1.10.1 #1.12.0 ## udomain > jaist
-    file=tigervnc-${vncVer}.x86_64.tar.gz
-    test -s "$file" || curl -fSL -k -O https://jaist.dl.sourceforge.net/project/tigervnc/stable/${vncVer}/$file
+    # vncVer=1.10.1 #1.12.0 ## udomain > jaist
+    # file=tigervnc-${vncVer}.x86_64.tar.gz
+    # test -s "$file" || curl -fSL -k -O https://jaist.dl.sourceforge.net/project/tigervnc/stable/${vncVer}/$file
     # 
     img="docker-headless:core" && echo -e "\n\nimg: $img"
     docker build $cache $pull -t $repo/$ns/$img -f src/Dockerfile . 
     # docker push $repo/$ns/$img    
 
     # 关联子项: ubt20, gnome
-    export IMG_PUSH=false
-    cd ../deb10; sh img_build.sh
-    cd ../ubt-custom; sh img_build.sh
-    cd ../ubt-desktop; sh img_build.sh
+    # export IMG_PUSH=false
+    # # cd ../deb10; sh img_build.sh
+    # cd ../ubt-custom; sh img_build.sh
+    # cd ../ubt-desktop; sh img_build.sh
     ;;
 esac
