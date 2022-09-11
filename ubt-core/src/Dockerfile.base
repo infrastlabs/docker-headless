@@ -1,15 +1,19 @@
 
 FROM ubuntu:20.04
-ENV DEBIAN_FRONTEND noninteractive
+ENV \
+  DEBIAN_FRONTEND=noninteractive \
+  LOCALE_INCLUDE="zh_CN zh_HK zh_TW en en_AU fr fr_CA pt pt_BR es ar cs de it ru nl tr is sv uk ja ko th vi"
 # use cat > excludes: 再少一层
 # COPY src/excludes /etc/dpkg/dpkg.cfg.d/excludes
 # mirrors.tuna.tsinghua.edu.cn
 # mirrors.ustc.edu.cn
 # mirrors.aliyun.com
 # mirrors.163.com
+ARG TARGETPLATFORM
 RUN export DOMAIN="mirrors.ustc.edu.cn"; \
-  echo "deb http://${DOMAIN}/ubuntu focal main restricted universe multiverse" > /etc/apt/sources.list \
-  && echo "deb http://${DOMAIN}/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
+  test -z "$(echo $TARGETPLATFORM |grep arm)" && target=ubuntu || target=ubuntu-ports; \
+  echo "deb http://${DOMAIN}/$target focal main restricted universe multiverse" > /etc/apt/sources.list \
+  && echo "deb http://${DOMAIN}/$target focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
     \
   # default:echo -e;
   echo "path-exclude /usr/share/doc/*\n\
@@ -22,8 +26,11 @@ path-exclude /usr/share/lintian/*\n\
 #path-exclude /usr/share/i18n/*\n\
 # XKB: Failed to compile keymap
 # path-exclude /usr/share/X11/*\n\
-path-include /usr/share/locale/zh_CN/*" > /etc/dpkg/dpkg.cfg.d/excludes; \
+# path-include /usr/share/locale/zh_CN/*\n\
+" > /etc/dpkg/dpkg.cfg.d/excludes; \
+  echo $LOCALE_INCLUDE |sed "s/ /\n/g" |while read one; do echo "path-include /usr/share/locale/$one/*" >> /etc/dpkg/dpkg.cfg.d/excludes; done; \
   cat /etc/dpkg/dpkg.cfg.d/excludes; \
+  rm -rf /usr/share/locale/* ; \
   \
   echo 'apt update -qq && apt install -yq --no-install-recommends $@ && apt clean && rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
     && chmod +x /usr/local/bin/apt.sh; \
