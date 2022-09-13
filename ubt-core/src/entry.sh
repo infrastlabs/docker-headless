@@ -16,7 +16,7 @@ function oneVnc(){
         user1=headless #xvnc$N
     fi
 
-    # SV
+    # SV: xvnc$N.conf
     local xn="x$N"
     local varlog=/var/log/supervisor
     echo """
@@ -50,12 +50,13 @@ stdout_logfile=$varlog/$xn-parec.log
 stdout_logfile_maxbytes = 50MB
 stdout_logfile_backups  = 10
 redirect_stderr=true
-
     """ > /etc/supervisor/conf.d/xvnc$N.conf
+
+    # SV: x$N-de.conf
     echo """
 [program:$xn-de]
-#,LANG=zh_CN.UTF-8,LANGUAGE=zh_CN:en #cur: 不加没中文
-environment=DISPLAY=:$N,HOME=/home/headless,USER=headless,SHELL=/bin/bash,TERM=xterm,LANG=zh_CN.UTF-8,LANGUAGE=zh_CN:en
+#,LANG=$L.UTF-8,LANGUAGE=$L:en #cur: 不加没中文
+environment=DISPLAY=:$N,HOME=/home/headless,USER=headless,SHELL=/bin/bash,TERM=xterm,LANG=$L.UTF-8,LANGUAGE=$L:en
 priority=45
 user=headless
 command=bash -c \"env |grep -v PASS; source /.env; exec startfluxbox\"
@@ -64,12 +65,44 @@ stdout_logfile_maxbytes = 50MB
 stdout_logfile_backups  = 10
 redirect_stderr=true    
     """ > /etc/supervisor/conf.d/x$N-de.conf
+
+    # XRDP /etc/xrdp/xrdp.ini
+    echo """
+[Xvnc$N]
+name=Xvnc$N
+lib=libvnc.so
+username=asknoUser
+password=askheadless
+ip=127.0.0.1
+port=$port1
+chansrvport=DISPLAY($N)
+    """ > $tmpDir/xrdp-sesOne$N.conf
+    # $N atLast
+    local line=$(cat /etc/xrdp/xrdp.ini |grep  "^# \[PRE_ADD_HERE\]" -n |cut -d':' -f1)
+    line=$(expr $line - 1)
+    sed -i "$line r $tmpDir/xrdp-sesOne$N.conf" /etc/xrdp/xrdp.ini
+    rm -f $tmpDir/xrdp-sesOne$N.conf
+
+    # noVNC /usr/local/webhookd/static/index.html
+    # TODO: fk-webhookd: wsconn识别display10参数; 
+    mkdir -p /etc/novnc
+    echo "display$N: 127.0.0.1:$port1" >> /etc/novnc/token.conf
+    # 
+    # echo "<li>[<a href=\"javascript:void(0);\" onclick=\"openVnc('display$N', 'vnc')\">$N-resize</a>&nbsp;&nbsp; <a href=\"javascript:void(0);\" onclick=\"openVnc('display$N', 'vnc_lite')\">lite</a>] | $name1</li>" >> $tmpDir/novncHtml$N.htm
+    echo "<li><a href=\"javascript:void(0);\" onclick=\"openVnc('display$N', 'vnc')\">display$N</a></li>" > $tmpDir/novncHtml$N.htm
+    echo "<li><a href=\"javascript:void(0);\" onclick=\"openVnc('display$N', 'vnc_lite')\">display$N-lite</a></li>" >> $tmpDir/novncHtml$N.htm
+    local line2=$(cat /usr/local/webhookd/static/index.html |grep  "ADD_HERE" -n |cut -d':' -f1)
+    line2=$(expr $line2 - 1)
+    sed -i "$line2 r $tmpDir/novncHtml$N.htm" /usr/local/webhookd/static/index.html
+    rm -f $tmpDir/novncHtml$N.htm
 }
 # oneVnc "$id" "$name"
 function setXserver(){
     #tpl replace: each revert clean;
     cat /etc/xrdp/xrdp.ini.tpl > /etc/xrdp/xrdp.ini
-    # cat /usr/local/novnc/index.tpl.html > /usr/local/novnc/index.html
+    cat /etc/novnc/index.html > /usr/local/webhookd/static/index.html
+    # /xvnc.sh pulse X; oneVnc: xrdp,novnc sed_add_tmpfile
+    tmpDir=/tmp/.headless; mkdir -p $tmpDir && chown headless:headless -R $tmpDir ; #pulse: default-xx.pa
 
     # setPorts; sed port=.* || env_ctReset
     sed -i "s^port=3389^port=${PORT_RDP}^g" /etc/xrdp/xrdp.ini
@@ -82,6 +115,9 @@ function setXserver(){
     port0=$(expr 0 + $VNC_OFFSET) #vnc: 5900+10
     # sed -i "s/_DISPLAY_/$port0/" /etc/supervisor/conf.d/sv.conf
     oneVnc "$port0" "headless" #sv
+    sed -i "s/Environment=DISPLAY=.*/Environment=DISPLAY=:$VNC_OFFSET/g" /etc/systemd/system/de-start.service
+    sed -i "s/Environment=LANG=.*/Environment=LANG=$L.UTF-8/g" /etc/systemd/system/de-start.service
+    sed -i "s/Environment=LANGUAGE=.*/Environment=LANGUAGE=$L:en/g" /etc/systemd/system/de-start.service
 
     # clearPass: if not default
     if [ "headless" != "$VNC_PASS" ]; then
@@ -125,8 +161,17 @@ setlocale
 # Dump environment variables
 # https://hub.fastgit.org/hectorm/docker-xubuntu/blob/master/scripts/bin/container-init
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-env | grep -Ev '^(.*PASS.*|PWD|OLDPWD|HOME|USER|SHELL|TERM|([^=]*(PASSWORD|SECRET)[^=]*))=' \
- |grep -v "LOC_\|DEBIAN_FRONTEND" | sort > /etc/environment
+export DISPLAY=:$VNC_OFFSET
+ #| grep -Ev '^(.*PASS.*|PWD|OLDPWD|HOME|USER|SHELL|TERM|([^=]*(PASSWORD|SECRET)[^=]*))=' \
+env \
+ |grep -Ev '_PASS$|^SHLVL|^HOSTNAME|^PWD|^OLDPWD|^HOME|^USER|^SHELL|^TERM' \
+ |grep -Ev "LOC_|DEBIAN_FRONTEND|LOCALE_INCLUDE" | sort > /etc/environment
+# source /.env
+: > /.env
+cat /etc/environment |while read one; do sudo echo export $one >> /.env; done
+echo "export XMODIFIERS=@im=ibus" >> /.env
+echo "export GTK_IM_MODULE=ibus" >> /.env
+echo "export QT_IM_MODULE=ibus" >> /.env
 
 # ENV
 # DISPLAY=${DISPLAY:-localhost:21}
@@ -136,13 +181,7 @@ env | grep -Ev '^(.*PASS.*|PWD|OLDPWD|HOME|USER|SHELL|TERM|([^=]*(PASSWORD|SECRE
 
 # CONF
 test -f /home/headless/.ICEauthority && chmod 644 /home/headless/.ICEauthority #mate err
-
-# setsysenv #/usr/bin/setsysenv: /.env
-: > /.env
-env |grep -v '_PASS$\|^SHELL\|^HOSTNAME\|^HOME\|^PWD\|^SHLVL\|^TERM\|^PATH\|^DEBIAN_FRONTEND' |while read one; 
-do 
-    sudo echo export $one >> /.env; 
-done
+rm -f /home/headless/.config/autostart/pulseaudio.desktop
 
 # startCMD
 test -z "$START_SESSION" || sed -i "s/startfluxbox/$START_SESSION/g" /etc/systemd/system/de-start.service
