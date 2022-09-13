@@ -24,11 +24,12 @@ FROM ubuntu:20.04 as files2
   apt update && apt -y install curl
   # webhookd, noVNC
   # https://gitee.com/infrastlabs/fk-webhookd/releases/download/v22.08.18/webhookd.tar.gz
-  RUN echo a.1; \
+  RUN echo a.12; \
     cd /tmp; file=webhookd.tar.gz; curl -fSL -k -O https://gitee.com/infrastlabs/fk-webhookd/releases/download/v22.08.18/$file; \
     hookd=/rootfs/usr/local/webhookd; mkdir -p $hookd; tar -zxvf $file -C $hookd; rm -f $file; \
     \
-    cd /rootfs/usr/local/webhookd/static; file=v1.3.0.tar.gz; curl -fSL -k -O https://hub.fastgit.xyz/novnc/noVNC/archive/$file; \
+    # https://gitee.com/infrastlabs/fk-webhookd/releases/download/v22.08.18/v1.3.0.tar.gz
+    cd /rootfs/usr/local/webhookd/static; file=v1.3.0.tar.gz; curl -fSL -k -O https://github.com/novnc/noVNC/archive/$file; \
     bash down_vnc.sh; rm -f $file;  
   # 
   COPY src/*.sh /rootfs/
@@ -41,7 +42,7 @@ FROM ubuntu:20.04 as files2
     cd /rootfs/etc/skel/Desktop; chmod +x *.desktop
 
 # FROM ubuntu:20.04
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v4-slim
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v5-slim
 # 轻量级桌面 openbox + tint2 + conky + stalonetray + pcmanfm + xcompmgr #http://t.zoukankan.com/huapox-p-3516155.html #huapox
 #   无thunar/lxappearance: 结合asbru纯SSH,音频场景（管维）
 RUN apt.sh \
@@ -57,59 +58,8 @@ COPY --from=files1 /rootfs /rootfs_bin
 COPY --from=files2 /rootfs /rootfs_conf
 # RUN bash /xconf.sh
 
-# from base-v4-slim, inner fluxbox's test
-# HEADLESS
-RUN \
-  # cd /tmp; file=Squared_for_Debian.zip; curl -fSL -k -O https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/flux/$file; \
-  # unzip -d /usr/share/fluxbox/styles/ $file; rm -f /tmp/$file; \
-  # wget -qO /usr/share/images/fluxbox/debian-squared.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png; \
-  \
-  wget -qO /usr/share/images/fluxbox/ubuntu-light.png https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png; \
-  mkdir -p /etc/skel/.config/clipit /etc/skel/.config/pnmixer /etc/skel/.fluxbox; \
-  file=/etc/skel/.fluxbox/overlay; \
-  echo "\
-menu.hilite.font: PT Sans-11:regular\n\
-menu.frame.font: PT Sans-11:regular\n\
-menu.title.font: PT Sans-11:regular\n\
-toolbar.clock.font: PT Sans-11:bold\n\
-toolbar.workspace.font: PT Sans-11:regular\n\
-toolbar.iconbar.focused.font: PT Sans-11:regular\n\
-toolbar.iconbar.unfocused.font: PT Sans-11:regular\n\
-window.font: Lato-9\n\
-  " > $file; \
-  sed -i  "s/PT Sans/WenQuanYi Zen Hei/" $file; \
-  \
-  file=/etc/skel/.fluxbox/init; \
-  echo "\
-# session.styleFile: /usr/share/fluxbox/styles/Squared_for_Debian\n\
-#sakura's border
-session.screen0.colPlacementDirection: TopToBottom\n\
-session.screen0.defaultDeco: NORMAL\n\
-\n\
-#windows's width @bar
-session.screen0.iconbar.alignment: Left\n\
-session.screen0.iconbar.iconTextPadding:        15\n\
-session.screen0.iconbar.iconWidth:      134\n\
-session.screen0.iconbar.mode: {static groups} (workspace)\n\
-session.screen0.iconbar.usePixmap: false\n\
-\n\
-# #session.screen0.toolbar.placement:      TopRight\n\
-session.screen0.toolbar.tools: prevworkspace, workspacename, nextworkspace, iconbar, systemtray, clock\n\
-session.screen0.toolbar.widthPercent: 99\n\
-  " > $file; \
-  \
-  file=/etc/skel/.config/clipit/clipitrc; \
-  echo "\
-[rc]\n\
-save_history=true\n\
-  " > $file; \
-  \
-  file=/etc/skel/.config/pnmixer/config; \
-  echo "\
-[PNMixer]\n\
-VolumeControlCommand=pavucontrol\n\
-  " > $file; \
-  find /etc/skel; 
+# fluxbox's conf
+RUN bash /etc/skel/.fluxbox/fluxbox.sh
 
 # WORKDIR /home/headless
 CMD ["bash", "-c", "cp -a /rootfs_bin/* /; cp -a /rootfs_conf/* /; bash /xconf.sh; exec /entry.sh"]
