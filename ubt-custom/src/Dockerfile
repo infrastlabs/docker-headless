@@ -7,13 +7,9 @@ FROM ubuntu:20.04 as files1
   ADD src/clear3d.theme /rootfs/usr/share/plank/themes/Default/dock.theme
   RUN find /rootfs* |wc; \
     cd /rootfs_home_headless/Desktop; chmod +x *.desktop
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core-v4 as core
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v4-slim
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core as core
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v5-slim
 RUN \  
-  export DOMAIN="mirrors.aliyun.com"; \
-  echo "deb http://${DOMAIN}/ubuntu focal main restricted universe multiverse" > /etc/apt/sources.list \
-  && echo "deb http://${DOMAIN}/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
-  \
   # adwaita first(clear icons)
   # notes: 影响通用版的系统体验(gnome列表图，小图标..) >>在前面layer已装 在最后做清理
   # apt.sh adwaita-icon-theme; \
@@ -76,7 +72,7 @@ COPY --from=files1 /rootfs /
 COPY --from=files1 --chown=headless:headless /rootfs_home_headless /home/headless/
 RUN cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*; \
   \
-  sed -i "s/ibus/fcitx/g" /etc/profile; \
+  # sed -i "s/ibus/fcitx/g" /etc/profile; \
   wget -qO /usr/share/backgrounds/xfce/xfce-teal.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png; \
   \
   # 清理ubt自带图标, keep项: hicolor 
@@ -87,7 +83,5 @@ RUN cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* fla
 
 
 ENV \
-  START_SESSION=xfce4-session \
-  # TODO无此变量时..，有则便于调试
-  DISPLAY=":10"
+  START_SESSION=xfce4-session
 WORKDIR /home/headless
