@@ -1,14 +1,10 @@
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core-v4 as core
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v4
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core as core
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v5
 
 # REF: docker-gui > ubt2004-mint-cinna
 # http://packages.linuxmint.com/
 # https://mirrors.tuna.tsinghua.edu.cn/linuxmint
 RUN \
-  export DOMAIN="mirrors.aliyun.com"; \
-  echo "deb http://${DOMAIN}/ubuntu focal main restricted universe multiverse" > /etc/apt/sources.list \
-  && echo "deb http://${DOMAIN}/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
-  \
   echo "deb https://mirrors.tuna.tsinghua.edu.cn/linuxmint una main upstream import backport">> /etc/apt/sources.list; \
   LINUX_MINT_KEY=$(apt update 2>&1 | grep -o '[0-9A-Z]\{16\}$' | xargs) && \
   apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 ${LINUX_MINT_KEY}; \
@@ -56,6 +52,5 @@ ENV \
   # mintwelcome
   XDG_CURRENT_DESKTOP=XFCE \
   START_SESSION=xfce4-session \
-  START_SYSTEMD=true \
-  DISPLAY=":10"
+  START_SYSTEMD=true
 WORKDIR /home/headless

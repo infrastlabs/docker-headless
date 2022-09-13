@@ -1,17 +1,8 @@
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core-v4 as core
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v4
-
-# mirrors.tuna.tsinghua.edu.cn
-# mirrors.ustc.edu.cn
-# mirrors.aliyun.com
-# mirrors.163.com
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core as core
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v5
 
 # ubuntu-desktop 128 MB
 RUN \
-  export DOMAIN="mirrors.aliyun.com"; \
-  echo "deb http://${DOMAIN}/ubuntu focal main restricted universe multiverse" > /etc/apt/sources.list \
-  && echo "deb http://${DOMAIN}/ubuntu focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
-  \
   apt.sh ubuntu-desktop; \
   apt -y remove gdm3  gvfs*
 
@@ -45,6 +36,5 @@ ENV \
   # PULSE_SERVER="tcp:localhost:4731" \
   # DISPLAY="localhost:31" \
   START_SESSION=gnome-session \
-  START_SYSTEMD=true \
-  DISPLAY=":10"
+  START_SYSTEMD=true
 WORKDIR /home/headless

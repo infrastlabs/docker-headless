@@ -1,5 +1,5 @@
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core-v4 as core
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v4
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core as core
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v5
 
 # after mint-meta-mate # mate-desktop-environment-core: 5436B;
 RUN apt.sh mate-desktop-environment-core
@@ -49,6 +49,5 @@ ENV \
   # mintwelcome
   XDG_CURRENT_DESKTOP=MATE \
   START_SESSION=mate-session \
-  START_SYSTEMD=true \
-  DISPLAY=":10"
+  START_SYSTEMD=true
 WORKDIR /home/headless
