@@ -149,7 +149,6 @@ tcutils=true
 # ip=127.0.0.1
 # port=5901
 # chansrvport=DISPLAY(1)
-
 # [Xvnc2]
 # name=Xvnc2
 # lib=libvnc.so
@@ -158,15 +157,14 @@ tcutils=true
 # ip=127.0.0.1
 # port=5902
 # chansrvport=DISPLAY(2)
-
-[Xvnc10]
-name=Xvnc10
-lib=libvnc.so
-username=asknoUser
-password=askheadless
-ip=127.0.0.1
-port=5910
-chansrvport=DISPLAY(10)
+# [Xvnc10]
+# name=Xvnc10
+# lib=libvnc.so
+# username=asknoUser
+# password=askheadless
+# ip=127.0.0.1
+# port=5910
+# chansrvport=DISPLAY(10)
 
 
 # [PRE_ADD_HERE]
