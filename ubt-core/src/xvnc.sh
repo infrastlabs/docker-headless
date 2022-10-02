@@ -10,6 +10,7 @@ xvnc)
     # /usr/local/xrdp/sbin/xrdp-chansrv &
     xrdp-chansrv &
     # default: Xvnc :99 -BlacklistThreshold=5 -BlacklistTimeout=10
+    rm -f /tmp/.X$DISPLAY-lock #clear first, avoid dead-lock
     exec Xvnc -ac $DISPLAY -listen tcp -rfbauth=/etc/xrdp/vnc_pass -depth 16 -BlacklistThreshold=3 -BlacklistTimeout=1
     ;;
 pulse)
