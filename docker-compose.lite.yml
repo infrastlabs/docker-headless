@@ -1,7 +1,7 @@
 version: '2.4'
 services:
   headless:
-    image: infrastlabs/docker-headless:full
+    image: infrastlabs/docker-headless:latest
     container_name: headless
     restart: unless-stopped
     # https://docs.docker.com/compose/compose-file/compose-file-v2/#healthcheck
@@ -12,14 +12,15 @@ services:
       retries: 3
       start_period: 5s
     network_mode: host
+    privileged: true #xrdp-disk-mount
     shm_size: 1g
     environment:
-      - VNC_OFFSET=10  #5900 bind conflict
+      - VNC_OFFSET=10  #5900+10
       - L=zh_CN
       - SSH_PASS=headless
       - VNC_PASS=headless
       - VNC_PASS_RO=View123
     volumes:
-      - /_ext:/_ext
+      # - /_ext:/_ext
       - /opt:/opt
       - /:/mnt
