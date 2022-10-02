@@ -39,7 +39,7 @@ $RUN \
     \
     mkdir -p  /usr/share/man/man1/; \
     su - headless -c "mkdir -p /home/headless/.config/plank/dock1/launchers"; \
-    echo "curl mp3.." && su - headless -c "curl -O https://m3.8js.net//20210522/tashanhe-shiqishune.mp3";
+    echo "curl mp3.." && su - headless -c "curl -k -O -fSL https://www.51mp3ring.com/51mp3ring_com3/at20131018141155.mp3";
 
 ##AUDIO###########################
 # Setup D-Bus; ;
@@ -108,3 +108,8 @@ $RUN \
   \
   # sed -i "s^value=\"gnome\"^value=\"Papirus-Bunsen-grey\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml; \
   sed -i "s^OSH_THEME=\"font\"^OSH_THEME=\"axin\"^g" /home/headless/.bashrc; 
+
+# link: Xvnc, vncpasswd
+$RUN rm -f /usr/bin/Xvnc; ln -s /usr/local/tigervnc/bin/Xvnc /usr/bin/Xvnc; \
+  rm -f /usr/bin/vncpasswd; ln -s /usr/local/tigervnc/bin/vncpasswd /usr/bin/vncpasswd;
+  
