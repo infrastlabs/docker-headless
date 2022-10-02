@@ -7,8 +7,10 @@ FROM ubuntu:20.04 as files1
   ADD src/clear3d.theme /rootfs/usr/share/plank/themes/Default/dock.theme
   RUN find /rootfs* |wc; \
     cd /rootfs_home_headless/Desktop; chmod +x *.desktop
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core as core
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v5-slim
+# FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core as core
+# FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v5-slim
+FROM infrastlabs/docker-headless:core-multi as core
+FROM infrastlabs/docker-headless:base-v5-slim-multi
 RUN \  
   # adwaita first(clear icons)
   # notes: 影响通用版的系统体验(gnome列表图，小图标..) >>在前面layer已装 在最后做清理
@@ -32,7 +34,8 @@ RUN \
   # flameshot_qt;
   strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5; \
   # LLVM(定制版这里删调它,除gnome,cinna其它de无影响); clear big lib: 88M (qt: flameshot,sogoupinyin) > img: -27M
-  rm -f /usr/lib/x86_64-linux-gnu/libLLVM-12.so.1; 
+  rm -f /usr/lib/x86_64-linux-gnu/libLLVM-12.so.1; \
+  rm -f /usr/lib/aarch64-linux-gnu/libLLVM-12.so.1; 
 
 # APPS+ #+clipit/-diodon
 # #add-apt-repository: software-properties-common
@@ -60,7 +63,8 @@ RUN apt.sh papirus-icon-theme greybird-gtk-theme; \
   dpkg -l |grep bunsen && exit 0 || exit 1;
 
 # libxss1: wps
-RUN apt.sh libxss1 
+# libunwind8 libxfont2: Xvnc-compile
+RUN apt.sh libxss1 libunwind8 libxfont2
 
 # core
 COPY --from=core /rootfs_bin /
