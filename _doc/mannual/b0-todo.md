@@ -8,10 +8,15 @@
 
 ## 一、TODO
 
+**221002**
+
+- core: Dockerfile.base +healthcheck
+- cust: hostkeys change
+
 **220809**
 
-- ubt arm镜像：tigervnc退出连接导致其进程挂掉(v10.1) > try: 源码版v12.0
-- mint sogou输入法：0808号初装，当前fcitx进程有时挂 (+fcitx-rime)
+- ubt arm镜像：~~tigervnc退出连接导致其进程挂掉(v10.1) > try: 源码版v12.0~~
+- mint ~~sogou输入法：0808号初装，当前fcitx进程有时挂~~  (暂不影响使用，+fcitx-rime)
 - plasma 桌面： 系统设置左侧栏黑块(区域不可见，但可点击)
 - webhookd: 入口页、集成linux-dash
 
