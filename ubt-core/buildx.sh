@@ -32,8 +32,9 @@ compile)
     cd $old;
     #  
     repo=registry-1.docker.io
-    img="docker-headless:core-compile-multi"
+    img="docker-headless:core-compile"
     plat="--platform linux/amd64,linux/arm64" #,linux/arm
+    # --network=host: docker buildx create --use --name mybuilder2 --buildkitd-flags '--allow-insecure-entitlement network.host'
     docker buildx build $plat --push -t $ns/$img -f src/Dockerfile.compile . 
     ;;
 # tiger)
@@ -48,7 +49,11 @@ compile)
 slim)
     repo=registry-1.docker.io
     # repo=registry.cn-shenzhen.aliyuncs.com #arm64/amd64可以用,只是cr.console.aliyun.com上无多镜像显示
-    img="docker-headless:base-$ver-slim-multi"
+    img="docker-headless:base-$ver-slim"
+    # cache
+    ali="registry.cn-shenzhen.aliyuncs.com"
+    cimg="docker-headless-cache:base-$ver-slim"
+    cache="--cache-from type=registry,ref=$ali/$ns/$cimg --cache-to type=registry,ref=$ali/$ns/$cimg"
     
     # host-21-60:~ # docker buildx inspect mybuilder --bootstrap
     # Platforms: linux/amd64, linux/386, 
@@ -60,33 +65,26 @@ slim)
     # --platform linux/arm/v7,linux/arm64/v8,linux/amd64
     plat="--platform linux/amd64,linux/arm64,linux/arm" ##linux/arm> linux/arm/v7
     args="--build-arg FULL="
-    docker buildx build $plat $args --push -t $repo/$ns/$img -f src/Dockerfile.base . 
+    docker buildx build $cache $plat $args --push -t $repo/$ns/$img -f src/Dockerfile.base . 
     ;;
 base)
     repo=registry-1.docker.io
-    img="docker-headless:base-$ver-multi"
+    img="docker-headless:base-$ver"
+    # cache
+    ali="registry.cn-shenzhen.aliyuncs.com"
+    cimg="docker-headless-cache:base-$ver"
+    cache="--cache-from type=registry,ref=$ali/$ns/$cimg --cache-to type=registry,ref=$ali/$ns/$cimg"
+
     plat="--platform linux/amd64,linux/arm64,linux/arm"
     args="--build-arg FULL=/.."
-    docker buildx build $plat $args --push -t $repo/$ns/$img -f src/Dockerfile.base . 
+    docker buildx build $cache $plat $args --push -t $repo/$ns/$img -f src/Dockerfile.base . 
     ;;   
-core)
-    repo=registry-1.docker.io
-    img="docker-headless:core-multi"
-    plat="--platform linux/amd64,linux/arm64"
-    docker buildx build $plat $args --push -t $repo/$ns/$img -f src/Dockerfile . 
-    ;;          
 *)
     repo=registry-1.docker.io
     # repo=registry.cn-shenzhen.aliyuncs.com #支持?
     # repo=172.25.21.60:81 #registry-multiArch
-
-    img="docker-headless:core-$ver-arm"
-    # plat="--platform linux/amd64,linux/arm64" #,linux/arm
-    plat="--platform linux/arm64" #spe-debug
-    # docker build $cache $pull -t $repo/$ns/$img --build-arg FULL=/.. -f src/arm/arm.Dockerfile . 
-    # --cache-from $repo/$ns/$img 
-    # --build-arg FULL=/..
-    docker  buildx build $plat --push -t $repo/$ns/$img -f src/arm/arm.Dockerfile . 
-    docker push $repo/$ns/$img    
-    ;;
+    img="docker-headless:core"
+    plat="--platform linux/amd64,linux/arm64"
+    docker buildx build $plat $args --push -t $repo/$ns/$img -f src/Dockerfile . 
+    ;;          
 esac

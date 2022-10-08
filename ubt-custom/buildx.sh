@@ -14,7 +14,7 @@ ver=v5 # latest
 case "$1" in
 *)
     repo=registry-1.docker.io
-    img="docker-headless:latest-multi"
+    img="docker-headless:latest"
     plat="--platform linux/amd64,linux/arm64" #,linux/arm
     docker  buildx build $plat --push -t $repo/$ns/$img -f src/Dockerfile . 
     ;;
