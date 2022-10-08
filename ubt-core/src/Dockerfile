@@ -1,5 +1,5 @@
 # FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core-compile as bin
-FROM infrastlabs/docker-headless:core-compile-multi as bin
+FROM infrastlabs/docker-headless:core-compile as bin
 # FROM scratch as files1
 FROM ubuntu:20.04 as files1
   # ubt2004: tigervnc-standalone-server 1.10.1+dfsg-3
@@ -51,7 +51,7 @@ FROM ubuntu:20.04 as files2
 
 # FROM ubuntu:20.04
 # FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v5-slim
-FROM infrastlabs/docker-headless:base-v5-slim-multi
+FROM infrastlabs/docker-headless:base-v5-slim
 # 轻量级桌面 openbox + tint2 + conky + stalonetray + pcmanfm + xcompmgr #http://t.zoukankan.com/huapox-p-3516155.html #huapox
 #   无thunar/lxappearance: 结合asbru纯SSH,音频场景（管维）
 RUN apt.sh \
