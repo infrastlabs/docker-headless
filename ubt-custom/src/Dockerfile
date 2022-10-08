@@ -9,8 +9,8 @@ FROM ubuntu:20.04 as files1
     cd /rootfs_home_headless/Desktop; chmod +x *.desktop
 # FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core as core
 # FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v5-slim
-FROM infrastlabs/docker-headless:core-multi as core
-FROM infrastlabs/docker-headless:base-v5-slim-multi
+FROM infrastlabs/docker-headless:core as core
+FROM infrastlabs/docker-headless:base-v5-slim
 RUN \  
   # adwaita first(clear icons)
   # notes: 影响通用版的系统体验(gnome列表图，小图标..) >>在前面layer已装 在最后做清理
