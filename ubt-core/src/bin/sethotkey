@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# leftAlt> leftCtl
+# flux
+oKey="^Alt "
+nKey="Control "
+file=~/.fluxbox/keys
+test -s $file && sed -i "s/$oKey/$nKey/g" $file
+
+# xfce
+oKey="&lt;Alt&gt"
+nKey="&lt;Ctl&gt"
+file=~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
+test -s $file && sed -i "s/$oKey/$nKey/g" $file
+
+# gnome,plas, cinna/cmate/cxfce
+#TODO
