@@ -1,5 +1,5 @@
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core as core
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v5
+FROM infrastlabs/docker-headless:core as core
+FROM infrastlabs/docker-headless:base-v5
 
 # kubuntu-desktop 273 MB # 7054 kB #plasma-desktop 已装
 # https://github.com/ms-jpq/kde-in-docker/blob/daddy/base/bionic/Dockerfile #nautilus > dolphin
@@ -7,8 +7,8 @@ RUN \
   apt.sh kubuntu-desktop dolphin konsole
 
 # CORE
-COPY --from=core /rootfs_bin /
-COPY --from=core /rootfs_conf /
+COPY --from=core /rootfs/bin /
+COPY --from=core /rootfs/conf /
 RUN bash /xconf.sh
 
 RUN \

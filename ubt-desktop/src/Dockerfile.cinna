@@ -1,5 +1,5 @@
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core as core
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v5
+FROM infrastlabs/docker-headless:core as core
+FROM infrastlabs/docker-headless:base-v5
 
 # cinna-desktop 139 MB 
 RUN apt.sh cinnamon cinnamon-l10n gnome-icon-theme
@@ -34,8 +34,8 @@ RUN apt.sh \
   mintreport ; cd /usr/bin; rm -f mintupdate*
 
 # CORE
-COPY --from=core /rootfs_bin /
-COPY --from=core /rootfs_conf /
+COPY --from=core /rootfs/bin /
+COPY --from=core /rootfs/conf /
 RUN bash /xconf.sh
 
 # HEADLESS

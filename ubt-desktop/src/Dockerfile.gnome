@@ -1,5 +1,5 @@
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core as core
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v5
+FROM infrastlabs/docker-headless:core as core
+FROM infrastlabs/docker-headless:base-v5
 
 # ubuntu-desktop 128 MB
 RUN \
@@ -14,8 +14,8 @@ RUN apt.sh \
   apt -y remove update-manager software-properties-common xterm;
 
 # CORE
-COPY --from=core /rootfs_bin /
-COPY --from=core /rootfs_conf /
+COPY --from=core /rootfs/bin /
+COPY --from=core /rootfs/conf /
 RUN bash /xconf.sh
 
 RUN \
