@@ -174,13 +174,14 @@ Control Alt o :Exec chromium
 Control Alt n :Exec konsole
 Control Alt g :Exec gvim
 Control Alt t :Exec stterm
-Alt t :Exec stterm
+Alt t :Exec sakura
+Alt e :Exec geany
 Alt f :Exec thunar
 #
 Alt Left :PrevWorkspace
 Alt Right :NextWorkspace
 Alt Up :Maximize
-Alt Down :NextTab
+Alt Down :Minimize
 
 #Mod1 space :WindowMenu
 #Mod4 Tab :NextTab
