@@ -14,14 +14,13 @@ Multi-Desktop with `XRDP/NOVNC/PulseAudio` based on `Ubuntu20.04`, Formatting a 
 - Desktop apps: ibus-rime/fcitx-sogou, flameshot, PAC.
 - Slim image: `core: 170.53 MB(fluxbox)`, `latest: 277.48 MB(ibus,xfce4.14)`, `sogou: 354.15 MB(fcitx)`
 
-## QuickStart
+## step1: QuickStart
 
 `docker run -it --rm --shm-size 1g --net=host infrastlabs/docker-headless`
 
  -- | Conn | PASS | ReadOnly 
 --- | ---  | ---  | ---
 noVnc | https://192.168.0.x:10081 | `headless` | `View123` 
-Audio | http://192.168.0.x:10082  |     -      | - 
 RDP   | 192.168.0.x:10089         | `headless` | - 
 SSH   | ssh -p 10022 headless@192.168.0.x | `headless` | - 
 
@@ -39,13 +38,23 @@ cinna   |Mint| cinnamon | ibus  | systemd | [![Docker Image Size](https://img.sh
 cmate   |Mint| mate | ibus  | systemd | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/cmate)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|GoodExperience
 cxfce   |Mint| xfce | ibus  | systemd | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/cxfce)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|Xfce 4.16
 
+![](https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/mannual/res/01rdp-double-screen.png)
+
+## step2: Producttion
+
+x86/arm64 supported, prefer with docker-compose: [docker-compose.yml](./docker-compose.yml) [docker-compose.lite.yml](./docker-compose.lite.yml)
+
+- [Customize docker-compose.yml](./ubt-custom/docker-compose.yml) latest,sogou,core x3
+- [MultiDesktop docker-compose.yml](./ubt-desktop/docker-compose.yml) gnome,plas,cinna,cmate,cxfce x5
+
 ```bash
-# supvervisor
-docker  run -it --rm -p 10081:10081 -p 10089:10089 \
+# supvervisor: core, latest, sogou (--privileged: xrdp-disk-mount)
+docker  run -d -p 10081:10081 -p 10089:10089 --shm-size 1g \
   infrastlabs/docker-headless:sogou
 
-# systemd启动
-docker  run -it --rm -p 10081:10081 -p 10089:10089 \
+# systemd: gnome(must-systemd), plas, mint(cinna, cmate, cxfce)
+# NOTICE：sogou-arm64 still be supporting, mint series only with x86(cinnamon,mate,xfce4.16) ,seems none arm-repo with linuxmint
+docker  run -d -p 10081:10081 -p 10089:10089 --shm-size 1g \
   --tmpfs /run --tmpfs /run/lock --tmpfs /tmp \
   --cap-add SYS_BOOT --cap-add SYS_ADMIN \
   -v /sys/fs/cgroup:/sys/fs/cgroup \
@@ -70,18 +79,15 @@ echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /
 - [4.Usage of IBUS/Flameshot](./_doc/mannual/b4-apps.md)
 - [Details](./detail.md) （Hotkeys, Envs, SysApps）
 
-
-![](https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/mannual/res/01rdp-double-screen.png)
-
 **(3)Producttion-Deployment**: 
 
 - [Windows-VM Deployment：](./_doc/deploy/win-vbox/README.md) With `barge-os` mini-container system, `--net=host` Use the VM's IP 
 - [Linux-Server Deployment：](./_doc/deploy/fat-docker/README.md) Use `macvlan`'s network，with special IP，sugest with lxcfs installed.
 - [Kubernetes Deployment：](./_doc/deploy/k8s-headless/README.md) Deployment+Service
 
-## UseCase
+## step3: UseCase
 
-Quick start with Locale: `docker run -it --rm --shm-size 1g -e VNC_OFFSET=20 -e L=zh_CN --net=host infrastlabs/docker-headless:full`, Prefer [docker-compose.yml](./docker-compose.yml)
+Quick start with Locale: `docker run -it --rm --shm-size 1g -e VNC_OFFSET=20 -e L=zh_CN --net=host infrastlabs/docker-headless:latest`, Prefer [docker-compose.yml](./docker-compose.yml)
 
 **(1)Development** (java, golang, nodejs)
 

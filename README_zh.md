@@ -15,7 +15,7 @@ Multi-Desktop with `XRDP/NOVNC/PulseAudio` based on `Ubuntu20.04`, Formatting a 
 - 精简小巧 `core: 170.53 MB(fluxbox)`, `latest: 277.48 MB(ibus,xfce4.14)`, `sogou: 354.15 MB(fcitx)`
 
 
-## 快速开始
+## 一、快速开始
 
 `docker run -it --rm --shm-size 1g --net=host infrastlabs/docker-headless`
 
@@ -39,25 +39,28 @@ cinna   |Mint| cinnamon | ibus  | systemd | [![Docker Image Size](https://img.sh
 cmate   |Mint| mate | ibus  | systemd | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/cmate)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|体验良好
 cxfce   |Mint| xfce | ibus  | systemd | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/cxfce)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|新版xfce
 
+![](https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/mannual/res/01rdp-double-screen.png)
+
+## 二、Producttion
+
+x86/arm64 supported, 推荐 docker-compose: [docker-compose.yml](./docker-compose.yml) [docker-compose.lite.yml](./docker-compose.lite.yml)
+
+- [定制版 docker-compose.yml](./ubt-custom/docker-compose.yml) latest,sogou,core 三组
+- [多桌面 docker-compose.yml](./ubt-desktop/docker-compose.yml) gnome,plas,cinna,cmate,cxfce 五组
+
 ```bash
-# supvervisor
-docker  run -it --rm -p 10081:10081 -p 10089:10089 \
+# supvervisor: core, latest, sogou (--privileged: xrdp-disk-mount)
+docker  run -d -p 10081:10081 -p 10089:10089 --shm-size 1g \
   infrastlabs/docker-headless:sogou
 
-# systemd启动
-docker  run -it --rm -p 10081:10081 -p 10089:10089 \
+# systemd: gnome(must-systemd), plas, mint(cinna, cmate, cxfce)
+# 注：sogou arm64版暂未支持, mint系列暂只有x86(cinnamon,mate,xfce4.16) ，它官方没找到arm源
+docker  run -d -p 10081:10081 -p 10089:10089 --shm-size 1g \
   --tmpfs /run --tmpfs /run/lock --tmpfs /tmp \
   --cap-add SYS_BOOT --cap-add SYS_ADMIN \
   -v /sys/fs/cgroup:/sys/fs/cgroup \
   infrastlabs/docker-headless:gnome
 ```
-
-**小孩才选择，你全要？**
-
-- 定制版[docker-compose.yml](./ubt-custom/docker-compose.yml) latest,sogou,core 三组
-- 多桌面[docker-compose.yml](./ubt-desktop/docker-compose.yml) gnome,plas,cinna,cmate,cxfce 五组
-
-![](https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/mannual/res/01rdp-double-screen.png)
 
 **(0)源码目录**
 
@@ -93,9 +96,9 @@ echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /
 - [Linux服务器部署：](./_doc/deploy/fat-docker/README.md) 容器使用macvlan网络，分配专用IP，建议安装lxcfs
 - [K8S内部署：](./_doc/deploy/k8s-headless/README.md) Deployment+Service
 
-## 使用示例
+## 三、使用示例
 
-中文版快速体验: `docker run -it --rm --shm-size 1g -e VNC_OFFSET=20 -e L=zh_CN --net=host infrastlabs/docker-headless:full`, 推荐[docker-compose.yml](./docker-compose.yml)
+多语言快速体验: `docker run -it --rm --shm-size 1g -e VNC_OFFSET=20 -e L=zh_CN --net=host infrastlabs/docker-headless:latest`, 推荐[docker-compose.yml](./docker-compose.yml)
 
 **(1)Dev开发环境搭建** (java, golang, nodejs)
 
