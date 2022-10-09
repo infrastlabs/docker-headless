@@ -67,12 +67,19 @@ RUN apt.sh libunwind8 libxfont2 libgl1; \
 
 # 拆分包体与配置项两块，免频繁变动基础包
 # HEADLESS
-COPY --from=files1 /rootfs /rootfs_bin
-COPY --from=files2 /rootfs /rootfs_conf
+COPY --from=files1 /rootfs /rootfs/bin
+COPY --from=files2 /rootfs /rootfs/conf
 
 # fluxbox's conf
-# RUN bash /rootfs_conf/etc/skel/.fluxbox/fluxbox.sh
+# RUN bash /rootfs/conf/etc/skel/.fluxbox/fluxbox.sh
 # RUN bash /xconf.sh
 
+RUN \
+  echo "cp -a /rootfs/bin/* /; \n\
+cp -a /rootfs/conf/* /; \n\
+bash /etc/skel/.fluxbox/fluxbox.sh; \n\
+bash /xconf.sh;\n\
+touch /rootfs/.core-init-lock\n\
+" > /rootfs/.core-init
 # WORKDIR /home/headless
-CMD ["bash", "-c", "cp -a /rootfs_bin/* /; cp -a /rootfs_conf/* /; bash /etc/skel/.fluxbox/fluxbox.sh; bash /xconf.sh; exec /entry.sh"]
+CMD ["bash", "-c", "test -f /rootfs/.core-init-lock || bash /rootfs/.core-init;  exec /entry.sh"]
