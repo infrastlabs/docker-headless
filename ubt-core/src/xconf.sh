@@ -39,7 +39,7 @@ $RUN \
     \
     mkdir -p  /usr/share/man/man1/; \
     su - headless -c "mkdir -p /home/headless/.config/plank/dock1/launchers"; \
-    echo "curl mp3.." && su - headless -c "curl -k -O -fSL https://www.51mp3ring.com/51mp3ring_com3/at20131018141155.mp3";
+    echo "curl mp3.." && su - headless -c "curl --connect-timeout 3 -k -O -fSL https://www.51mp3ring.com/51mp3ring_com3/at20131018141155.mp3";
 
 ##AUDIO###########################
 # Setup D-Bus; ;
@@ -101,7 +101,7 @@ $RUN \
 # LOCALE, OHMYBASH, SETTINGS
 $RUN \
   # ohmybash
-  echo "curl oh-my-bash.." && su - headless -c "$(curl -fsSL https://gitee.com/g-system/oh-my-bash/raw/sam-custom/tools/install.sh)"; \
+  echo "curl oh-my-bash.." && su - headless -c "$(curl --connect-timeout 3 -fsSL https://gitee.com/g-system/oh-my-bash/raw/sam-custom/tools/install.sh)"; \
   rm -rf /home/headless/.oh-my-bash/.git; 
   # danger!
   bash -c 'cd /home/headless/.oh-my-bash/themes && rm -rf `ls |grep -v "axin\|sh$"` || echo "onmybash not exist, skip clear"'; \
