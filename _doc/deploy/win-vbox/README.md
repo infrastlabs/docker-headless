@@ -27,7 +27,7 @@ vols="""
 """
 docker run -d --name=devbox --shm-size 1g \
 --privileged --restart=always --net=host $vols \
-registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:ubt1804-zh_CN
+infrastlabs/docker-headless:latest
 
 # 配置Dind访问
 # 宿主机：18.09.3? |docker-1.10.3 @barge
