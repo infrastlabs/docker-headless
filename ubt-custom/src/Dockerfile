@@ -67,8 +67,8 @@ RUN apt.sh papirus-icon-theme greybird-gtk-theme; \
 RUN apt.sh libxss1 libunwind8 libxfont2
 
 # core
-COPY --from=core /rootfs_bin /
-COPY --from=core /rootfs_conf /
+COPY --from=core /rootfs/bin /
+COPY --from=core /rootfs/conf /
 RUN bash /xconf.sh
 
 # HEADLESS
@@ -77,7 +77,8 @@ COPY --from=files1 --chown=headless:headless /rootfs_home_headless /home/headles
 RUN cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*; \
   \
   # sed -i "s/ibus/fcitx/g" /etc/profile; \
-  wget -qO /usr/share/backgrounds/xfce/xfce-teal.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png; \
+  wget -qO /usr/share/backgrounds/xfce/xfce-teal.png https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png; \
+  wget -qO /usr/share/backgrounds/xfce/xfce-pure-blue.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/pure-blue.jpg; \
   \
   # 清理ubt自带图标, keep项: hicolor 
   # locolor gnome bloom
