@@ -4,6 +4,7 @@ $RUN \
   # wget -qO /usr/share/images/fluxbox/debian-squared.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png; \
   \
   wget -qO /usr/share/images/fluxbox/ubuntu-light.png https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png; \
+  wget -qO /usr/share/images/fluxbox/ubuntu-pure-blue.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/pure-blue.jpg; \
   mkdir -p /etc/skel/.config/clipit /etc/skel/.config/pnmixer /etc/skel/.fluxbox; \
   file=/etc/skel/.fluxbox/overlay; \
   echo -e "\
