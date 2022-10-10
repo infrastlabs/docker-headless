@@ -7,6 +7,17 @@ FROM ubuntu:20.04 as files1
   ADD src/clear3d.theme /rootfs/usr/share/plank/themes/Default/dock.theme
   RUN find /rootfs* |wc; \
     cd /rootfs_home_headless/Desktop; chmod +x *.desktop
+
+#ERROR: https://www.cnblogs.com/dengjialing/p/16387358.html
+# /opt/sogoupinyin/files/bin
+# $ ./sogoupinyin-configtool 
+# ./sogoupinyin-configtool: error while loading shared libraries: libwayland-client.so.0: ELF load command alignment not page-aligned
+FROM ubuntu:20.04 as files2
+  ARG TARGETPLATFORM
+  # sogoupinyin_4.0.1.2800_arm64.deb
+  ADD sogoupinyin_4.0.1.2800_*.deb /.bundle/
+  RUN cd /.bundle/; export ver=sogoupinyin_4.0.1.2800; \
+    test -z "$(echo $TARGETPLATFORM |grep arm)" && cp ${ver}_x86_64.deb ${ver}.deb || cp ${ver}_arm64.deb ${ver}.deb; 
 FROM infrastlabs/docker-headless:core as core
 FROM infrastlabs/docker-headless:base-v5-slim
 RUN \  
@@ -32,7 +43,8 @@ RUN \
   # flameshot_qt;
   strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5; \
   # LLVM(定制版这里删调它,除gnome,cinna其它de无影响); clear big lib: 88M (qt: flameshot,sogoupinyin) > img: -27M
-  rm -f /usr/lib/x86_64-linux-gnu/libLLVM-12.so.1; 
+  rm -f /usr/lib/x86_64-linux-gnu/libLLVM-12.so.1; \
+  rm -f /usr/lib/aarch64-linux-gnu/libLLVM-12.so.1;  
 
 # 2868 kB #fcitx ##img:78.095 MB
 # 15.3 kB #输入法依赖 https://shurufa.sogou.com/linux/guide
@@ -57,8 +69,14 @@ RUN \
   xfce4-settings xfce4-session xfwm4 xfdesktop4 \
   xfce4-notifyd thunar
 
+# libxss1: wps
+# libunwind8 libxfont2: Xvnc-compile
+RUN apt.sh libxss1 libunwind8 libxfont2
+
 # deps: fcitx 4.x: init when start; TODO fcitx-rime
-ADD sogoupinyin_4.0.1.2800_x86_64.deb /.bundle/
+# sogoupinyin_4.0.1.2800_arm64.deb
+#ADD sogoupinyin_4.0.1.2800_x86_64.deb /.bundle/
+COPY --from=files2 /.bundle/sogoupinyin_4.0.1.2800.deb /.bundle/sogoupinyin_4.0.1.2800.deb
 # RUN dpkg -i /tmp/sogoupinyin_4.0.1.2800_x86_64.deb
 
 # papirus-icon-theme
@@ -93,17 +111,10 @@ RUN cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* fla
   # locolor gnome bloom
   cd /usr/share/icons && rm -rf Humanity* ubuntu-mono* LoginIcons Tango; \
   \
-  # # ohmybash (xconf.sh有了)
-  # su - headless -c "$(curl -fsSL https://gitee.com/g-system/oh-my-bash/raw/sam-custom/tools/install.sh)"; \
-  # rm -rf /home/headless/.oh-my-bash/.git; \
-  # # danger!
-  # bash -c 'cd /home/headless/.oh-my-bash/themes && rm -rf `ls |grep -v "axin\|sh$"` || echo "onmybash not exist, skip clear"'; \
-  # sed -i "s^OSH_THEME=\"font\"^OSH_THEME=\"axin\"^g" /home/headless/.bashrc; \
-  \
   sed -i "s^value=\"Mint-Y\"^value=\"Papirus-Bunsen-grey\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml;
 
 
 ENV \
   START_SESSION=xfce4-session
 WORKDIR /home/headless
-CMD ["bash", "-c", "dpkg -l |grep 'sogoupinyin' || dpkg -i /.bundle/sogoupinyin_4.0.1.2800_x86_64.deb; exec /entry.sh"]
+CMD ["bash", "-c", "dpkg -l |grep 'sogoupinyin' || dpkg -i /.bundle/sogoupinyin_4.0.1.2800.deb; exec /entry.sh"]
