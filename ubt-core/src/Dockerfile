@@ -65,6 +65,26 @@ RUN apt.sh libunwind8 libxfont2 libgl1; \
   rm -f /usr/lib/x86_64-linux-gnu/libLLVM-12.so.1; \
   rm -f /usr/lib/aarch64-linux-gnu/libLLVM-12.so.1; 
 
+# +服务器维护工具(gparted, wifiPojie,..); core与latest差异化
+RUN apt.sh \
+  gparted \
+  \
+  # +papirus-icon-theme
+  # dbus-x11 at-spi2-core
+  thunar lxappearance \
+  language-pack-gnome-zh-hans papirus-icon-theme greybird-gtk-theme; \
+  rm -f /usr/share/backgrounds/greybird.svg; \
+  \
+  wget https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
+  dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb; \
+  cd /usr/share/icons && rm -rf Papirus-Bunsen-Dark-bluegrey Papirus-Bunsen-Dark-grey Papirus-Dark Papirus-Light ePapirus; \
+  \
+  # Papirus left: 16x(clipit:21M) 64x(desktop:21M)
+  cd /usr/share/icons/Papirus && rm -rf 18x* 22x* 24x* 32x*  48x* 64x* ; \
+  ls -lh /usr/share/icons/Papirus; \
+  \
+  dpkg -l |grep bunsen && exit 0 || exit 1;
+
 # 拆分包体与配置项两块，免频繁变动基础包
 # HEADLESS
 COPY --from=files1 /rootfs /rootfs/bin
