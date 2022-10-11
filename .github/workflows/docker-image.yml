@@ -1,0 +1,13 @@
+name: Docker Image CI
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: cd ubt-core; docker build . --file src/Dockerfile --tag docker-headless:t1-$(date +%s)
