@@ -5,7 +5,7 @@ $RUN \
   \
   # wget --connect-timeout=3 -qO /usr/share/images/fluxbox/ubuntu-light.png https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png; \
   wget --connect-timeout=3 -qO /usr/share/images/fluxbox/ubuntu-light.png https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/pure-blue.jpg; \
-  mkdir -p /etc/skel/.config/clipit /etc/skel/.config/pnmixer /etc/skel/.fluxbox; \
+  mkdir -p /etc/skel/.config/clipit /etc/skel/.config/pnmixer /etc/skel/.config/gtk-3.0 /etc/skel/.fluxbox; \
   file=/etc/skel/.fluxbox/overlay; \
   echo -e "\
 menu.hilite.font: PT Sans-11:regular\n\
@@ -49,4 +49,18 @@ save_history=true\n\
 [PNMixer]\n\
 VolumeControlCommand=pavucontrol\n\
   " > $file; \
+  \
+  file=/etc/skel/.config/gtk-3.0/settings.ini; \
+  echo -e "\
+[Setings]\n\
+gtk-theme-name=Greybird\n\
+gtk-icon-theme-name=Papirus-Bunsen-bluegrey\n\
+  " > $file; \
+  \
+  file=/etc/skel/.gtkrc-2.0; \
+  echo -e "\
+gtk-theme-name=Greybird\n\
+gtk-icon-theme-name=Papirus-Bunsen-bluegrey\n\
+  " > $file; \  
+  \  
   find /etc/skel; 
