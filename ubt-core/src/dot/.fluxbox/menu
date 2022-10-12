@@ -19,13 +19,16 @@
 	#[exec]   (♠ stTerm) {stterm} 
 	#[exec]   (♠ Run) {fbrun}
 	[exec] (● Sakura) {sakura}
-	#[exec] (● Thunar) {thunar}
+	[exec] (● Thunar) {thunar}
 	[exec] (● Geany) {geany}
 	[exec]   (♠ Ristretto) {ristretto} 
 	[exec]   (♠ Asbru-cm) {asbru-cm} 
 	[exec]   (♠ Engrampa) {engrampa} 
 	[exec]   (♠ Gnome-monitor) {gnome-system-monitor} 
 	[separator]
+	[submenu] (Tools)
+		[exec] (♣ gparted) {sudo gparted}  
+	[end]
 	[submenu] (Fluxbox menu)
 		[nop] (Custom configs)
 		[exec] (menu) {geany ~/.fluxbox/menu}
@@ -66,7 +69,7 @@
 		[exit] (○ Exit)
 	[end]
 	# ●http://www.fhdq.net/
-	#[exec] (● Lxappearance) {lxappearance}
+	[exec] (♫ Lxappearance) {lxappearance}
 	[exec] (♫ Pavucontrol) {pavucontrol}
 	[exec] (♫ Qmmp) {qmmp}
 	[exec] (♣ Google Chrome) {google-chrome-stable}
