@@ -103,7 +103,7 @@ RUN cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* fla
   sed -i "s^value=\"Mint-Y\"^value=\"Papirus-Bunsen-grey\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml;
 
 ENV \
-  START_SESSION=xfce4-session \
-  DBUS_SESSION_BUS_ADDRESS="unix:path=/run/dbus/system_bus_socket"
+  # DBUS_SESSION_BUS_ADDRESS="unix:path=/run/dbus/system_bus_socket" \
+  START_SESSION=xfce4-session
 WORKDIR /home/headless
 CMD ["bash", "-c", "dpkg -l |grep 'sogoupinyin' || dpkg -i /.bundle/sogoupinyin_4.0.1.2800.deb; exec /entry.sh"]

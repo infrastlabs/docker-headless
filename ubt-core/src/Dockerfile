@@ -66,6 +66,7 @@ RUN apt.sh \
   ls -lh /usr/share/icons/Papirus; \
   \
   dpkg -l |grep bunsen && exit 0 || exit 1;
+RUN apt.sh firefox
 
 # 拆分包体与配置项两块，免频繁变动基础包
 # HEADLESS
@@ -83,6 +84,7 @@ bash /etc/skel/.fluxbox/fluxbox.sh; \n\
 bash /xconf.sh;\n\
 touch /rootfs/.core-init-lock\n\
 " > /rootfs/.core-init
-ENV DBUS_SESSION_BUS_ADDRESS="unix:path=/run/dbus/system_bus_socket"
+# .fluxbox/startup >> if -z $DBUS ; eval $(dbus-launch --sh-syntax --exit-with-session)
+# ENV DBUS_SESSION_BUS_ADDRESS="unix:path=/run/dbus/system_bus_socket"
 # WORKDIR /home/headless
 CMD ["bash", "-c", "test -f /rootfs/.core-init-lock || bash /rootfs/.core-init;  exec /entry.sh"]

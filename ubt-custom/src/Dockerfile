@@ -73,7 +73,8 @@ RUN cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* fla
   # locolor gnome bloom
   cd /usr/share/icons && rm -rf Humanity* ubuntu-mono* LoginIcons Tango; \
   \
-  sed -i "s^value=\"Mint-Y\"^value=\"Papirus-Bunsen-grey\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml;
+  sed -i "s^value=\"Mint-Y\"^value=\"Papirus-Bunsen-bluegrey\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml; \
+  sed -i "s^xfce-teal.png^xfce-pure-blue.jpg^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml;
 
 ENV \
   # DBUS_SESSION_BUS_ADDRESS="unix:path=/run/dbus/system_bus_socket" \

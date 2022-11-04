@@ -18,14 +18,14 @@ sogou)
     # file=sogoupinyin_4.0.1.2800_arm64.deb
     # test -s "$file" || curl -k -O -fSL https://ime.sogouimecdn.com/202210102001/fb5863bbce2217fbf4e4c78f9f5a5e16/dl/gzindex/1656597217/$file
     # 
-    img="remote-desktop:sogou"
+    img="docker-headless:sogou"
     plat="--platform linux/amd64,linux/arm64"
     cimg="docker-headless-cache:sogou"
     cache="--cache-from type=registry,ref=$ali/$ns/$cimg --cache-to type=registry,ref=$ali/$ns/$cimg"
     docker  buildx build $cache $plat --push -t $repo/$ns/$img -f src/Dockerfile.sogou . 
     ;;  
 *)
-    img="remote-desktop:latest"
+    img="docker-headless:latest"
     plat="--platform linux/amd64,linux/arm64" #,linux/arm
     cimg="docker-headless-cache:latest"
     cache="--cache-from type=registry,ref=$ali/$ns/$cimg --cache-to type=registry,ref=$ali/$ns/$cimg"

@@ -14,35 +14,35 @@ repo=registry-1.docker.io
 case "$1" in
 # https://www.linuxmint.com/download_all.php #linuxmint官方暂无arm版？
 cinna)
-    img="remote-desktop:cinna"
+    img="docker-headless:cinna"
     plat="--platform linux/amd64" #,linux/arm64
     cimg="docker-headless-cache:cinna"
     cache="--cache-from type=registry,ref=$ali/$ns/$cimg --cache-to type=registry,ref=$ali/$ns/$cimg"
     docker  buildx build $cache $plat --push -t $repo/$ns/$img -f src/Dockerfile.cinna . 
     ;;
 cmate)
-    img="remote-desktop:cmate"
+    img="docker-headless:cmate"
     plat="--platform linux/amd64" #,linux/arm64
     cimg="docker-headless-cache:cmate"
     cache="--cache-from type=registry,ref=$ali/$ns/$cimg --cache-to type=registry,ref=$ali/$ns/$cimg"
     docker  buildx build $cache $plat --push -t $repo/$ns/$img -f src/Dockerfile.cmate . 
     ;;
 cxfce)
-    img="remote-desktop:cxfce"
+    img="docker-headless:cxfce"
     plat="--platform linux/amd64" #,linux/arm64
     cimg="docker-headless-cache:cxfce"
     cache="--cache-from type=registry,ref=$ali/$ns/$cimg --cache-to type=registry,ref=$ali/$ns/$cimg"
     docker  buildx build $cache $plat --push -t $repo/$ns/$img -f src/Dockerfile.cxfce . 
     ;;
 plas)
-    img="remote-desktop:plas"
+    img="docker-headless:plas"
     plat="--platform linux/amd64,linux/arm64"
     cimg="docker-headless-cache:gnome"
     cache="--cache-from type=registry,ref=$ali/$ns/$cimg --cache-to type=registry,ref=$ali/$ns/$cimg"
     docker  buildx build $cache $plat --push -t $repo/$ns/$img -f src/Dockerfile.plasma . 
     ;;
 *)
-    img="remote-desktop:gnome"
+    img="docker-headless:gnome"
     plat="--platform linux/amd64,linux/arm64" #,linux/arm
 
     # https://docs.docker.com/engine/reference/commandline/buildx_build/
