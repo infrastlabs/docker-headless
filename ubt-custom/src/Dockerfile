@@ -7,15 +7,9 @@ FROM ubuntu:20.04 as files1
   ADD src/clear3d.theme /rootfs/usr/share/plank/themes/Default/dock.theme
   RUN find /rootfs* |wc; \
     cd /rootfs_home_headless/Desktop; chmod +x *.desktop
-# FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core as core
-# FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v5-slim
 FROM infrastlabs/docker-headless:core as core
 FROM infrastlabs/docker-headless:base-v5-slim
 RUN \  
-  # adwaita first(clear icons)
-  # notes: 影响通用版的系统体验(gnome列表图，小图标..) >>在前面layer已装 在最后做清理
-  # apt.sh adwaita-icon-theme; \
-  # cd /usr/share/icons; rm -rf Humanity* ubuntu-mono* hicolor LoginIcons Tango; \
 # RUN \  
   # VIDEO: 30.5 MB
   # libllvm12 已包含 # libgl1-mesa-glx >libgl1-mesa-dri ##ex:  mesa-utils 
@@ -56,10 +50,6 @@ RUN apt.sh papirus-icon-theme greybird-gtk-theme; \
   dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb; \
   cd /usr/share/icons && rm -rf Papirus-Bunsen-Dark-bluegrey Papirus-Bunsen-Dark-grey Papirus-Dark Papirus-Light ePapirus; \
   \
-  # Papirus left: 16x(clipit:21M) 64x(desktop:21M)
-  # cd /usr/share/icons/Papirus && rm -rf 18x* 22x* 24x* 32x*  48x* ; \
-  # ls -lh /usr/share/icons/Papirus; \
-  \
   dpkg -l |grep bunsen && exit 0 || exit 1;
 
 # libxss1: wps
@@ -76,7 +66,6 @@ COPY --from=files1 /rootfs /
 COPY --from=files1 --chown=headless:headless /rootfs_home_headless /home/headless/
 RUN cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*; \
   \
-  # sed -i "s/ibus/fcitx/g" /etc/profile; \
   wget -qO /usr/share/backgrounds/xfce/xfce-teal.png https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png; \
   wget -qO /usr/share/backgrounds/xfce/xfce-pure-blue.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/pure-blue.jpg; \
   \
@@ -86,7 +75,7 @@ RUN cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* fla
   \
   sed -i "s^value=\"Mint-Y\"^value=\"Papirus-Bunsen-grey\"^g" /home/headless/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml;
 
-
 ENV \
+  # DBUS_SESSION_BUS_ADDRESS="unix:path=/run/dbus/system_bus_socket" \
   START_SESSION=xfce4-session
 WORKDIR /home/headless

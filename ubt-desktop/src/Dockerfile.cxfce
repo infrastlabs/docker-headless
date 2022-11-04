@@ -45,7 +45,6 @@ RUN bash /xconf.sh
 
 # HEADLESS 不使用定制项，官方原滋味
 ADD --chown=headless:headless src/.mint-artwork-xfce /home/headless
-# ADD --chown=headless:headless src/.mint-artwork-xfce/.config/autostart /home/headless/.config/autostart
 RUN cd /home/headless/Desktop; chmod +x *.desktop
 
 ENV \

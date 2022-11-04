@@ -11,9 +11,6 @@ RUN echo "deb https://mirrors.tuna.tsinghua.edu.cn/linuxmint ulyana main upstrea
   LINUX_MINT_KEY=$(apt update 2>&1 | grep -o '[0-9A-Z]\{16\}$' | xargs) && \
   apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 ${LINUX_MINT_KEY}
 
-# 0.01 Mbs	mint-meta-core
-# 0.01 Mbs	mint-meta-mate
-# 0.01 Mbs	mint-meta-xfce
 # 0.01 Mbs	mint-meta-cinnamon #singleStep: 67.2 MB
 # 223 MB > 85.2M > 140 MB(artwork)
 # xserver-xephyr wamerican cinnamon-core cinnamon-doc cinnamon-desktop-environment \

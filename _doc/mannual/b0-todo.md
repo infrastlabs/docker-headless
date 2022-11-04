@@ -8,6 +8,13 @@
 
 ## 一、TODO
 
+**221019**
+
+- webvnc(S/C): 10081服务注册：（nezha,webhookd,chisel）
+  - server: wanGateway; client: natAgent; (X11@local)
+  - novnc: 直接novnc> websock> chisel_uds_local> ---chiselTunnel--- > remote
+  - rdp/ssh: exportPort(instID,switch) > chisel_uds_local> ---chiselTunnel--- > remote
+
 **221002**
 
 - core: Dockerfile.base +healthcheck
@@ -18,7 +25,7 @@
 - ubt arm镜像：~~tigervnc退出连接导致其进程挂掉(v10.1) > try: 源码版v12.0~~
 - mint ~~sogou输入法：0808号初装，当前fcitx进程有时挂~~  (暂不影响使用，+fcitx-rime)
 - plasma 桌面： 系统设置左侧栏黑块(区域不可见，但可点击)
-- webhookd: 入口页、集成linux-dash
+- webhookd: 入口页、集成linux-dash >> webvnc(nezha,webhookd,chisel)
 
 **220307**
 
@@ -36,34 +43,13 @@
 
 `docker run -it --rm --net=host -v /sys/fs/cgroup:/sys/fs/cgroup --mount type=tmpfs,dst=/run --mount type=tmpfs,dst=/run/lock $img bash -c "exec /usr/sbin/init"`
 
-## 二、Design
+## ~~二、Design~~
 
-Docker + Headless项(**键鼠/显示/音频/输入法**; ~~网络、电源、蓝牙、打印机~~)
+Docker + Headless项(**键鼠/显示/音频/输入法**; ~~网络、电源、蓝牙、打印机~~) Done.(22.10.18)
 
-- XServer 基础能力（RDP+SSH+noVNC）
-  - Xvnc[Xorg]
-  - xrdp
-  - noVNC
-- XApps 通用镜像 基础层
-  - XLib
-  - 音频: pulse + pavucontrol
-  - 显卡: LibGL--opengl--mesa3d--DRI
-  - fluxbox: 内置独立进程桌面
-- WM 多桌面
-  - xfwm
-  - marco
-  - metacity
-- DE 桌面定制
-  - session
-  - desktop
-  - panel
-  - notify,tray
-  - dock,plank
-  - menu
-  - 
-  - ControlCenter
-  - File
-  - Terminal
+- Base 通用镜像 基础层 (XLib LibGL--opengl--mesa3d--DRI)
+- Remote 基础能力（RDP+SSH+noVNC）
+- Desktop 桌面要素
 
 ## 三、OTH
 

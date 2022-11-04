@@ -8,7 +8,7 @@
 
 SYS|TYPE|DE|WM
 ---|---|---|---
-ubt2004|GShell|ele|gala
+ubt2004|GShell|ele|gala/metacity
 ubt2004|KShell|neon|kwin
 ubt2004|Mint|mate|Marco
 ubt2004|Mint|cinna|xx

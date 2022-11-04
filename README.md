@@ -24,6 +24,8 @@ noVnc | https://192.168.0.x:10081 | `headless` | `View123`
 RDP   | 192.168.0.x:10089         | `headless` | - 
 SSH   | ssh -p 10022 headless@192.168.0.x | `headless` | - 
 
+![](https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/mannual/res/01rdp-double-screen.png)
+
 **Tags**
 
  TAG | Distro | DESK | INPUT | STARTER | IMAGE |Star|Descrition 
@@ -38,14 +40,17 @@ cinna   |Mint| cinnamon | ibus  | systemd | [![Docker Image Size](https://img.sh
 cmate   |Mint| mate | ibus  | systemd | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/cmate)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|GoodExperience
 cxfce   |Mint| xfce | ibus  | systemd | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/cxfce)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|Xfce 4.16
 
-![](https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/mannual/res/01rdp-double-screen.png)
+**ImageLayers**
+
+![](./_doc/mannual/res/design/RDesktop_IMAGE.png)
 
 ## step2: Producttion
 
-x86/arm64 supported, prefer with docker-compose: [docker-compose.yml](./docker-compose.yml) [docker-compose.lite.yml](./docker-compose.lite.yml)
+x86/arm64 supported, Producttion prefer with `docker-compose`
 
-- [Customize docker-compose.yml](./ubt-custom/docker-compose.yml) latest,sogou,core x3
-- [MultiDesktop docker-compose.yml](./ubt-desktop/docker-compose.yml) gnome,plas,cinna,cmate,cxfce x5
+- [docker-compose.yml](./docker-compose.yml)
+- [docker-compose.cust.yml](./docker-compose.cust.yml) (latest,sogou,core x3)
+- [docker-compose.desk.yml](./docker-compose.desk.yml) (gnome,plas,cinna,cmate,cxfce x5)
 
 ```bash
 # supvervisor: core, latest, sogou (--privileged: xrdp-disk-mount)
@@ -57,7 +62,7 @@ docker  run -d -p 10081:10081 -p 10089:10089 --shm-size 1g \
 docker  run -d -p 10081:10081 -p 10089:10089 --shm-size 1g \
   --tmpfs /run --tmpfs /run/lock --tmpfs /tmp \
   --cap-add SYS_BOOT --cap-add SYS_ADMIN \
-  -v /sys/fs/cgroup:/sys/fs/cgroup \
+  -v /sys/fs/cgroup:/sys/fs/cgroup:rw --cgroupns=host \
   infrastlabs/docker-headless:gnome
 ```
 
@@ -84,6 +89,10 @@ echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /
 - [Windows-VM Deployment：](./_doc/deploy/win-vbox/README.md) With `barge-os` mini-container system, `--net=host` Use the VM's IP 
 - [Linux-Server Deployment：](./_doc/deploy/fat-docker/README.md) Use `macvlan`'s network，with special IP，sugest with lxcfs installed.
 - [Kubernetes Deployment：](./_doc/deploy/k8s-headless/README.md) Deployment+Service
+
+**Design**
+
+![](./_doc/mannual/res/design/RDesktop.png)
 
 ## step3: UseCase
 

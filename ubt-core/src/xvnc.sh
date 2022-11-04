@@ -7,7 +7,6 @@ case "$cmd" in
 xvnc)
  #chansrv
     export DISPLAY=:$offsetLimitIndex #:2
-    # /usr/local/xrdp/sbin/xrdp-chansrv &
     xrdp-chansrv &
     # default: Xvnc :99 -BlacklistThreshold=5 -BlacklistTimeout=10
     rm -f /tmp/.X$offsetLimitIndex-lock #clear first, avoid dead-lock

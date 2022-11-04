@@ -1,37 +1,61 @@
+##Prod: Change Password############################
+#  SSH_PASS=ChangeMe  VNC_PASS=ChangeMe2  VNC_PASS_RO=ChangeMe3
+#  echo "headless:$SSH_PASS" |sudo chpasswd
+#  echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /etc/xrdp/vnc_pass; sudo chmod 644 /etc/xrdp/vnc_pass
+###################################################
 version: '2.4'
 services:
-  headless:
-    # latest, slim, full
+  latest:
     image: infrastlabs/docker-headless:latest
-    container_name: headless
     restart: unless-stopped
-    # https://docs.docker.com/compose/compose-file/compose-file-v2/#healthcheck
     healthcheck:
       test: ["CMD", "bash", "-c", "supervisorctl status |grep -v 'RUNNING' && exit 1 || exit 0 "]
-      interval: 5s
-      timeout: 3s 
-      retries: 3
-      start_period: 5s
-    network_mode: bridge #when network_mode!=host, change the mapping to avoid port-confilct.
-    # privileged: true
     shm_size: 1g
-    ports:
-      - "10089:10089"
-      - "10081:10081"
-      - "10022:10022"
+    privileged: true
+    network_mode: host
     environment:
+      - TZ=Asia/Shanghai
+      - L=zh_CN
       - SSH_PASS=headless
       - VNC_PASS=headless
       - VNC_PASS_RO=View123
-      - VNC_SSL_ONLY=false
-      - VNC_OFFSET=10  #network_mode: host, aviod port-conflict
-      # - VNC_CERT=      #when empty: random generate each restart.
-      - TZ=Asia/Shanghai
-      - L=zh_CN
-    # Persist Data: /_ext, /opt; />/mnt/
-    volumes:
-      # - /_ext:/_ext
+    volumes: 
+      - /_ext:/_ext
       - /opt:/opt
-      - /:/mnt
-    cap_add:
-      - SYS_ADMIN    #xrdp remote volume mount
+      - /:/mnt  
+
+  sogou:
+    image: infrastlabs/docker-headless:sogou
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "bash", "-c", "supervisorctl status |grep -v 'RUNNING' && exit 1 || exit 0 "]
+    shm_size: 1g
+    privileged: true
+    network_mode: host
+    environment:
+      - VNC_OFFSET=11  #5900+11
+      - PORT_SSH=11022
+      - PORT_VNC=11081
+      - PORT_RDP=11089
+    volumes: 
+      - /_ext:/_ext
+      - /opt:/opt
+      - /:/mnt  
+
+  core:
+    image: infrastlabs/docker-headless:core
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "bash", "-c", "supervisorctl status |grep -v 'RUNNING' && exit 1 || exit 0 "]
+    shm_size: 1g
+    privileged: true
+    network_mode: host
+    environment:
+      - VNC_OFFSET=12
+      - PORT_SSH=11022
+      - PORT_VNC=11081
+      - PORT_RDP=11089
+    volumes: 
+      - /_ext:/_ext
+      - /opt:/opt
+      - /:/mnt      

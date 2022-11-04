@@ -22,7 +22,7 @@ function oneVnc(){
     echo """
 #[program:xvnc$N-$name1]
 [program:$xn-xvnc]
-environment=DISPLAY=:$N,HOME=/home/$user1
+environment=DISPLAY=:$N,HOME=/home/$user1$env_dbus
 priority=35
 user=$user1
 command=/xvnc.sh xvnc $N
@@ -32,7 +32,7 @@ stdout_logfile_backups  = 10
 redirect_stderr=true
 
 [program:$xn-pulse]
-environment=DISPLAY=:$N,HOME=/home/$user1
+environment=DISPLAY=:$N,HOME=/home/$user1$env_dbus
 priority=36
 user=$user1
 command=/xvnc.sh pulse $N
@@ -42,7 +42,7 @@ stdout_logfile_backups  = 10
 redirect_stderr=true
 
 [program:$xn-parec]
-environment=DISPLAY=:$N,HOME=/home/$user1,PORT_VNC=$PORT_VNC
+environment=DISPLAY=:$N,HOME=/home/$user1,PORT_VNC=$PORT_VNC$env_dbus
 priority=37
 user=$user1
 command=/xvnc.sh parec $N
@@ -56,7 +56,7 @@ redirect_stderr=true
     echo """
 [program:$xn-de]
 #,LANG=$L.UTF-8,LANGUAGE=$L:en #cur: 不加没中文
-environment=DISPLAY=:$N,HOME=/home/headless,USER=headless,SHELL=/bin/bash,TERM=xterm,LANG=$L.UTF-8,LANGUAGE=$L:en
+environment=DISPLAY=:$N,HOME=/home/headless,USER=headless,SHELL=/bin/bash,TERM=xterm,LANG=$L.UTF-8,LANGUAGE=$L:en$env_dbus
 priority=45
 user=headless
 command=bash -c \"env |grep -v PASS; source /.env; exec startfluxbox\"
@@ -134,14 +134,17 @@ function setXserver(){
     unset SSH_PASS VNC_PASS VNC_PASS_RO #unset, not show in desktopEnv.
     unset LOC_XFCE LOC_APPS LOC_APPS2 DEBIAN_FRONTEND    
 }
-lock=/.1stinit.lock
-setXserver
 
 # touch /var/run/dbus/system_bus_socket && chmod 777 /var/run/dbus/system_bus_socket; #>>pulse: conn dbus err.
 # # Start DBUS session bus: (ref: deb9 .flubxbox/startup)
 # if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
-#    eval $(dbus-launch --sh-syntax --exit-with-session)
+#     #dbus-daemon --syslog --fork --print-pid 4 --print-address 6 --session
+#     eval $(dbus-launch --sh-syntax --exit-with-session)
+    echo "D-Bus per-session daemon address is: $DBUS_SESSION_BUS_ADDRESS"
 # fi
+test -z "$DBUS_SESSION_BUS_ADDRESS" || env_dbus=",DBUS_SESSION_BUS_ADDRESS=\"$DBUS_SESSION_BUS_ADDRESS\""
+lock=/.1stinit.lock
+setXserver
 
 ##xconf.sh#########
 #   # 
@@ -191,5 +194,3 @@ cnt=0.1
 echo "sleep $cnt" && sleep $cnt;
 test -z "$START_SYSTEMD" || rm -f /etc/supervisor/conf.d/x$VNC_OFFSET-de.conf
 test -z "$START_SYSTEMD" && exec supervisord -n || exec /lib/systemd/systemd
-
-# test up

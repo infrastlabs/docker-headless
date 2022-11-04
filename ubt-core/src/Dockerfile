@@ -1,21 +1,6 @@
-# FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:core-compile as bin
 FROM infrastlabs/docker-headless:core-compile as bin
-# FROM scratch as files1
 FROM ubuntu:20.04 as files1
-  # ubt2004: tigervnc-standalone-server 1.10.1+dfsg-3
   COPY --from=bin /rootfs /rootfs/
-  # 
-  # # tigervnc 1.10.1 > 1.12.0 
-  # # https://udomain.dl.sourceforge.net/project/tigervnc/stable/1.10.1/tigervnc-1.10.1.x86_64.tar.gz
-  # ENV ver=1.10.1
-  # # ENV ver=1.12.0
-  # ADD tigervnc-${ver}.x86_64.tar.gz /tigervnc-pkg
-  # RUN mkdir -p /rootfs/usr/bin /rootfs/usr/lib64/xorg; cd /tigervnc-pkg/tigervnc-${ver}.x86_64/; \
-  #   \cp -a usr/bin/Xvnc /rootfs/usr/bin/Xvnc; \
-  #   \cp -a usr/bin/vncpasswd /rootfs/usr/bin/vncpasswd; \
-  #   \cp -a usr/lib64/swrast_dri.so /rootfs/usr/lib64/swrast_dri.so; \
-  #   mkdir -p /rootfs/usr/lib/dri; ln -s /usr/lib64/swrast_dri.so /rootfs/usr/lib/dri/; \
-  #   \cp -a usr/lib64/xorg/protocol.txt /rootfs/usr/lib64/xorg/protocol.txt
 
 FROM ubuntu:20.04 as files2
   ARG TARGETPLATFORM
@@ -46,11 +31,8 @@ FROM ubuntu:20.04 as files2
   RUN cd /rootfs/usr/bin; chmod +x *; \
     cd /rootfs/etc/skel/Desktop; chmod +x *.desktop; \
     # https://github.com/TigerVNC/tigervnc/issues/800 #bernhardu,2019=Tigervnc killed just after connect 
-    # LD_PRELOAD=/lib/aarch64-linux-gnu/libgcc_s.so.1 vncserver :2 -localhost no
     test -z "$(echo $TARGETPLATFORM |grep arm64)" || sed -i "s^exec Xvnc^LD_PRELOAD=/lib/aarch64-linux-gnu/libgcc_s.so.1 exec Xvnc^g" /rootfs/xvnc.sh;
 
-# FROM ubuntu:20.04
-# FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v5-slim
 FROM infrastlabs/docker-headless:base-v5-slim
 # 轻量级桌面 openbox + tint2 + conky + stalonetray + pcmanfm + xcompmgr #http://t.zoukankan.com/huapox-p-3516155.html #huapox
 #   无thunar/lxappearance: 结合asbru纯SSH,音频场景（管维）
@@ -101,5 +83,6 @@ bash /etc/skel/.fluxbox/fluxbox.sh; \n\
 bash /xconf.sh;\n\
 touch /rootfs/.core-init-lock\n\
 " > /rootfs/.core-init
+ENV DBUS_SESSION_BUS_ADDRESS="unix:path=/run/dbus/system_bus_socket"
 # WORKDIR /home/headless
 CMD ["bash", "-c", "test -f /rootfs/.core-init-lock || bash /rootfs/.core-init;  exec /entry.sh"]

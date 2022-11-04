@@ -20,21 +20,12 @@ RUN bash /xconf.sh
 
 RUN \
   wget -qO /usr/share/backgrounds/warty-final-ubuntu.png https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png; 
-  # \
-  # wget https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
-  # dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb; \
-  # dpkg -l |grep bunsen && exit 0 || exit 1;  
-
 
 # HEADLESS
 ADD --chown=headless:headless src/.config /home/headless/.config
 
 ENV \
   XDG_SESSION_TYPE=x11 \
-  # XKL_XMODMAP_DISABLE=1 \
-  \
-  # PULSE_SERVER="tcp:localhost:4731" \
-  # DISPLAY="localhost:31" \
   START_SESSION=gnome-session \
   START_SYSTEMD=true
 WORKDIR /home/headless

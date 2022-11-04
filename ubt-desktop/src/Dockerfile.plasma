@@ -21,5 +21,3 @@ ADD --chown=headless:headless src/.config /home/headless/.config
 ENV \
   START_SESSION=startplasma-x11 \
   START_SYSTEMD=true
-
-# CMD ["plasma_session"]

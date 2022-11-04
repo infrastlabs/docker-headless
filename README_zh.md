@@ -1,21 +1,13 @@
-# Docker云桌面（docker-headless）
+**Docker云桌面**（docker-headless）
+
+基于`Ubuntu20.04`胖容器+远程接入, 实现`Linux`下私人桌面、云端办公。在生产跑浏览器做调试/维护。在服务器搭建专用开发环境，公司/Home互通办公。镜像体积小、支持多语言、提供多桌面
 
 [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/latest)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)
 [![Docker Pulls](https://img.shields.io/docker/pulls/infrastlabs/docker-headless.svg)](https://hub.docker.com/r/infrastlabs/docker-headless)
 [![Last commit](https://img.shields.io/github/last-commit/infrastlabs/docker-headless.svg)](https://www.github.com/infrastlabs/docker-headless)
 [![GitHub issues](https://img.shields.io/github/issues/infrastlabs/docker-headless.svg)](https://www.github.com/infrastlabs/docker-headless/issues)
 
-Multi-Desktop with `XRDP/NOVNC/PulseAudio` based on `Ubuntu20.04`, Formatting a HeadlessBox/Cloud Desktop.
-
-- Screen shared with both RDP/noVnc. (ReadWrite/ReadOnly)
-- MultiScreen support. (mstsc+xrdp+tigervnc)
-- Audio support. (xrdp+pulseaudio/noVNC+broadcast)
-- Locale/TZ support. 中文输入法(五笔/拼音)
-- Desktop apps: ibus-rime/fcitx-sogou, flameshot, PAC.
-- 精简小巧 `core: 170.53 MB(fluxbox)`, `latest: 277.48 MB(ibus,xfce4.14)`, `sogou: 354.15 MB(fcitx)`
-
-
-## 一、快速开始
+**一、快速开始**
 
 `docker run -it --rm --shm-size 1g --net=host infrastlabs/docker-headless`
 
@@ -25,78 +17,19 @@ noVnc | http://192.168.0.x:10081 | `headless` | `View123`
 RDP   | 192.168.0.x:10089        | `headless` | - 
 SSH   | ssh -p 10022 headless@192.168.0.x | `headless` | - 
 
-**镜像清单**
-
- TAG | 发行版 | 桌面 | 输入法 | 启动器 | 镜像 |推荐|说明 
---- | --- | ---  | ---  | --- | --- | --- | ---
-latest |Ubuntu| xfce | ibus  | supervisor | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/latest)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|定制,体积小
-sogou  |Ubuntu| xfce | fcitx | supervisor | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/sogou)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|搜狗输入法
-core   |Ubuntu| flux | ibus  | supervisor | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/core)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★☆|配置层,调试用
----|---|---|---|---|---|---
-gnome   |Ubuntu| gnome | ibus  | systemd | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/gnome)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|兼容性好
-plas   |Kubuntu| plasma | ibus  | systemd | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/plas)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★☆|设置左侧黑块
-cinna   |Mint| cinnamon | ibus  | systemd | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/cinna)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★☆|显卡驱动提示
-cmate   |Mint| mate | ibus  | systemd | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/cmate)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|体验良好
-cxfce   |Mint| xfce | ibus  | systemd | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/cxfce)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|新版xfce
-
 ![](https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/mannual/res/01rdp-double-screen.png)
 
-## 二、Producttion
+**二、设计说明**
 
-x86/arm64 supported, 推荐 docker-compose: [docker-compose.yml](./docker-compose.yml) [docker-compose.lite.yml](./docker-compose.lite.yml)
+- 容器：环境固化、宿主隔离、胖容器/虚拟机
+- 桌面：远程共享、双屏支持(RDP)、只读屏幕(noVNC)
+- 特色：远程音频、本土化、输入法(五笔/拼音)
+- 多桌面：Xfce,Mate,Cinnamon,Gnome,Plasma
+- 小体积：镜像层复用、小巧精简 `core: 170.53 MB`, `latest: 277.48 MB`, `sogou: 354.15 MB`
 
-- [定制版 docker-compose.yml](./ubt-custom/docker-compose.yml) latest,sogou,core 三组
-- [多桌面 docker-compose.yml](./ubt-desktop/docker-compose.yml) gnome,plas,cinna,cmate,cxfce 五组
+![](./_doc/mannual/res/design/RDesktop.png)
 
-```bash
-# supvervisor: core, latest, sogou (--privileged: xrdp-disk-mount)
-docker  run -d -p 10081:10081 -p 10089:10089 --shm-size 1g \
-  infrastlabs/docker-headless:sogou
-
-# systemd: gnome(must-systemd), plas, mint(cinna, cmate, cxfce)
-# 注：sogou arm64版暂未支持, mint系列暂只有x86(cinnamon,mate,xfce4.16) ，它官方没找到arm源
-docker  run -d -p 10081:10081 -p 10089:10089 --shm-size 1g \
-  --tmpfs /run --tmpfs /run/lock --tmpfs /tmp \
-  --cap-add SYS_BOOT --cap-add SYS_ADMIN \
-  -v /sys/fs/cgroup:/sys/fs/cgroup \
-  infrastlabs/docker-headless:gnome
-```
-
-**(0)源码目录**
-
-- [deb9: 基于Debian9的版本 (xfce定制:体积小,稳定)](./deb9/)
-- [ubt-core: Ubuntu基础版 (极简:含核心远程组件，内置fluxbox)](./ubt-core/)
-- [ubt-custom: 新版Ubuntu20.04 (xfce定制:Xfce4.14, 对标deb9, 搜狗输入法)](./ubt-custom/)
-- [ubt-desktop: 多桌面 (通用:Gnome,Plasma,Cinnamon,Mate,Xfce4)](./ubt-desktop/)
-
-**(1)密码修改**: 生产禁用默认密码，初始后请修改!!
-
-```bash
-# 动态修改密码：
-SSH_PASS=xxx  VNC_PASS=xxx2  VNC_PASS_RO=xxx3
-echo "headless:$SSH_PASS" |sudo chpasswd
-echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /etc/xrdp/vnc_pass; sudo chmod 644 /etc/xrdp/vnc_pass
-```
-
-**(2)使用帮助**: 
-
-- [云桌面功能简介](./_doc/mannual/01-CloudDesktop.md) &nbsp; [TODO](./_doc/mannual/b0-todo.md)
-- [1.如何设置为中文或其它语言？](./_doc/mannual/b1-locale.md)
-- [2.双屏连接，远程剪切板、音频如何使用？](./_doc/mannual/b2-rdp.md)
-- [3.如何WEB访问远程桌面？](./_doc/mannual/b3-vnc.md)
-- [4.中文输入法、截图软件使用说明](./_doc/mannual/b4-apps.md)
-- [5.音乐播放器及远程音频相关说明](./_doc/mannual/b5-audio.md)
-- [6.如何使用Ubuntu, Mate，KDE等其它桌面](./_doc/mannual/b6-desktop.md) (多桌面,网关模式)
-- [Detail明细说明](./detail.md) （快捷键、环境变量、系统应用）
-
-
-**(3)生产部署指引**: 
-
-- [Windows虚拟机部署：](./_doc/deploy/win-vbox/README.md) 采用barge-os迷你容器系统, --net=host 采用虚机IP 
-- [Linux服务器部署：](./_doc/deploy/fat-docker/README.md) 容器使用macvlan网络，分配专用IP，建议安装lxcfs
-- [K8S内部署：](./_doc/deploy/k8s-headless/README.md) Deployment+Service
-
-## 三、使用示例
+**三、使用示例**
 
 多语言快速体验: `docker run -it --rm --shm-size 1g -e VNC_OFFSET=20 -e L=zh_CN --net=host infrastlabs/docker-headless:latest`, 推荐[docker-compose.yml](./docker-compose.yml)
 

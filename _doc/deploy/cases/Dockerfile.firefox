@@ -1,7 +1,0 @@
-FROM infrastlabs/docker-headless:latest
-RUN apt.sh \
-  firefox-esr;
-RUN apt.sh \
-  fonts-wqy-zenhei
-RUN cp /usr/share/applications/firefox-esr.desktop /home/headless/Desktop; \
-  cd /home/headless/Desktop; chown headless:headless firefox-esr*; chmod +x firefox-esr*;

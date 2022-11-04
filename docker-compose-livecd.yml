@@ -1,0 +1,125 @@
+##Entry: web:10181, ssh:10122, rdp:10189###########
+# gnome: http://192.168.0.x:10181
+# plasma: http://192.168.0.x:10281
+# cinnamon: http://192.168.0.x:10381
+# cmate: http://192.168.0.x:10481
+# cxfce: http://192.168.0.x:10581
+###################################################
+version: '2.4'
+services:
+  gnome:
+    image: infrastlabs/docker-headless:gnome
+    restart: unless-stopped
+    shm_size: 1g
+    privileged: true #xrdp thinclient_drives
+    healthcheck:
+      test: ["CMD", "bash", "-c", "supervisorctl status |grep -v 'RUNNING' && exit 1 || exit 0 "]
+    ports:
+      - "10181:10081"
+      - "10189:10089"
+      # - "10122:10022"
+    cap_add:
+      - SYS_BOOT 
+      - SYS_ADMIN         
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    volumes: 
+      - /sys/fs/cgroup:/sys/fs/cgroup 
+      - /_ext:/_ext
+      - /:/mnt      
+
+  plasma:
+    image: infrastlabs/docker-headless:plas
+    restart: unless-stopped
+    shm_size: 1g
+    privileged: true #plasma
+    healthcheck:
+      test: ["CMD", "bash", "-c", "supervisorctl status |grep -v 'RUNNING' && exit 1 || exit 0 "]
+    ports:
+      - "10281:10081"
+      - "10289:10089"
+      # - "10222:10022"
+    cap_add:
+      - SYS_BOOT 
+      - SYS_ADMIN         
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    volumes: 
+      - /sys/fs/cgroup:/sys/fs/cgroup 
+      - /_ext:/_ext
+      - /:/mnt  
+
+  cinna:
+    image: infrastlabs/docker-headless:cinna
+    restart: unless-stopped
+    shm_size: 1g
+    privileged: true
+    healthcheck:
+      test: ["CMD", "bash", "-c", "supervisorctl status |grep -v 'RUNNING' && exit 1 || exit 0 "]
+    ports:
+      - "10381:10081"
+      - "10389:10089"
+      # - "10322:10022"
+    cap_add:
+      - SYS_BOOT 
+      - SYS_ADMIN         
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    volumes: 
+      - /sys/fs/cgroup:/sys/fs/cgroup 
+      - /_ext:/_ext
+      - /:/mnt  
+
+  cmate:
+    image: infrastlabs/docker-headless:cmate
+    restart: unless-stopped
+    shm_size: 1g
+    privileged: true
+    healthcheck:
+      test: ["CMD", "bash", "-c", "supervisorctl status |grep -v 'RUNNING' && exit 1 || exit 0 "]
+    ports:
+      - "10481:10081"
+      - "10489:10089"
+      # - "10422:10022"
+    cap_add:
+      - SYS_BOOT 
+      - SYS_ADMIN         
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    volumes: 
+      - /sys/fs/cgroup:/sys/fs/cgroup 
+      - /_ext:/_ext
+      - /:/mnt  
+
+  cxfce:
+    image: infrastlabs/docker-headless:cxfce
+    restart: unless-stopped
+    shm_size: 1g
+    privileged: true
+    healthcheck:
+      test: ["CMD", "bash", "-c", "supervisorctl status |grep -v 'RUNNING' && exit 1 || exit 0 "]
+    ports:
+      - "10581:10081"
+      - "10589:10089"
+      # - "10522:10022"
+    cap_add:
+      - SYS_BOOT
+      - SYS_ADMIN
+      # https://github.com/docker-archive/libcontainer/blob/master/SPEC.md#security
+      # $ cat ct_caps.txt2  |cut -d' ' -f1 |grep -v "^$" |sort |sed "s/CAP_/- /g"    
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    volumes: 
+      - /sys/fs/cgroup:/sys/fs/cgroup 
+      - /_ext:/_ext
+      - /:/mnt  

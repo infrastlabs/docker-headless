@@ -5,7 +5,8 @@ $RUN \
   \
   # wget --connect-timeout=3 -qO /usr/share/images/fluxbox/ubuntu-light.png https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png; \
   wget --connect-timeout=3 -qO /usr/share/images/fluxbox/ubuntu-light.png https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/pure-blue.jpg; \
-  mkdir -p /etc/skel/.config/clipit /etc/skel/.config/pnmixer /etc/skel/.config/gtk-3.0 /etc/skel/.fluxbox; \
+  mkdir -p /etc/skel/.config/clipit /etc/skel/.config/pnmixer /etc/skel/.config/gtk-3.0 /etc/skel/.fluxbox \
+    /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml; \
   file=/etc/skel/.fluxbox/overlay; \
   echo -e "\
 menu.hilite.font: PT Sans-11:regular\n\
@@ -15,7 +16,7 @@ toolbar.clock.font: PT Sans-11:bold\n\
 toolbar.workspace.font: PT Sans-11:regular\n\
 toolbar.iconbar.focused.font: PT Sans-11:regular\n\
 toolbar.iconbar.unfocused.font: PT Sans-11:regular\n\
-window.font: Lato-9\n\
+window.font: PT Sans-9:regular\n\
   " > $file; \
   sed -i  "s/PT Sans/WenQuanYi Zen Hei/" $file; \
   \
@@ -52,15 +53,30 @@ VolumeControlCommand=pavucontrol\n\
   \
   file=/etc/skel/.config/gtk-3.0/settings.ini; \
   echo -e "\
-[Setings]\n\
+[Settings]\n\
 gtk-theme-name=Greybird\n\
 gtk-icon-theme-name=Papirus-Bunsen-bluegrey\n\
   " > $file; \
   \
-  file=/etc/skel/.gtkrc-2.0; \
+  file=/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/thunar.xml; \
   echo -e "\
-gtk-theme-name=Greybird\n\
-gtk-icon-theme-name=Papirus-Bunsen-bluegrey\n\
-  " > $file; \  
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+\n\
+<channel name=\"thunar\" version=\"1.0\">\n\
+  <property name=\"last-view\" type=\"string\" value=\"ThunarIconView\"/>\n\
+  <property name=\"last-location-bar\" type=\"string\" value=\"ThunarLocationEntry\"/>\n\
+  <property name=\"last-icon-view-zoom-level\" type=\"string\" value=\"THUNAR_ZOOM_LEVEL_100_PERCENT\"/>\n\
+  <property name=\"last-separator-position\" type=\"int\" value=\"170\"/>\n\
+  <property name=\"hidden-bookmarks\" type=\"array\">\n\
+    <value type=\"string\" value=\"network://\"/>\n\
+  </property>\n\
+</channel>\n\
+  " > $file; \
+  \
+#   file=/etc/skel/.gtkrc-2.0; \
+#   echo -e "\
+# gtk-theme-name=Greybird\n\
+# gtk-icon-theme-name=Papirus-Bunsen-bluegrey\n\
+#   " > $file; \  
   \  
-  find /etc/skel; 
+  find /etc/skel |wc; 
