@@ -1,6 +1,6 @@
 # CloudDesktop简介
 
-支持Web,RDP,SSH多种远程方式
+镜像体积小、支持多语言、提供多桌面。Web,RDP,SSH多种远程接入
 
 ## 一、WEB浏览器
 

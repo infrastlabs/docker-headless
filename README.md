@@ -9,7 +9,7 @@ Multi-Desktop with `XRDP/NOVNC/PulseAudio` based on `Ubuntu20.04`, Formatting a 
 
 ## step1: QuickStart
 
-`docker run -it --rm --shm-size 1g --net=host infrastlabs/docker-headless`
+`docker run -it --rm --shm-size 1g --net=host infrastlabs/docker-headless:latest`
 
  -- | Conn | PASS | ReadOnly 
 --- | ---  | ---  | ---
@@ -26,7 +26,7 @@ SSH   | ssh -p 10022 headless@192.168.0.x | `headless` | -
 - Audio support. (xrdp+pulseaudio/noVNC+broadcast)
 - Locale/TZ support.
 - Desktop apps: ibus-rime/fcitx-sogou, flameshot, PAC.
-- Slim image: `core: 170.53 MB(fluxbox)`, `latest: 277.48 MB(ibus,xfce4.14)`, `sogou: 354.15 MB(fcitx)`
+- Slim image: `core: 170.53 MB`, `latest: 277.48 MB`, `sogou: 354.15 MB`
 
 ![](./_doc/res/design/RDesktop.png)
 
@@ -69,7 +69,7 @@ wget https://vscode.cdn.azure.cn/stable/6cba118ac49a1b88332f312a8f67186f7f3c1643
 wget https://download.jetbrains.com.cn/idea/ideaIC-2016.3.8-no-jdk.tar.gz
 ```
 
-![](_doc/mannual/res/02/ide2-vscode.png)
+![](_doc/res/02/ide2-vscode.png)
 
 **(2)Office**
 
@@ -86,12 +86,12 @@ sudo sed -i "1a export XMODIFIERS=@im=ibus" /usr/bin/{wps,wpp,et}
 sudo sed -i "2a export QT_IM_MODULE=ibus" /usr/bin/{wps,wpp,et}
 ```
 
-![](_doc/mannual/res/02/apps-office-wps.jpg)
+![](_doc/res/02/apps-office-wps.jpg)
 
 
 **(3)Docker Dind**
 
-![](_doc/mannual/res/02/dind2-headlessLinks.png)
+![](_doc/res/02/dind2-headlessLinks.png)
 
 ```bash
 # exec@host: docker,dcp

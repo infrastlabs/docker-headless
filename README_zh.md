@@ -1,6 +1,6 @@
 **Docker云桌面**（docker-headless）
 
-基于`Ubuntu20.04`胖容器+远程接入, 实现`Linux`下私人桌面、云端办公。在生产跑浏览器做调试/维护。在服务器搭建专用开发环境，公司/Home互通办公。镜像体积小、支持多语言、提供多桌面 [[Detail]](./Detail.md)
+基于`Ubuntu20.04`胖容器+远程接入, 实现`Linux`下私人桌面、云端办公。在生产跑浏览器做调试/维护。在服务器搭建专用开发环境，公司/Home互通办公。[[Detail]](./Detail.md)
 
 [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/latest)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)
 [![Docker Pulls](https://img.shields.io/docker/pulls/infrastlabs/docker-headless.svg)](https://hub.docker.com/r/infrastlabs/docker-headless)
@@ -37,15 +37,12 @@ SSH   | ssh -p 10022 headless@192.168.0.x | `headless` | -
 # LiveCD Experience: gnome/plasma, mint-series only with x86(cinna, cmate, cxfce)
 # Plasma/Mint with START_SYSTEMD=false
 docker run -it --rm --net=host --shm-size 1g \
-  -e L=en_US -e VNC_OFFSET=99 -e START_SYSTEMD=false \
-  infrastlabs/docker-headless:cmate
+  -e L=en_US -e VNC_OFFSET=99 -e START_SYSTEMD=false infrastlabs/docker-headless:cmate
 
 # Gnome with systemd, cgroup_v2: --cgroupns=host (docker 20.10+)
 docker run -it --rm --net=host --shm-size 1g -e VNC_OFFSET=99 \
-  --tmpfs /run --tmpfs /run/lock --tmpfs /tmp \
-  --cap-add SYS_BOOT --cap-add SYS_ADMIN \
-  -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
-  infrastlabs/docker-headless:gnome
+  --tmpfs /run --tmpfs /run/lock --tmpfs /tmp -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
+  --cap-add SYS_BOOT --cap-add SYS_ADMIN infrastlabs/docker-headless:gnome
 ```
 
 **(1)Dev开发环境搭建** (java, golang, nodejs)
@@ -86,7 +83,7 @@ wget https://vscode.cdn.azure.cn/stable/6cba118ac49a1b88332f312a8f67186f7f3c1643
 wget https://download.jetbrains.com.cn/idea/ideaIC-2016.3.8-no-jdk.tar.gz
 ```
 
-![](_doc/mannual/res/02/ide2-vscode.png)
+![](_doc/res/02/ide2-vscode.png)
 
 **(2)浏览器、Office办公**
 
@@ -105,14 +102,14 @@ sudo sed -i "1a export XMODIFIERS=@im=ibus" /usr/bin/{wps,wpp,et}
 sudo sed -i "2a export QT_IM_MODULE=ibus" /usr/bin/{wps,wpp,et}
 ```
 
-![](_doc/mannual/res/02/apps-office-wps.jpg)
+![](_doc/res/02/apps-office-wps.jpg)
 
 
 **(3)Docker Dind模式**
 
 支持在容器内调用宿主机的dockerd，用于dockerfile构建、容器控制等场景。
 
-![](_doc/mannual/res/02/dind2-headlessLinks.png)
+![](_doc/res/02/dind2-headlessLinks.png)
 
 ```bash
 # 宿主机运行：获取docker,docker-compose文件:
