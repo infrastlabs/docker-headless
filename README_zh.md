@@ -9,7 +9,7 @@
 
 **一、快速开始**
 
-`docker run -it --rm --shm-size 1g --net=host infrastlabs/docker-headless`
+`docker run -it --rm --shm-size 1g --net=host infrastlabs/docker-headless:latest`
 
  -- | 连接 | 密码 | 只读密码 
 --- | ---  | ---  | ---
@@ -32,6 +32,21 @@ SSH   | ssh -p 10022 headless@192.168.0.x | `headless` | -
 **三、使用示例**
 
 多语言快速体验: `docker run -it --rm --shm-size 1g -e VNC_OFFSET=20 -e L=zh_CN --net=host infrastlabs/docker-headless:latest`, 推荐[docker-compose.yml](./docker-compose.yml)
+
+```bash
+# LiveCD Experience: gnome/plas, mint-series only with x86(cinna, cmate, cxfce)
+# Plasma/Mint with START_SYSTEMD=false
+docker run -it --rm --net=host --shm-size 1g \
+  -e L=en_US -e VNC_OFFSET=99 -e START_SYSTEMD=false \
+  infrastlabs/docker-headless:cmate
+
+# Gnome with systemd, cgroup_v2: --cgroupns=host (docker 20.10+)
+docker run -it --rm --net=host --shm-size 1g -e VNC_OFFSET=99 \
+  --tmpfs /run --tmpfs /run/lock --tmpfs /tmp \
+  --cap-add SYS_BOOT --cap-add SYS_ADMIN \
+  -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
+  infrastlabs/docker-headless:gnome
+```
 
 **(1)Dev开发环境搭建** (java, golang, nodejs)
 
@@ -79,7 +94,7 @@ wps, chrome/firefox
 
 ```bash
 # 火狐/谷歌浏览器
-sudo apt -y install firefox-esr chromium #chromium-driver
+sudo apt -y install firefox #firefox-esr chromium
 # 网易云音乐
 wget https://d1.music.126.net/dmusic/netease-cloud-music_1.2.1_amd64_ubuntu_20190428.deb
 # WPS三件套

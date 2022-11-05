@@ -37,7 +37,7 @@ cxfce)
 plas)
     img="docker-headless:plas"
     plat="--platform linux/amd64,linux/arm64"
-    cimg="docker-headless-cache:gnome"
+    cimg="docker-headless-cache:plas"
     cache="--cache-from type=registry,ref=$ali/$ns/$cimg --cache-to type=registry,ref=$ali/$ns/$cimg"
     docker  buildx build $cache $plat --push -t $repo/$ns/$img -f src/Dockerfile.plasma . 
     ;;

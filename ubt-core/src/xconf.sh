@@ -91,7 +91,7 @@ $RUN \
     \
   # systemd2
   # find `ls |grep -Ev "^home|^root|^usr|^opt|^mnt|^sys|^proc"`
-  cd /; find `ls |grep -E "^etc|^var"` |grep systemd |grep ".service$" |grep "supervi" |while read one; do echo $one; rm -f $one; done; \
+  find `echo /etc/ /lib/ /var/` -name "*systemd*" |grep ".service$" |grep "supervi" |while read one; do echo $one; rm -f $one; done; \
   \
   dpkg-divert --local --rename --add /sbin/udevadm; ln -s /bin/true /sbin/udevadm; \
   systemctl enable de-entry; systemctl enable de-start; \

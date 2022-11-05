@@ -17,7 +17,10 @@ services:
       - SSH_PASS=headless
       - VNC_PASS=headless
       - VNC_PASS_RO=View123
-      - VNC_OFFSET=20 #default 10
+      - VNC_OFFSET=11
+      - PORT_SSH=11022
+      - PORT_VNC=11081
+      - PORT_RDP=11089
       - TZ=Asia/Shanghai
       - L=zh_CN
     volumes: 
@@ -34,10 +37,10 @@ services:
     privileged: true
     network_mode: host
     environment:
-      - VNC_OFFSET=21  #5900+21
-      - PORT_SSH=11022
-      - PORT_VNC=11081
-      - PORT_RDP=11089
+      - VNC_OFFSET=12  #5900+12
+      - PORT_SSH=12022
+      - PORT_VNC=12081
+      - PORT_RDP=12089
     volumes: 
       - /_ext:/_ext
       - /opt:/opt
@@ -52,10 +55,10 @@ services:
     privileged: true
     network_mode: host
     environment:
-      - VNC_OFFSET=22
-      - PORT_SSH=12022
-      - PORT_VNC=12081
-      - PORT_RDP=12089
+      - VNC_OFFSET=13
+      - PORT_SSH=13022
+      - PORT_VNC=13081
+      - PORT_RDP=13089
     volumes: 
       - /_ext:/_ext
       - /opt:/opt

@@ -25,6 +25,7 @@ function oneVnc(){
 environment=DISPLAY=:$N,HOME=/home/$user1$env_dbus
 priority=35
 user=$user1
+startretries=5
 command=/xvnc.sh xvnc $N
 stdout_logfile=$varlog/$xn-xvnc.log
 stdout_logfile_maxbytes = 50MB
@@ -35,6 +36,7 @@ redirect_stderr=true
 environment=DISPLAY=:$N,HOME=/home/$user1$env_dbus
 priority=36
 user=$user1
+startretries=5
 command=/xvnc.sh pulse $N
 stdout_logfile=$varlog/$xn-pulse.log
 stdout_logfile_maxbytes = 50MB
@@ -45,6 +47,7 @@ redirect_stderr=true
 environment=DISPLAY=:$N,HOME=/home/$user1,PORT_VNC=$PORT_VNC$env_dbus
 priority=37
 user=$user1
+startretries=5
 command=/xvnc.sh parec $N
 stdout_logfile=$varlog/$xn-parec.log
 stdout_logfile_maxbytes = 50MB
@@ -59,6 +62,7 @@ redirect_stderr=true
 environment=DISPLAY=:$N,HOME=/home/headless,USER=headless,SHELL=/bin/bash,TERM=xterm,LANG=$L.UTF-8,LANGUAGE=$L:en$env_dbus
 priority=45
 user=headless
+startretries=5
 command=bash -c \"env |grep -v PASS; source /.env; exec startfluxbox\"
 stdout_logfile=/var/log/supervisor/$xn-de.log
 stdout_logfile_maxbytes = 50MB
@@ -192,5 +196,5 @@ test -z "$START_SESSION" || sed -i "s/startfluxbox/$START_SESSION/g" /etc/superv
 
 cnt=0.1
 echo "sleep $cnt" && sleep $cnt;
-test -z "$START_SYSTEMD" || rm -f /etc/supervisor/conf.d/x$VNC_OFFSET-de.conf
-test -z "$START_SYSTEMD" && exec supervisord -n || exec /lib/systemd/systemd
+test "true" != "$START_SYSTEMD" || rm -f /etc/supervisor/conf.d/x$VNC_OFFSET-de.conf
+test "true" != "$START_SYSTEMD" && exec supervisord -n || exec /lib/systemd/systemd

@@ -19,5 +19,7 @@ RUN \
 ADD --chown=headless:headless src/.config /home/headless/.config
 
 ENV \
-  START_SESSION=startplasma-x11 \
+  # startplasma-x11: error with arm64
+  # START_SESSION=startplasma-x11 \
+  START_SESSION=plasma_session \
   START_SYSTEMD=true

@@ -37,6 +37,10 @@ RUN apt.sh \
   apt -y remove \
   mintreport ; cd /usr/bin; rm -f mintupdate*
 
+# tiger compiled
+RUN apt.sh libunwind8 libxfont2 libgl1; \
+  rm -f /usr/lib/x86_64-linux-gnu/libLLVM-12.so.1; \
+  rm -f /usr/lib/aarch64-linux-gnu/libLLVM-12.so.1; 
 # CORE
 COPY --from=core /rootfs/bin /
 COPY --from=core /rootfs/conf /
