@@ -19,7 +19,7 @@ COPY --from=core /rootfs/conf /
 RUN bash /xconf.sh
 
 RUN \
-  wget -qO /usr/share/backgrounds/warty-final-ubuntu.png https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png; 
+  wget -qO /usr/share/backgrounds/warty-final-ubuntu.png https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/assets/bg/bg-debian-liteblue.png; 
 
 # HEADLESS
 ADD --chown=headless:headless src/.config /home/headless/.config

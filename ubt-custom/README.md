@@ -1,34 +1,18 @@
-# mint
-
-从../ubuntu[core-v4-slim]继承的定制版，基于mint源安装xfce4.16, 皮肤效果对标deb9，试用项：Fcitx.sogou输入法
+# Cust定制版
 
 - 从deb9演进(debian9 > ubuntu2004), mint主题+xfce4.16+tint2+plank
-- 复用基础镜像 `FROM docker-headless:core-v4-slim`
-- ~~mint,flux二合一： 考虑多用户，可选桌面..~~
+- 复用基础镜像 `FROM docker-headless:base-v5-slim`
+- Ibus-rime, Fcitx-sogou输入法
 
 ```bash
-# 10022, 10089, 10081
-# env="-e PORT_SSH=10092 -e PORT_RDP=10099 -e PORT_VNC=10091"
-docker run -it --rm --net=host $env -e VNC_OFFSET=10  infrastlabs/docker-headless:mint-v3
+# env="-e PORT_SSH=10022 -e PORT_RDP=10089 -e PORT_VNC=10081"
+docker run -it --rm --net=host $env -e VNC_OFFSET=10  infrastlabs/docker-headless:latest
+
 # gemmi-deb11 连接本地 声音无延迟、不卡顿
 rdesktop localhost:10089 -uabc -pheadless -a 16 -g 1600x1010 -r sound:local
 ```
 
-**版本选择**
-
-https://wiki.debian.org/LTS  #deb9: (July 6, 2020 to June 30, 2022 )  
-https://ubuntu.com/about/release-cycle #ubt20: (2020.4 - 2030.4)
-
-![](./../_doc/deploy/assets/lts_ubuntu.png)
-
-- deb9: 2017, xrdp 0.9.16_OpenSSL 1.1.0l  10 Sep 2019|Xvnc TigerVNC 1.10.0|pulseaudio 10.0
-- deb10: 2019, 
-- deb11: 2021, 
-- ubt18: 
-- ubt20: xrdp 0.9.16_OpenSSL 1.1.1f  31 Mar 2020|Xvnc TigerVNC 1.12.0|pulseaudio 13.99.1
-- ubt22: 
-
-![](./../_doc/deploy/assets/lts_debian.png)
+**Xvnc**
 
 ```bash
 # ubt20:

@@ -1,6 +1,6 @@
 **Docker云桌面**（docker-headless）
 
-基于`Ubuntu20.04`胖容器+远程接入, 实现`Linux`下私人桌面、云端办公。在生产跑浏览器做调试/维护。在服务器搭建专用开发环境，公司/Home互通办公。镜像体积小、支持多语言、提供多桌面
+基于`Ubuntu20.04`胖容器+远程接入, 实现`Linux`下私人桌面、云端办公。在生产跑浏览器做调试/维护。在服务器搭建专用开发环境，公司/Home互通办公。镜像体积小、支持多语言、提供多桌面 [[Detail]](./Detail.md)
 
 [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/latest)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)
 [![Docker Pulls](https://img.shields.io/docker/pulls/infrastlabs/docker-headless.svg)](https://hub.docker.com/r/infrastlabs/docker-headless)
@@ -17,7 +17,7 @@ noVnc | http://192.168.0.x:10081 | `headless` | `View123`
 RDP   | 192.168.0.x:10089        | `headless` | - 
 SSH   | ssh -p 10022 headless@192.168.0.x | `headless` | - 
 
-![](https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/mannual/res/01rdp-double-screen.png)
+![](https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/res/01rdp-double-screen.png)
 
 **二、设计说明**
 
@@ -27,14 +27,14 @@ SSH   | ssh -p 10022 headless@192.168.0.x | `headless` | -
 - 多桌面：Xfce,Mate,Cinnamon,Gnome,Plasma
 - 小体积：镜像层复用、小巧精简 `core: 170.53 MB`, `latest: 277.48 MB`, `sogou: 354.15 MB`
 
-![](./_doc/mannual/res/design/RDesktop.png)
+![](./_doc/res/design/RDesktop.png)
 
 **三、使用示例**
 
 多语言快速体验: `docker run -it --rm --shm-size 1g -e VNC_OFFSET=20 -e L=zh_CN --net=host infrastlabs/docker-headless:latest`, 推荐[docker-compose.yml](./docker-compose.yml)
 
 ```bash
-# LiveCD Experience: gnome/plas, mint-series only with x86(cinna, cmate, cxfce)
+# LiveCD Experience: gnome/plasma, mint-series only with x86(cinna, cmate, cxfce)
 # Plasma/Mint with START_SYSTEMD=false
 docker run -it --rm --net=host --shm-size 1g \
   -e L=en_US -e VNC_OFFSET=99 -e START_SYSTEMD=false \

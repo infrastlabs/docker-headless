@@ -87,7 +87,7 @@ services:
       - /:/mnt      
 
   plasma:
-    image: infrastlabs/docker-headless:plas
+    image: infrastlabs/docker-headless:plasma
     restart: unless-stopped
     shm_size: 1g
     privileged: true

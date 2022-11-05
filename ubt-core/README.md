@@ -1,32 +1,13 @@
 # ubt
 
 - 镜像: 包含x86_64, arm64两个体系的镜像
-- 版本: 分为标准版，slim版(不含3D显卡，输入法，Flameshot, Git)
+- 版本: 标准版，slim版(不含3D显卡，输入法，Flameshot, Git)
 - 集成systemd(2M), 以仿真实际Linux桌面发行版
 - 基础能力
   - tigervnc
   - xrdp, pulse
   - webhookd, noVNC
   - misc, 多语言，显卡/输入法，常用软件
-
-```bash
-docker run -it --rm -p 11081:10081 -p 11089:10089 \
-  infrastlabs/docker-headless:core-v4-slim /entry.sh
-
-# systemd
-docker run -it --rm -p 11081:10081 -p 11089:10089 \
-  --tmpfs /run --tmpfs /run/lock --tmpfs /tmp   --privileged \
-  -v /_ext:/_ext -v /sys/fs/cgroup:/sys/fs/cgroup \
-  infrastlabs/docker-headless:core-v4-slim
-```
-
-**TODO**
-
-- entry.sh
-  - ~~x10-de.conf 自动生成~~
-  - ~~setsysenv_drop, grep -v _PASS$~~
-  - ~~START_SESSION~~
-- 特点脑图: 无头模式,本地化,核心能力,层缓存,约定/配置项,用例分享
 
 **arm64**
 

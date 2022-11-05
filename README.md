@@ -1,6 +1,6 @@
 # docker-headless
 
-Multi-Desktop with `XRDP/NOVNC/PulseAudio` based on `Ubuntu20.04`, Formatting a HeadlessBox/Cloud Desktop.
+Multi-Desktop with `XRDP/NOVNC/PulseAudio` based on `Ubuntu20.04`, Formatting a HeadlessBox/Cloud Desktop. [[Detail]](./Detail.md)
 
 [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/latest)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)
 [![Docker Pulls](https://img.shields.io/docker/pulls/infrastlabs/docker-headless.svg)](https://hub.docker.com/r/infrastlabs/docker-headless)
@@ -17,7 +17,7 @@ noVnc | https://192.168.0.x:10081 | `headless` | `View123`
 RDP   | 192.168.0.x:10089         | `headless` | - 
 SSH   | ssh -p 10022 headless@192.168.0.x | `headless` | - 
 
-![](https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/mannual/res/01rdp-double-screen.png)
+![](https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/res/01rdp-double-screen.png)
 
 **Design**
 
@@ -28,7 +28,7 @@ SSH   | ssh -p 10022 headless@192.168.0.x | `headless` | -
 - Desktop apps: ibus-rime/fcitx-sogou, flameshot, PAC.
 - Slim image: `core: 170.53 MB(fluxbox)`, `latest: 277.48 MB(ibus,xfce4.14)`, `sogou: 354.15 MB(fcitx)`
 
-![](./_doc/mannual/res/design/RDesktop.png)
+![](./_doc/res/design/RDesktop.png)
 
 ## step3: UseCase
 

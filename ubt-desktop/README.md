@@ -27,7 +27,7 @@ docker  run -it --rm -p 10081:10081 -p 10089:10089 \
 infrastlabs/docker-headless:gnome
 
 # plasma: 需要privileged 否则start_kdeinit: Operation not permitted
-docker  run -it --rm -p 11081:10081 -p 11089:10089   --tmpfs /run --tmpfs /run/lock --tmpfs /tmp   --privileged   -v /sys/fs/cgroup:/sys/fs/cgroup infrastlabs/docker-headless:plas
+docker  run -it --rm -p 11081:10081 -p 11089:10089   --tmpfs /run --tmpfs /run/lock --tmpfs /tmp   --privileged   -v /sys/fs/cgroup:/sys/fs/cgroup infrastlabs/docker-headless:plasma
 ```
 
 **TODO**

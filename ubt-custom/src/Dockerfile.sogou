@@ -76,7 +76,7 @@ COPY --from=files2 /.bundle/sogoupinyin_4.0.1.2800.deb /.bundle/sogoupinyin_4.0.
 RUN apt.sh papirus-icon-theme greybird-gtk-theme; \
   rm -f /usr/share/backgrounds/greybird.svg; \
   \
-  wget https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
+  wget https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
   dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb; \
   cd /usr/share/icons && rm -rf Papirus-Bunsen-Dark-bluegrey Papirus-Bunsen-Dark-grey Papirus-Dark Papirus-Light ePapirus; \
   \
@@ -93,8 +93,8 @@ COPY --from=files1 --chown=headless:headless /rootfs_home_headless /home/headles
 RUN cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*; \
   \
   sed -i "s/ibus/fcitx/g" /etc/profile; \
-  wget -qO /usr/share/backgrounds/xfce/xfce-teal.png https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/bg-debian-liteblue.png; \
-  wget -qO /usr/share/backgrounds/xfce/xfce-pure-blue.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/deploy/assets/pure-blue.jpg; \
+  wget -qO /usr/share/backgrounds/xfce/xfce-teal.png https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/assets/bg/bg-debian-liteblue.png; \
+  wget -qO /usr/share/backgrounds/xfce/xfce-pure-blue.jpg https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/assets/bg/pure-blue.jpg; \
   \
   # 清理ubt自带图标, keep项: hicolor 
   # locolor gnome bloom
