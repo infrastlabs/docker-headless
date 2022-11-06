@@ -63,7 +63,7 @@ jobs:
           # BUILD
           echo core; cd ubt-core; sh buildx.sh
           #HEADLESS's merge
-          if [ "docker-headless" == "${{ github.repository }}" ]; then
+          if [ "infrastlabs/docker-headless" == "${{ github.repository }}" ]; then
             echo custom; cd ../ubt-custom; sh buildx.sh; sh buildx.sh sogou; 
             echo desktop; cd ../ubt-desktop; sh buildx.sh cmate; sh buildx.sh cxfce; sh buildx.sh cinna; sh buildx.sh plasma; sh buildx.sh; 
           fi
