@@ -177,6 +177,7 @@ Control Alt t :Exec stterm
 Alt t :Exec sakura
 Alt e :Exec geany
 Alt f :Exec thunar
+Alt q :Exec flameshot gui
 #
 Alt Left :PrevWorkspace
 Alt Right :NextWorkspace

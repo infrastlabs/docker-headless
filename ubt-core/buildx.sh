@@ -62,7 +62,13 @@ base)
     # repo=172.25.21.60:81 #registry-multiArch
     # img="docker-headless:core"
     img="docker-headless:core" #use parent's
+
+    # cache
+    ali="registry.cn-shenzhen.aliyuncs.com"
+    cimg="docker-headless-cache:core"
+    cache="--cache-from type=registry,ref=$ali/$ns/$cimg --cache-to type=registry,ref=$ali/$ns/$cimg"
+
     plat="--platform linux/amd64,linux/arm64"
-    docker buildx build $plat $args --push -t $repo/$ns/$img -f src/Dockerfile . 
+    docker buildx build $cache $plat $args --push -t $repo/$ns/$img -f src/Dockerfile . 
     ;;          
 esac

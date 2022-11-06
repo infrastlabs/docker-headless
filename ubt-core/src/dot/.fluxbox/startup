@@ -60,7 +60,7 @@ fi
 # +feh
 # feh --no-fehbg --bg-scale ~/.fluxbox/res/wallpapers_slax_wallpaper.jpg 
 # (sleep 0.1; ibus-daemon -drx) &
-#ibus-daemon -drx #backend
+ibus-daemon -drx #backend
 
 # And last but not least we start fluxbox.
 # Because it is the last app you have to run it with ''exec'' before it.

@@ -28,7 +28,7 @@ SSH   | ssh -p 10022 headless@192.168.0.x | `headless` | -
 - Desktop apps: ibus-rime/fcitx-sogou, flameshot, PAC.
 - Slim image: `core: 170.53 MB`, `latest: 277.48 MB`, `sogou: 354.15 MB`
 
-![](./_doc/res/design/RDesktop.png)
+![](https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/res/design/RDesktop.png)
 
 ## step3: UseCase
 

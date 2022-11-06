@@ -8,6 +8,62 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: cd ubt-core; docker build . --file src/Dockerfile --tag docker-headless:t1-$(date +%s)
+      - uses: actions/checkout@v3
+      # - name: Build the Docker image
+      #   run: cd ubt-core; docker build . --file src/Dockerfile --tag docker-headless:t1-$(date +%s)
+      
+      # ref: fk-nezha
+      # - name: Login to repo:AliyunCS
+      #   uses: docker/login-action@master
+      #   with:
+      #     registry: registry.cn-shenzhen.aliyuncs.com
+      #     username: ${{ secrets.DOCKER_REGISTRY_USER_INFRASTSUBUSER2 }}
+      #     password: ${{ secrets.DOCKER_REGISTRY_PW_INFRASTSUBUSER2 }}
+      # - name: Login to repo:DockerHub
+      #   uses: docker/login-action@master
+      #   with:
+      #     registry: registry-1.docker.io
+      #     username: ${{ secrets.DOCKER_REGISTRY_USER_DOCKERHUB }}
+      #     password: ${{ secrets.DOCKER_REGISTRY_PW_DOCKERHUB }}
+      
+      # - name: Build dasbboard image And Push
+      #   uses: docker/build-push-action@v2
+      #   with:
+      #     context: .
+      #     file: ./Dockerfile
+      #     platforms: linux/amd64,linux/arm64,linux/arm,linux/s390x,linux/riscv64 # linux/386,
+      #     push: true
+      #     tags: |
+      #       ${{ steps.image-name.outputs.GHRC_IMAGE_NAME }}:${{ steps.extract_branch.outputs.tag }}
+      #       ${{ steps.image-name.outputs.ALI_IMAGE_NAME }}:${{ steps.extract_branch.outputs.tag }}
+
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Call buildx.sh(build with ali's cache, push)
+        run: |
+          # VARS
+          echo ${{ github.repository_owner }} #infrastlabs
+          echo ${{ github.repository }}
+          echo ${{ secrets.DOCKER_REGISTRY_PW_DOCKERHUB }} #fill not show in log
+          # INFO
+          pwd && ls -l
+          docker version
+          free -h; df -h; ip a |grep inet; uname -a;
+          
+          # ENV
+          export DOCKER_REGISTRY_USER_infrastSubUser2=${{ secrets.DOCKER_REGISTRY_USER_INFRASTSUBUSER2 }}
+          export DOCKER_REGISTRY_PW_infrastSubUser2=${{ secrets.DOCKER_REGISTRY_PW_INFRASTSUBUSER2 }}
+          export DOCKER_REGISTRY_USER_dockerhub=${{ secrets.DOCKER_REGISTRY_USER_DOCKERHUB }}
+          export DOCKER_REGISTRY_PW_dockerhub=${{ secrets.DOCKER_REGISTRY_PW_DOCKERHUB }}
+
+          # BUILD
+          echo core; cd ubt-core; sh buildx.sh
+          #HEADLESS's merge
+          if [ "docker-headless" == "${{ github.repository }}" ]; then
+            echo custom; cd ../ubt-custom; sh buildx.sh; sh buildx.sh sogou; 
+            echo desktop; cd ../ubt-desktop; sh buildx.sh cmate; sh buildx.sh cxfce; sh buildx.sh cinna; sh buildx.sh plasma; sh buildx.sh; 
+          fi
