@@ -67,9 +67,10 @@ RUN apt.sh \
   \
   dpkg -l |grep bunsen && exit 0 || exit 1;
 
-RUN apt.sh firefox
 RUN apt.sh ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
   flameshot
+# firefox> midori > ?
+# RUN apt.sh midori
 
 # 拆分包体与配置项两块，免频繁变动基础包
 # HEADLESS

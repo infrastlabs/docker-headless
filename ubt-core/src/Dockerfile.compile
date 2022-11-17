@@ -158,14 +158,17 @@ RUN autoreconf -fiv; \
       --disable-xwin        --disable-xephyr     --disable-kdrive      \
       --disable-devel-docs  --disable-config-hal --disable-config-udev \
       --disable-unit-tests  --disable-selective-werror                 \
+      --enable-dri3      --enable-dri2                  \
+      --with-pic \
       --without-dtrace;                              \
-      # --enable-dri3      --enable-dri2                  \
-      # --with-pic; \
       make && make install; 
 # vncpasswd
 RUN cp /build/tigervnc-1.12.0/unix/vncpasswd/vncpasswd /usr/local/tigervnc/bin/
 # https://github.com/TigerVNC/tigervnc/issues/800
 # LD_PRELOAD=/lib/aarch64-linux-gnu/libgcc_s.so.1 vncserver :2 -localhost no
+
+# swrast_dri.so # /usr/lib/dri/swrast_dri.so
+# ln -s /usr/lib/x86_64-linux-gnu/dri /usr/lib/dri
 
 ###merge: xrdp, pulse, tigervnc###############################################
 # 11.9M
