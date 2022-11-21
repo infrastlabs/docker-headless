@@ -15,6 +15,7 @@ case "$1" in
 compile)
     # TigerVNC 1.12.0 |10 Nov 2021
     old=$(pwd); cd src/arm
+    # xrdp
     ver="0.9.16"
     file=xrdp-${ver}.tar.gz; test -s $file || curl -k -O -fSL https://github.com/neutrinolabs/xrdp/releases/download/v${ver}/$file
     # tiger

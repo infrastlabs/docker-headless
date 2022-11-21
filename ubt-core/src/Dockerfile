@@ -11,6 +11,14 @@ FROM ubuntu:20.04 as files2
   apt update && apt -y install curl
   # webhookd, noVNC
   # https://gitee.com/infrastlabs/fk-webhookd/releases/download/v22.08.18/webhookd.tar.gz
+  RUN \
+    # XCursor
+    # downUrl=https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/assets/theme
+    downUrl=https://github.com/ful1e5/XCursor-pro/releases/download/v2.0.1; \
+    mkdir -p /rootfs/usr/share/icons; \
+    file=XCursor-Pro-Dark.tar.gz; curl -k -fSL $downUrl/$file |tar -zx -C /rootfs/usr/share/icons/; \
+    file=XCursor-Pro-Light.tar.gz; curl -k -fSL $downUrl/$file |tar -zx -C /rootfs/usr/share/icons/; \
+    ls -lh /rootfs/usr/share/icons/;
   RUN echo a.123; \
     test -z "$(echo $TARGETPLATFORM |grep arm)" && file=webhookd.tar.gz || file=webhookd-arm64.tar.gz; \
     cd /tmp; curl -fSL -k -O https://gitee.com/infrastlabs/fk-webhookd/releases/download/v22.08.18/$file; \
@@ -20,7 +28,7 @@ FROM ubuntu:20.04 as files2
     \
     # https://gitee.com/infrastlabs/fk-webhookd/releases/download/v22.08.18/v1.3.0.tar.gz #https://github.com/novnc/noVNC/archive
     cd /rootfs/usr/local/webhookd/static; file=v1.3.0.tar.gz; curl -k -O -fSL https://gitee.com/infrastlabs/fk-webhookd/releases/download/v22.08.18/$file; \
-    bash down_vnc.sh; rm -f $file;  
+    bash down_vnc.sh; rm -f $file;
   # 
   COPY src/*.sh /rootfs/
   ADD src/etc /rootfs/etc

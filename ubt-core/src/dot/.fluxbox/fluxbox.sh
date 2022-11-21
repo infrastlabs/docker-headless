@@ -51,13 +51,6 @@ save_history=true\n\
 VolumeControlCommand=pavucontrol\n\
   " > $file; \
   \
-  file=/etc/skel/.config/gtk-3.0/settings.ini; \
-  echo -e "\
-[Settings]\n\
-gtk-theme-name=Greybird\n\
-gtk-icon-theme-name=Papirus-Bunsen-bluegrey\n\
-  " > $file; \
-  \
   file=/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/thunar.xml; \
   echo -e "\
 <?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
@@ -73,10 +66,16 @@ gtk-icon-theme-name=Papirus-Bunsen-bluegrey\n\
 </channel>\n\
   " > $file; \
   \
-#   file=/etc/skel/.gtkrc-2.0; \
-#   echo -e "\
-# gtk-theme-name=Greybird\n\
-# gtk-icon-theme-name=Papirus-Bunsen-bluegrey\n\
-#   " > $file; \  
+  file=/etc/skel/.config/gtk-3.0/settings.ini; \
+  echo -e "\
+[Settings]\n\
+gtk-theme-name=Greybird\n\
+gtk-icon-theme-name=Papirus-Bunsen-bluegrey\n\
+gtk-cursor-theme-name=XCursor-Pro-Dark\n\
+gtk-cursor-theme-size=0\n\
+  " > $file; \
+  \
+  # .gtkrc-2.0: lxappearance still not preseted.
+  # cat $file > /etc/skel/.gtkrc-2.0; \
   \  
   find /etc/skel |wc; 

@@ -15,6 +15,8 @@ sogou)
     # 403ERR: 手动下载放到该目录下缓存。# https://shurufa.sogou.com/linux
     # # https://ime.sogouimecdn.com/202210102001/e904b2fa390e7f15a685277b381b7c48/dl/gzindex/1656597217/sogoupinyin_4.0.1.2800_x86_64.deb
     # # https://ime.sogouimecdn.com/202210102001/fb5863bbce2217fbf4e4c78f9f5a5e16/dl/gzindex/1656597217/sogoupinyin_4.0.1.2800_arm64.deb
+    
+    # TODO: dockerImageDownLayer's outout here.
     # file=sogoupinyin_4.0.1.2800_arm64.deb
     # test -s "$file" || curl -k -O -fSL https://ime.sogouimecdn.com/202210102001/fb5863bbce2217fbf4e4c78f9f5a5e16/dl/gzindex/1656597217/$file
     # 
