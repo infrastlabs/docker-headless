@@ -51,14 +51,15 @@ docker run -it --rm --net=host --shm-size 1g -e VNC_OFFSET=99 \
 # JAVA
 sudo apt -y install openjdk-8-jdk openjdk-8-source && sudo apt -y install maven 
 # GO
-goVer=go1.17.8 #go1.16.15 #go1.13.15
+goVer=go1.19.9 #1.19.9:142.16M 1.17.8:129M #go1.16.15 #go1.13.15
 wget https://studygolang.com/dl/golang/$goVer.linux-amd64.tar.gz
 tar -zxf $goVer.linux-amd64.tar.gz; mv go $goVer.linux-amd64
 rm -f godev; ln -s $goVer.linux-amd64 godev #link godev
-# NODE
-wget https://npm.taobao.org/mirrors/node/v14.20.0/node-v14.20.0-linux-x64.tar.xz
-xz -d node-v14.20.0-linux-x64.tar.xz #tar.xz消失
-tar -xvf node-v14.20.0-linux-x64.tar
+# NODE https://nodejs.org/zh-cn/download/releases
+ver=v18.16.0 #v16.20.0 #v14.20.0
+wget https://nodejs.org/download/release/$ver/node-$ver-linux-x64.tar.xz
+xz -d node-$ver-linux-x64.tar.xz #tar.xz消失
+tar -xvf node-$ver-linux-x64.tar
 
 # cat >> /etc/profile <<EOF
 cat <<EOF |sudo tee -a /etc/profile
@@ -78,9 +79,19 @@ EOF
 #IDE: vscode, ideaIC
 # wget https://vscode.cdn.azure.cn/stable/91899dcef7b8110878ea59626991a18c8a6a1b3e/code_1.47.3-1595520028_amd64.deb
 # wget https://vscode.cdn.azure.cn/stable/c3f126316369cd610563c75b1b1725e0679adfb3/code_1.58.2-1626302803_amd64.deb
-wget https://vscode.cdn.azure.cn/stable/6cba118ac49a1b88332f312a8f67186f7f3c1643/code_1.61.2-1634656828_amd64.deb
+# wget https://vscode.cdn.azure.cn/stable/6cba118ac49a1b88332f312a8f67186f7f3c1643/code_1.61.2-1634656828_amd64.deb
+wget https://vscode.cdn.azure.cn/stable/e8a3071ea4344d9d48ef8a4df2c097372b0c5161/code_1.74.2-1671532382_arm64.deb
+wget https://vscode.cdn.azure.cn/stable/6445d93c81ebe42c4cbd7a60712e0b17d9463e97/code_1.81.0-1690980880_amd64.deb
+###
+https://code.visualstudio.com/updates/v1_74  #az764295.vo.msecnd.net > vscode.cdn.azure.cn
+https://update.code.visualstudio.com/1.74.3/linux-x64/stable
+https://update.code.visualstudio.com/1.74.3/linux-arm64/stable #x64> arm64
+https://vscode.cdn.azure.cn/stable/97dec172d3256f8ca4bfb2143f3f76b503ca0534/code-stable-arm64-1673284434.tar.gz
+https://vscode.cdn.azure.cn/stable/97dec172d3256f8ca4bfb2143f3f76b503ca0534/code-stable-x64-1673285154.tar.gz
+#
 #wget https://download.jetbrains.8686c.com/idea/ideaIC-2016.3.8-no-jdk.tar.gz
-wget https://download.jetbrains.com.cn/idea/ideaIC-2016.3.8-no-jdk.tar.gz
+#wget https://download.jetbrains.com.cn/idea/ideaIC-2016.3.8-no-jdk.tar.gz #322M
+wget https://download.jetbrains.com/idea/ideaIC-2017.3.7-no-jdk.tar.gz #366M JUnit5 Support
 ```
 
 ![](_doc/res/02/ide2-vscode.png)
@@ -114,9 +125,9 @@ sudo sed -i "2a export QT_IM_MODULE=ibus" /usr/bin/{wps,wpp,et}
 ```bash
 # 宿主机运行：获取docker,docker-compose文件:
 img=docker:18.09.8 #18.09.3
-docker run -v /_ext:/mnt $img sh -c "cp /usr/local/bin/docker /mnt; ls -lh /mnt |grep docker"
+docker run -v /_ext:/mnt $img sh -c "\cp /usr/local/bin/docker /mnt; ls -lh /mnt |grep docker"
 img=registry.cn-shenzhen.aliyuncs.com/k-bin/sync-kube:kube-att
-docker run --rm -v /_ext:/mnt $img sh -c 'cp -a /down/docker-compose /mnt/; ls -lh /mnt |grep docker'
+docker run --rm -v /_ext:/mnt $img sh -c '\cp -a /down/docker-compose /mnt/; ls -lh /mnt |grep docker'
 
 # 软链接: docker, socket
 ls /_ext/ |grep docker

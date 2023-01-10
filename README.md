@@ -19,14 +19,15 @@ SSH   | ssh -p 10022 headless@192.168.0.x | `headless` | -
 
 ![](https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/res/01rdp-double-screen.png)
 
-**Design**
+## step2: Design
 
 - Screen shared with both RDP/noVnc. (ReadWrite/ReadOnly)
-- MultiScreen support. (mstsc+xrdp+tigervnc)
-- Audio support. (xrdp+pulseaudio/noVNC+broadcast)
-- Locale/TZ support.
-- Desktop apps: ibus-rime/fcitx-sogou, flameshot, PAC.
-- Slim image: `core: 170.53 MB`, `latest: 277.48 MB`, `sogou: 354.15 MB`
+- Multi Desktop: Xfce, Mate, Cinnamon, Gnome, Plasma
+- Slim Image: `core: 170.53 MB`, `latest: 277.48 MB`, `sogou: 354.15 MB`
+- Feats
+  - MultiScreen support. (mstsc+xrdp+tigervnc)
+  - Audio support. (xrdp+pulseaudio/noVNC+broadcast)
+  - Locale/TZ support. Apps `ibus-rime/fcitx-sogou`, `flameshot`, `PAC`.
 
 ![](https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/res/design/RDesktop.png)
 
