@@ -42,8 +42,8 @@ FROM ubuntu:20.04 as files2
     # https://github.com/TigerVNC/tigervnc/issues/800 #bernhardu,2019=Tigervnc killed just after connect 
     test -z "$(echo $TARGETPLATFORM |grep arm64)" || sed -i "s^exec Xvnc^LD_PRELOAD=/lib/aarch64-linux-gnu/libgcc_s.so.1 exec Xvnc^g" /rootfs/xvnc.sh;
 
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v51-slim
-# FROM infrastlabs/docker-headless:base-v51-slim
+# FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v51-slim
+FROM infrastlabs/docker-headless:base-v51-slim
 # 轻量级桌面 openbox + tint2 + conky + stalonetray + pcmanfm + xcompmgr #http://t.zoukankan.com/huapox-p-3516155.html #huapox
 #   无thunar/lxappearance: 结合asbru纯SSH,音频场景（管维）
 RUN apt.sh \
