@@ -26,6 +26,7 @@ environment=DISPLAY=:$N,HOME=/home/$user1$env_dbus
 priority=35
 user=$user1
 startretries=5
+autorestart=true
 command=/xvnc.sh xvnc $N
 stdout_logfile=$varlog/$xn-xvnc.log
 stdout_logfile_maxbytes = 50MB
@@ -37,6 +38,7 @@ environment=DISPLAY=:$N,HOME=/home/$user1$env_dbus
 priority=36
 user=$user1
 startretries=5
+autorestart=true
 command=/xvnc.sh chansrv $N
 stdout_logfile=$varlog/$xn-chansrv.log
 stdout_logfile_maxbytes = 50MB
@@ -48,6 +50,7 @@ environment=DISPLAY=:$N,HOME=/home/$user1$env_dbus
 priority=36
 user=$user1
 startretries=5
+autorestart=true
 command=/xvnc.sh pulse $N
 stdout_logfile=$varlog/$xn-pulse.log
 stdout_logfile_maxbytes = 50MB
@@ -59,6 +62,7 @@ environment=DISPLAY=:$N,HOME=/home/$user1,PORT_VNC=$PORT_VNC$env_dbus
 priority=37
 user=$user1
 startretries=5
+autorestart=true
 command=/xvnc.sh parec $N
 stdout_logfile=$varlog/$xn-parec.log
 stdout_logfile_maxbytes = 50MB
@@ -151,7 +155,7 @@ function setXserver(){
         echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |vncpasswd /etc/xrdp/vnc_pass; chmod 644 /etc/xrdp/vnc_pass
         echo "" #newLine
         # SV: headless:VNC_PASS_RO
-        sed -i "s/port=password=.*/password=${VNC_PASS_RO}/g" /etc/supervisor/supervisord.conf
+        sed -i "s/password=.*/password=${VNC_PASS_RO}/g" /etc/supervisor/supervisord.conf
     fi
     unset SSH_PASS VNC_PASS VNC_PASS_RO #unset, not show in desktopEnv.
     unset LOC_XFCE LOC_APPS LOC_APPS2 DEBIAN_FRONTEND    

@@ -14,5 +14,6 @@
     "workbench.editor.enablePreview": false,
     "workbench.editor.tabSizing": "shrink",
     "diffEditor.renderSideBySide": true,
-    "update.mode": "none"
+    "update.mode": "none",
+    "search.showLineNumbers": true
 }
