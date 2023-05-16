@@ -61,10 +61,14 @@ jobs:
           export DOCKER_REGISTRY_PW_dockerhub=${{ secrets.DOCKER_REGISTRY_PW_DOCKERHUB }}
 
           # BUILD
-          echo core; cd ubt-core; sh buildx.sh #compile
+          echo core; cd ubt-core; 
+            # sh buildx.sh compile
+            # sh buildx.sh slim; sh buildx.sh base
+            sh buildx.sh #core
           #HEADLESS's merge
           if [ "infrastlabs/docker-headless" == "${{ github.repository }}" ]; then
-            #cp: cannot stat 'sogoupinyin_4.0.1.2800_arm64.deb': No such file or directory
             echo custom; cd ../ubt-custom; sh buildx.sh; #sh buildx.sh sogou; 
-            echo desktop; cd ../ubt-desktop; sh buildx.sh cmate; sh buildx.sh cxfce; sh buildx.sh cinna; sh buildx.sh plasma; sh buildx.sh; 
+            echo desktop; cd ../ubt-desktop; 
+              sh buildx.sh; sh buildx.sh plasma; 
+              sh buildx.sh cxfce; sh buildx.sh cinna; #sh buildx.sh cmate; 
           fi
