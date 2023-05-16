@@ -1,5 +1,5 @@
 FROM infrastlabs/docker-headless:core as core
-FROM infrastlabs/docker-headless:base-v5
+FROM infrastlabs/docker-headless:base-v51
 
 # kubuntu-desktop 273 MB # 7054 kB #plasma-desktop 已装
 # https://github.com/ms-jpq/kde-in-docker/blob/daddy/base/bionic/Dockerfile #nautilus > dolphin

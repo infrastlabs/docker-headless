@@ -1,5 +1,5 @@
 FROM infrastlabs/docker-headless:core as core
-FROM infrastlabs/docker-headless:base-v5
+FROM infrastlabs/docker-headless:base-v51
 
 # cinna-desktop 139 MB 
 RUN apt.sh cinnamon cinnamon-l10n gnome-icon-theme

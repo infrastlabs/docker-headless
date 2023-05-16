@@ -1,5 +1,5 @@
 FROM infrastlabs/docker-headless:core as core
-FROM infrastlabs/docker-headless:base-v5
+FROM infrastlabs/docker-headless:base-v51
 
 # ubuntu-desktop 128 MB
 RUN \

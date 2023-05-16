@@ -1,5 +1,5 @@
 FROM infrastlabs/docker-headless:core as core
-FROM infrastlabs/docker-headless:base-v5
+FROM infrastlabs/docker-headless:base-v51
 
 # after mint-meta-mate # mate-desktop-environment-core: 5436B;
 RUN apt.sh mate-desktop-environment-core
@@ -16,9 +16,12 @@ RUN apt.sh libglib2.0-dev
 # 152 MB > 225 MB(+mint-meta-mate) 
 # 318 MB(before mate-desk-core) > 249M(after, una)
 # 240 MB(back: ulyana); una: UI选主题，提示Mint-Y未装..
+
+#13 8.113 The following packages have unmet dependencies:
+#13 8.198  mint-meta-mate : Depends: mint-meta-core but it is not going to be installed
 RUN apt.sh \
     mintlocale mint-themes mint-artwork \
-    mint-meta-mate; \
+    mint-meta-core mint-meta-mate; \
   cd /usr/share/backgrounds; rm -rf linuxmint-* cosmos; cd linuxmint; rm -f `ls |grep -v "default\|sele_ring.jpg"`; \
   cd /usr/share/icons; rm -rf `ls |grep "Mint-X\|Tango\|Human\|ubuntu-mono\|LoginIcons\|Contrast\|mate\|locolor"`; \
   cd /usr/share/themes; rm -rf `ls |grep "Mint-X\|Tradition\|BlackMATE\|Submarine\|GreenLag\|BlueMenta\|HighContrast"`; \

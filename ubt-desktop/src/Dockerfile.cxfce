@@ -1,5 +1,5 @@
 FROM infrastlabs/docker-headless:core as core
-FROM infrastlabs/docker-headless:base-v5
+FROM infrastlabs/docker-headless:base-v51
 
 # REF: docker-gui > ubt2004-mint-cinna
 # http://packages.linuxmint.com/
