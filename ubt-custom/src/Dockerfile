@@ -8,7 +8,7 @@ FROM ubuntu:20.04 as files1
   RUN find /rootfs* |wc; \
     cd /rootfs_home_headless/Desktop; chmod +x *.desktop
 FROM infrastlabs/docker-headless:core as core
-FROM infrastlabs/docker-headless:base-v5-slim
+FROM infrastlabs/docker-headless:base-v51-slim
 RUN \  
 # RUN \  
   # VIDEO: 30.5 MB

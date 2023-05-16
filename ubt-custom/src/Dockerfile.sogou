@@ -19,7 +19,7 @@ FROM ubuntu:20.04 as files2
   RUN cd /.bundle/; export ver=sogoupinyin_4.0.1.2800; \
     test -z "$(echo $TARGETPLATFORM |grep arm)" && cp ${ver}_x86_64.deb ${ver}.deb || cp ${ver}_arm64.deb ${ver}.deb; 
 FROM infrastlabs/docker-headless:core as core
-FROM infrastlabs/docker-headless:base-v5-slim
+FROM infrastlabs/docker-headless:base-v51-slim
 RUN \  
 # RUN \  
   # VIDEO: 30.5 MB
