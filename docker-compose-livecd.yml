@@ -13,7 +13,7 @@ services:
     shm_size: 1g
     privileged: true
     healthcheck:
-      test: ["CMD", "bash", "-c", "supervisorctl status |grep -v 'RUNNING' && exit 1 || exit 0 "]
+      test: ["CMD", "bash", "-c", "sv status |grep -v 'Running' && exit 1 || exit 0 "]
     ports:
       - "10181:10081"
       - "10189:10089"
@@ -31,7 +31,7 @@ services:
     shm_size: 1g
     privileged: true
     healthcheck:
-      test: ["CMD", "bash", "-c", "supervisorctl status |grep -v 'RUNNING' && exit 1 || exit 0 "]
+      test: ["CMD", "bash", "-c", "sv status |grep -v 'Running' && exit 1 || exit 0 "]
     ports:
       - "10281:10081"
       - "10289:10089"
@@ -49,7 +49,7 @@ services:
     shm_size: 1g
     privileged: true
     healthcheck:
-      test: ["CMD", "bash", "-c", "supervisorctl status |grep -v 'RUNNING' && exit 1 || exit 0 "]
+      test: ["CMD", "bash", "-c", "sv status |grep -v 'Running' && exit 1 || exit 0 "]
     ports:
       - "10381:10081"
       - "10389:10089"
@@ -68,7 +68,7 @@ services:
     shm_size: 1g
     privileged: true #xrdp thinclient_drives
     healthcheck:
-      test: ["CMD", "bash", "-c", "supervisorctl status |grep -v 'RUNNING' && exit 1 || exit 0 "]
+      test: ["CMD", "bash", "-c", "sv status |grep -v 'Running' && exit 1 || exit 0 "]
     ports:
       - "10481:10081"
       - "10489:10089"
@@ -92,7 +92,7 @@ services:
     shm_size: 1g
     privileged: true
     healthcheck:
-      test: ["CMD", "bash", "-c", "supervisorctl status |grep -v 'RUNNING' && exit 1 || exit 0 "]
+      test: ["CMD", "bash", "-c", "sv status |grep -v 'Running' && exit 1 || exit 0 "]
     ports:
       - "10581:10081"
       - "10589:10089"
