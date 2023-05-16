@@ -10,7 +10,7 @@ repoHub=docker.io
 echo "${DOCKER_REGISTRY_PW_dockerhub}" |docker login --username=${DOCKER_REGISTRY_USER_dockerhub} --password-stdin $repoHub
         
 ns=infrastlabs
-ver=v5
+ver=v51 #base-v5 base-v5-slim
 case "$1" in
 compile)
     # TigerVNC 1.12.0 |10 Nov 2021

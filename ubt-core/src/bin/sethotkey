@@ -1,49 +1,53 @@
 #!/bin/sh
 key=$1
-# leftAlt> leftCtl
+if [ -z "$key" ]; then
+  echo "usage: sethotkey c/a [leftCtl/leftAlt]"
+  exit 0
+fi
 
 # FLUX
-test "c" == "$key" && oKey="^Alt " || oKey="Control "
-test "c" == "$key" && nKey="Control " || nKey="^Alt "
+test "c" == "$key" && oldKey="Alt " || oldKey="Control "
+test "c" == "$key" && nKey="Control " || nKey="Alt "
 file=~/.fluxbox/keys
-test -s $file && sed -i "s/$oKey/$nKey/g" $file
-test -s $file && cat $file |grep "$nKey"
-# reload flux
-# test -z "`ps -ef |grep fluxbox`" || fluxbox reconfig
-
+  test -s $file && sed -i "s/^$oldKey/$nKey/g" $file
+  test -s $file && cat $file |grep "^$nKey" |head -3
+  # reload flux
+  test -z "`ps -ef |grep fluxbox`" || fluxbox reconfig > /dev/null 2>&1
+  echo "fluxOK: MENU> Fluxbox menu> Reload config"
 
 # XFCE
-# oKey="\&lt;Alt\&gt"
+# oldKey="\&lt;Alt\&gt"
 # nKey="\&lt;Ctl\&gt" 
-test "c" == "$key" && oKey="\&lt;Alt\&gt" || oKey="\&lt;Ctl\&gt"
+test "c" == "$key" && oldKey="\&lt;Alt\&gt" || oldKey="\&lt;Ctl\&gt"
 test "c" == "$key" && nKey="\&lt;Ctl\&gt" || nKey="\&lt;Alt\&gt" #fix \&
 file=~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
-# # test -s $file && sed -i "s/$oKey/$nKey/g" $file
-# test -s $file && sed -i "s/name=\"$oKey;q\"/name=\"$nKey;q\"/g" $file
-# test -s $file && sed -i "s/name=\"$oKey;d\"/name=\"$nKey;d\"/g" $file
-# test -s $file && sed -i "s/name=\"$oKey;f\"/name=\"$nKey;f\"/g" $file
-# test -s $file && sed -i "s/name=\"$oKey;e\"/name=\"$nKey;e\"/g" $file
-# test -s $file && sed -i "s/name=\"$oKey;t\"/name=\"$nKey;t\"/g" $file
-# test -s $file && sed -i "s/name=\"$oKey;h\"/name=\"$nKey;h\"/g" $file
-# # 
-test -s $file && sed -i "s/name=\"$oKey;Down\"/name=\"$nKey;Down\"/g" $file
-test -s $file && sed -i "s/name=\"$oKey;Up\"/name=\"$nKey;Up\"/g" $file
-test -s $file && sed -i "s/name=\"$oKey;Left\"/name=\"$nKey;Left\"/g" $file
-test -s $file && sed -i "s/name=\"$oKey;Right\"/name=\"$nKey;Right\"/g" $file
-# test -s $file && cat $file |grep "name=\"$nKey;"
-# reload xfce4
+  #key1
+  # test -s $file && sed -i "s/name=\"$oldKey;q\"/name=\"$nKey;q\"/g" $file #not change
+  # test -s $file && sed -i "s/name=\"$oldKey;d\"/name=\"$nKey;d\"/g" $file
+  # test -s $file && sed -i "s/name=\"$oldKey;f\"/name=\"$nKey;f\"/g" $file
+  # test -s $file && sed -i "s/name=\"$oldKey;e\"/name=\"$nKey;e\"/g" $file
+  # test -s $file && sed -i "s/name=\"$oldKey;t\"/name=\"$nKey;t\"/g" $file
+  # test -s $file && sed -i "s/name=\"$oldKey;h\"/name=\"$nKey;h\"/g" $file
+  #key2
+  test -s $file && sed -i "s/name=\"$oldKey;Down\"/name=\"$nKey;Down\"/g" $file
+  test -s $file && sed -i "s/name=\"$oldKey;Up\"/name=\"$nKey;Up\"/g" $file
+  test -s $file && sed -i "s/name=\"$oldKey;Left\"/name=\"$nKey;Left\"/g" $file
+  test -s $file && sed -i "s/name=\"$oldKey;Right\"/name=\"$nKey;Right\"/g" $file
+  test -s $file && cat $file |grep "name=\"$nKey;" |head -3
+  # reload xfce4
+  echo "xfceOK: MENU> xx> Reload config"
 
-# <property name="&lt;Alt&gt;q" type="string" value="flameshot gui"/>
-# <property name="&lt;Alt&gt;d" type="string" value="/home/headless/.config/rofi/text/launcher.sh"/>
-# <property name="&lt;Alt&gt;f" type="string" value="thunar"/>
-# <property name="&lt;Alt&gt;e" type="string" value="geany"/>
-# <property name="&lt;Alt&gt;t" type="string" value="sakura"/>
-#     <property name="&lt;Alt&gt;h" type="string" value="hide_window_key"/>
-#     <property name="&lt;Alt&gt;Down" type="string" value="cycle_windows_key"/>
-#     <property name="&lt;Alt&gt;Up" type="string" value="maximize_window_key"/>
-#     <property name="&lt;Alt&gt;Left" type="string" value="left_workspace_key"/>
-#     <property name="&lt;Alt&gt;Right" type="string" value="right_workspace_key"/>
+  # <property name="&lt;Alt&gt;q" type="string" value="flameshot gui"/>
+  # <property name="&lt;Alt&gt;d" type="string" value="/home/headless/.config/rofi/text/launcher.sh"/>
+  # <property name="&lt;Alt&gt;f" type="string" value="thunar"/>
+  # <property name="&lt;Alt&gt;e" type="string" value="geany"/>
+  # <property name="&lt;Alt&gt;t" type="string" value="sakura"/>
+  #     <property name="&lt;Alt&gt;h" type="string" value="hide_window_key"/>
+  #     <property name="t&lt;Alt&g;Down" type="string" value="cycle_windows_key"/>
+  #     <property name="&lt;Alt&gt;Up" type="string" value="maximize_window_key"/>
+  #     <property name="&lt;Alt&gt;Left" type="string" value="left_workspace_key"/>
+  #     <property name="&lt;Alt&gt;Right" type="string" value="right_workspace_key"/>
     
 
 # GNOME,plasma, cinna/cmate/cxfce
-#TODO
+  #TODO

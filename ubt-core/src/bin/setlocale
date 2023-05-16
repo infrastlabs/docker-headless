@@ -2,7 +2,6 @@
 # TZ, L
 
 function setLocale(){
-    env |grep "TZ\|^L="
     # L="zh_CN" ##${L##*.} > zh_CN
     # LANG="zh_CN.UTF-8" #lang_area.charset
     charset=${L##*.}; test "$charset" == "$L" && charset="UTF-8" || echo "charset: $charset"
@@ -24,6 +23,7 @@ function setLocale(){
     cat /etc/default/locale
     # sleep 2
 }
+env |grep "TZ\|^L="
 test -z "$L" || setLocale
-sudo echo "${TZ}" >/etc/timezone
-sudo ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime
+test -z "$TZ" || echo "${TZ}" | sudo tee /etc/timezone
+test -z "$TZ" || sudo ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime

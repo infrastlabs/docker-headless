@@ -4,6 +4,7 @@ Description=x11 server
 [Service]
 Type=simple
 User=root
-ExecStart=/bin/bash -c "source /.env; exec supervisord -n"
+#supervisord -n > go-supervisord
+ExecStart=/bin/bash -c "source /.env; exec go-supervisord"
 [Install]
 WantedBy=multi-user.target

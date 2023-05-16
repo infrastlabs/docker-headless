@@ -11,14 +11,6 @@ FROM ubuntu:20.04 as files2
   apt update && apt -y install curl
   # webhookd, noVNC
   # https://gitee.com/infrastlabs/fk-webhookd/releases/download/v22.08.18/webhookd.tar.gz
-  RUN \
-    # XCursor
-    # downUrl=https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/assets/theme
-    downUrl=https://github.com/ful1e5/XCursor-pro/releases/download/v2.0.1; \
-    mkdir -p /rootfs/usr/share/icons; \
-    file=XCursor-Pro-Dark.tar.gz; curl -k -fSL $downUrl/$file |tar -zx -C /rootfs/usr/share/icons/; \
-    file=XCursor-Pro-Light.tar.gz; curl -k -fSL $downUrl/$file |tar -zx -C /rootfs/usr/share/icons/; \
-    ls -lh /rootfs/usr/share/icons/;
   RUN echo a.123; \
     test -z "$(echo $TARGETPLATFORM |grep arm)" && file=webhookd.tar.gz || file=webhookd-arm64.tar.gz; \
     cd /tmp; curl -fSL -k -O https://gitee.com/infrastlabs/fk-webhookd/releases/download/v22.08.18/$file; \
@@ -29,11 +21,20 @@ FROM ubuntu:20.04 as files2
     # https://gitee.com/infrastlabs/fk-webhookd/releases/download/v22.08.18/v1.3.0.tar.gz #https://github.com/novnc/noVNC/archive
     cd /rootfs/usr/local/webhookd/static; file=v1.3.0.tar.gz; curl -k -O -fSL https://gitee.com/infrastlabs/fk-webhookd/releases/download/v22.08.18/$file; \
     bash down_vnc.sh; rm -f $file;
+  RUN \
+    # XCursor
+    downUrl=https://ghproxy.com/https://github.com/ful1e5/XCursor-pro/releases/download/v2.0.1; \
+    # downUrl=https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/assets/theme; \
+    mkdir -p /rootfs/usr/share/icons; \
+    file=XCursor-Pro-Dark.tar.gz; curl -k -fSL $downUrl/$file |tar -zx -C /rootfs/usr/share/icons/; \
+    file=XCursor-Pro-Light.tar.gz; curl -k -fSL $downUrl/$file |tar -zx -C /rootfs/usr/share/icons/; \
+    ls -lh /rootfs/usr/share/icons/;
   # 
   COPY src/*.sh /rootfs/
   ADD src/etc /rootfs/etc
   ADD src/dot /rootfs/etc/skel
   ADD src/bin /rootfs/usr/bin
+  ADD src/svd.conf /rootfs/etc/supervisor/supervisord.conf
   ADD src/sv.conf /rootfs/etc/supervisor/conf.d/sv.conf
   COPY src/*.service /rootfs/etc/systemd/system/
   RUN cd /rootfs/usr/bin; chmod +x *; \
@@ -41,7 +42,8 @@ FROM ubuntu:20.04 as files2
     # https://github.com/TigerVNC/tigervnc/issues/800 #bernhardu,2019=Tigervnc killed just after connect 
     test -z "$(echo $TARGETPLATFORM |grep arm64)" || sed -i "s^exec Xvnc^LD_PRELOAD=/lib/aarch64-linux-gnu/libgcc_s.so.1 exec Xvnc^g" /rootfs/xvnc.sh;
 
-FROM infrastlabs/docker-headless:base-v5-slim
+FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v51-slim
+# FROM infrastlabs/docker-headless:base-v51-slim
 # 轻量级桌面 openbox + tint2 + conky + stalonetray + pcmanfm + xcompmgr #http://t.zoukankan.com/huapox-p-3516155.html #huapox
 #   无thunar/lxappearance: 结合asbru纯SSH,音频场景（管维）
 RUN apt.sh \

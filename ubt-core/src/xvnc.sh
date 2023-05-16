@@ -6,11 +6,15 @@ offsetLimitIndex=${offsetLimitIndex:-99}
 case "$cmd" in
 xvnc)
  #chansrv
-    export DISPLAY=:$offsetLimitIndex #:2
-    xrdp-chansrv &
+    # export DISPLAY=:$offsetLimitIndex #:2
+    # xrdp-chansrv &
     # default: Xvnc :99 -BlacklistThreshold=5 -BlacklistTimeout=10
     rm -f /tmp/.X$offsetLimitIndex-lock #clear first, avoid dead-lock
     exec Xvnc -ac $DISPLAY -listen tcp -rfbauth=/etc/xrdp/vnc_pass -depth 16 -BlacklistThreshold=3 -BlacklistTimeout=1
+    ;;
+chansrv)
+    export DISPLAY=:$offsetLimitIndex #:2
+    exec xrdp-chansrv
     ;;
 pulse)
     port=$(expr 4700 + $offsetLimitIndex) #4713
@@ -30,6 +34,6 @@ parec)
         | curl -k -H "Transfer-Encoding: chunked" -X POST -T -  "$url"    
     ;;
 *)
-    echo "please call with: xvnc.sh xvnc/xrec xx"
+    echo "please call with: xvnc.sh xvnc/chansrv/pulse/parec xx"
     ;;
 esac

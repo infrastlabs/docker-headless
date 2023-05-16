@@ -11,12 +11,13 @@ if [ -s "$xrdp/sbin/xrdp" ]; then
 fi
 
 ##########################################
+  # && ln -s /usr/bin/supervisorctl /usr/bin/sv \
 $RUN \
   export user=headless; \
   useradd -mp j9X2HRQvPCphA -s /bin/bash -G sudo $user \
   && echo "$user:$user" |chpasswd \
-  && echo 'Cmnd_Alias SU = /bin/su' >> /etc/sudoers \
-  && echo "$user ALL=(root) NOPASSWD: ALL" >> /etc/sudoers \
+  && echo 'Cmnd_Alias SU = /bin/su' |sudo tee -a /etc/sudoers \
+  && echo "$user ALL=(root) NOPASSWD: ALL" |sudo tee -a /etc/sudoers \
   \
   && chmod +x /*.sh; \
   test -f /usr/bin/dbus-daemon && chmod 700 /usr/bin/dbus-* || echo "dbus skip chmod."; \
@@ -25,9 +26,11 @@ $RUN \
   chmod +x /*.sh \
   && echo "welcome! HeadlessBox." > /etc/motd \
   && ln -s /usr/bin/vim.tiny /usr/bin/vt \
-  && ln -s /usr/bin/supervisorctl /usr/bin/sv \
-  && rm -f /bin/sh && ln -s /bin/bash /bin/sh \
-  && echo "alias ll='ls -lF'; alias la='ls -A'; alias l='ls -CF';" >> /home/$user/.bashrc
+  && rm -f /bin/sh && ln -s /bin/bash /bin/sh; \
+  \
+  mkdir -p /var/log/supervisor; \
+  rm -f /usr/bin/sv; echo -e "#!/bin/bash\ntest -z "\$1" && go-supervisord ctl -h || go-supervisord ctl \$@" > /usr/bin/sv; chmod +x /usr/bin/sv; \
+  echo "alias ll='ls -lF'; alias la='ls -A'; alias l='ls -CF';" |sudo tee -a /home/$user/.bashrc
 
 
 # +002
@@ -35,7 +38,7 @@ $RUN \
     # echo "welcome! HeadlessBox." > /etc/motd \
     # && ln -s /usr/bin/vim.tiny /usr/bin/vt \
     # && rm -f /bin/sh && ln -s /bin/bash /bin/sh \
-    # && echo "alias ll='ls -lF'; alias la='ls -A'; alias l='ls -CF';" >> /home/headless/.bashrc; \
+    # && echo "alias ll='ls -lF'; alias la='ls -A'; alias l='ls -CF';" |sudo tee -a /home/headless/.bashrc; \
     \
     mkdir -p  /usr/share/man/man1/; \
     su - headless -c "mkdir -p /home/headless/.config/plank/dock1/launchers"; \
@@ -59,14 +62,14 @@ $RUN \
   \
   # ibus env
   # 冗余? 复用/.env?
-  echo "export XMODIFIERS=@im=ibus" >> /etc/profile;\
-  echo "export GTK_IM_MODULE=ibus" >> /etc/profile;\
-  echo "export QT_IM_MODULE=ibus" >> /etc/profile;\
+  echo "export XMODIFIERS=@im=ibus" |sudo tee -a /etc/profile;\
+  echo "export GTK_IM_MODULE=ibus" |sudo tee -a /etc/profile;\
+  echo "export QT_IM_MODULE=ibus" |sudo tee -a /etc/profile;\
   \
   # 独立/.env每次entry都重生成;
-  echo "export XMODIFIERS=@im=ibus" >> /.env;\
-  echo "export GTK_IM_MODULE=ibus" >> /.env;\
-  echo "export QT_IM_MODULE=ibus" >> /.env;\
+  echo "export XMODIFIERS=@im=ibus" |sudo tee -a /.env;\
+  echo "export GTK_IM_MODULE=ibus" |sudo tee -a /.env;\
+  echo "export QT_IM_MODULE=ibus" |sudo tee -a /.env;\
   \
   # dconf: ibus, plank, engrampa; dconf dump / > xx.ini
   mkdir -p /etc/dconf/db;\

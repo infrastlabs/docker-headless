@@ -59,7 +59,7 @@ RUN \
   \
   # 343 kB
   # +xrdp 0.9.12 (compile: 0.9.16/19)
-  supervisor \
+  # supervisor \
   x11-xkb-utils libfdk-aac1 libopus0 \
   libsecret-1-0 libnss3 libxtst6 libasound2 xdg-utils \
   \
@@ -83,6 +83,20 @@ RUN \
   mv /opt/asbru /usr/local; rm -f /usr/bin/asbru-cm; ln -s /usr/local/asbru/asbru-cm /usr/bin/; \
   cd /usr/share/icons/hicolor/scalable/apps; rm -f asbru-cm.svg; ln -s /usr/local/asbru/res/asbru-logo.svg ./asbru-cm.svg; \
   dpkg -l |grep asbru && exit 0 || exit 1;  
+# go-supervisor https://github.com/ochinchina/supervisord/releases
+RUN echo a.1; \
+  # test -z "$(echo $TARGETPLATFORM |grep arm)" && arch=64-bit || arch=ARM64; \
+  # test -z "$(echo $TARGETPLATFORM |grep arm/v7)" || arch=ARM64v7; \
+  case ${TARGETPLATFORM} in \
+    "linux/amd64")  arch=64-bit    ;; \
+    "linux/arm64")  arch=ARM64     ;; \
+    "linux/arm/v7") arch=ARMv7   ;; \
+    "linux/arm/v6") arch=ARMv6   ;; \
+    "linux/386")    arch=NONE_i386 ;; \
+  esac; \
+  cd /tmp; curl -fSL -O https://ghproxy.com/https://github.com/ochinchina/supervisord/releases/download/v0.7.3/supervisord_0.7.3_Linux_$arch.tar.gz; \
+  tar -zxf supervisord_0.7.3_Linux_$arch.tar.gz; \cp -a supervisord_0.7.3_Linux_$arch/supervisord /usr/local/bin/go-supervisord; \
+  rm -rf /tmp/supervisord_0.7.3_Linux*; ls -lh /usr/local/bin/
 
 ARG FULL=""
 # TODO: full瘦身: ibus-rime librime-data-wubi启动时安装;
