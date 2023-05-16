@@ -2,6 +2,8 @@
 #  SSH_PASS=ChangeMe  VNC_PASS=ChangeMe2  VNC_PASS_RO=ChangeMe3
 #  echo "headless:$SSH_PASS" |sudo chpasswd
 #  echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /etc/xrdp/vnc_pass; sudo chmod 644 /etc/xrdp/vnc_pass
+# 
+#  sed -i "s/password=.*/password=$SV_ADMIN_PASS/g" /etc/supervisor/supervisord.conf #restartContainer
 ###################################################
 version: '2.4'
 services:
@@ -9,7 +11,7 @@ services:
     image: infrastlabs/docker-headless:latest
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "bash", "-c", "supervisorctl status |grep -v 'RUNNING' && exit 1 || exit 0 "]
+      test: ["CMD", "bash", "-c", "sv status |grep -v 'Running' && exit 1 || exit 0 "]
     shm_size: 1g
     privileged: true
     network_mode: host
@@ -32,7 +34,7 @@ services:
     image: infrastlabs/docker-headless:sogou
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "bash", "-c", "supervisorctl status |grep -v 'RUNNING' && exit 1 || exit 0 "]
+      test: ["CMD", "bash", "-c", "sv status |grep -v 'Running' && exit 1 || exit 0 "]
     shm_size: 1g
     privileged: true
     network_mode: host
@@ -50,7 +52,7 @@ services:
     image: infrastlabs/docker-headless:core
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "bash", "-c", "supervisorctl status |grep -v 'RUNNING' && exit 1 || exit 0 "]
+      test: ["CMD", "bash", "-c", "sv status |grep -v 'Running' && exit 1 || exit 0 "]
     shm_size: 1g
     privileged: true
     network_mode: host
