@@ -32,5 +32,6 @@ sogou)
     cimg="docker-headless-cache:latest"
     cache="--cache-from type=registry,ref=$ali/$ns/$cimg --cache-to type=registry,ref=$ali/$ns/$cimg"
     docker  buildx build $cache $plat --push -t $repo/$ns/$img -f src/Dockerfile . 
+    docker  buildx build $cache $plat --push -t $ali/$ns/$img -f src/Dockerfile . 
     ;;
 esac
