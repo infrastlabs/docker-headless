@@ -43,22 +43,3 @@ mstisc/mRemoteNG
 - PAC终端管理、oh-my-bash
 
 ![](res/06full-flameshot.png)
-
-## 五、发行版选择
-
-Debian9(LTS 5年已到期) > Ubuntu20.04(LTS 10年期)
-
-https://wiki.debian.org/LTS  #deb9: (July 6, 2020 to June 30, 2022 )  
-https://ubuntu.com/about/release-cycle #ubt20: (2020.4 - 2030.4)
-
-**1)Debian9**
-
-2017, xrdp 0.9.16_OpenSSL 1.1.0l  10 Sep 2019 |Xvnc TigerVNC 1.10.0 |pulseaudio 10.0
-
-![](./../_doc/assets/lts_debian.png)
-
-**2)Ubuntu20.04**
-
-xrdp 0.9.16_OpenSSL 1.1.1f  31 Mar 2020 |Xvnc TigerVNC 1.12.0 |pulseaudio 13.99.1
-
-![](./../_doc/assets/lts_ubuntu.png)
