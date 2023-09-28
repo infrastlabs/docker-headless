@@ -1,8 +1,8 @@
 
 
 - https://www.cnblogs.com/dakewei/p/13332688.html #docker如何构建多架构(arm64, x86_64, armv7)容器镜像?
-- https://cloud.tencent.com/developer/article/1543689 #Docker 19.03 引入的插件 buildx ##发布于2019-11-25 16:19:02阅读 17.7K
-- https://blog.csdn.net/u014110320/article/details/124406628 #Docker buildx 安装
+- https://cloud.tencent.com/developer/article/1543689 #Docker 19.03 引入的插件 buildx ##发布于2019-11-25 16:19:02阅读 17.7K|29.9K@23.9.28 `buildx v032`
+- https://blog.csdn.net/u014110320/article/details/124406628 #Docker buildx 安装 ##2022-04-25 `buildx v082`
 - 
 - https://www.jianshu.com/p/5426e7ad36f2 #docker-static Docker 静态二进制安装
 - https://download.docker.com/linux/static/stable/ #docker-19.03.15.tgz 2021-02-01 21:54:16 59.5 MiB
@@ -15,6 +15,20 @@
 - https://github.com/moby/buildkit #buildKit, buildx: --cache-to; --cache-from
 - https://docs.docker.com/engine/reference/commandline/buildx_build/
 
+```bash
+# unknown/unknown Artifact #1990
+# https://github.com/docker/buildx/issues/1509
+Copying my workaround suggestions from another issue:
+
+  1. Use `docker buildx imagetools inspect --raw` instead of `docker manifest inspect` - it should work similarly, and supports all the different media types in the registry. See the docs for [`docker buildx imagetools inspect.`](https://docs.docker.com/engine/reference/commandline/buildx_imagetools_inspect/).
+      Hopefully, this will just work, and should be a drop-in replacement!
+
+  2. Set `oci-mediatypes=false` in your `--output` flag (to use the docker distribution manifest list instead of an OCI index).
+      This might cause some issues with the generated provenance, which means you\'d probably prefer 3 instead.
+
+  3. Set `--provenance=false` to not generate the provenance (which is what causes the multi-platform index to be generated, even for a single platform).
+      Just remove the generated provenance entirely, this means that only a single manifest is created, no index needed, which sidesteps the problem.
+```
 
 **1)MultiArch构建**
 
