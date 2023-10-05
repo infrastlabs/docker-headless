@@ -8,9 +8,9 @@
 - [使用手册](./_doc/使用手册.md)
 - [适用场景与问题](./_doc/适用场景与问题.md)
 
-**Tags**
+## 一、Tags
 
- TAG | Distro | DESK | INPUT | STARTER | IMAGE |Star|Descrition 
+ TAG | Distro | Desktop | Input | Initd | Image |Star |Description 
 --- | --- | ---  | ---  | --- | --- | --- | ---
 latest |Ubuntu| xfce | ibus  | supervisor | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/latest)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|Customize,Lightweight
 sogou  |Ubuntu| xfce | fcitx | supervisor | [![Docker Image Size](https://img.shields.io/docker/image-size/infrastlabs/docker-headless/sogou)](https://hub.docker.com/r/infrastlabs/docker-headless/tags)|★★★★★|sogouInput
@@ -29,11 +29,31 @@ echo "headless:$SSH_PASS" |sudo chpasswd
 echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /etc/xrdp/vnc_pass; sudo chmod 644 /etc/xrdp/vnc_pass
 ```
 
-**ImageLayers**
+## 二、ImageLayers
+
+- Core: `slim> base` [amd64/arm64/armv7]
+- Custom: `slim> core/latest/sogou` [amd64/arm64]
+- Ubuntu: `slim> base> gnome/plasma` [amd64/arm64]
+- Mint: `slim> base> cxfce/cinna/cmate` [x86_64 only]
 
 ![](./_doc/res/design/RDesktop_IMAGE.png)
 
-**Detail**
+## 三、发行版选择
+
+Debian9(LTS 5年已到期) > Ubuntu20.04(LTS 10年期)
+
+- https://wiki.debian.org/LTS  #deb9: (July 6, 2020 to June 30, 2022 )  
+- https://ubuntu.com/about/release-cycle #ubt20: (2020.4 - 2030.4)
+
+**1)Debian9** `2017, xrdp 0.9.16_OpenSSL 1.1.0l  10 Sep 2019 |Xvnc TigerVNC 1.10.0 |pulseaudio 10.0`
+
+![](./_doc/assets/lts_debian.png)
+
+**2)Ubuntu20.04** `2020.04, xrdp 0.9.16_OpenSSL 1.1.1f  31 Mar 2020 |Xvnc TigerVNC 1.12.0 |pulseaudio 13.99.1`
+
+![](./_doc/assets/lts_ubuntu.png)
+
+**四、Detail**
 
 （Hotkeys, Envs, SysApps）
 
@@ -52,7 +72,7 @@ echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /
 - GUI: `sakura tint2 plank flameshot`, `gnome-system-monitor engrampa ristretto`
 - TZ/Font/Input: tzdata, ttf-wqy-microhei, ibus-rime
 
-**0.HostGUIApps**
+**0)HostGUIApps**
 
 ```bash
 export DISPLAY=:10
@@ -60,7 +80,7 @@ export PULSE_SERVER=tcp:127.0.0.1:4721 #audio
 # ./guiApps
 ```
 
-**1.HotKeys**
+**1)HotKeys**
 
 - HotKeys `super: Alt`
   - `sup+t`: terminal
@@ -73,7 +93,7 @@ export PULSE_SERVER=tcp:127.0.0.1:4721 #audio
   - `sup+left`: left workspace
   - `sup+right`: right workspace
 
-**2.Env**
+**2)Env**
 
 ```bash
 # ENV (default); SSH_PASS=headless, VNC_PASS=headless, VNC_PASS_RO=View123; 
@@ -92,7 +112,7 @@ ENV \
   TZ=Asia/Shanghai  
 ```
 
-**3.Apps**
+**3)Apps**
 
 - xfce4 https://www.xfce.org/projects
 - tint2 https://github.com/o9000/tint2
@@ -109,7 +129,7 @@ ENV \
 - gimp, code, idea, browser360, wps
 - oth: inkscape, falkon, Xonotic
 
-**4.Refs**
+**4)Refs**
 
 - https://github.com/accetto/xubuntu-vnc-novnc #276.52 MB
 - https://github.com/hectorm/docker-xubuntu #633.29 MB
