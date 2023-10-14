@@ -1,0 +1,105 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="shortcut icon" href="favicon.ico">
+    <meta name="description" content=".." />
+    <meta name="robots" content="nofollow">
+    <meta name="viewport" content="width=device-width">
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>noVnc@HeadlessBox</title>
+    <style type='text/css'>
+        body {
+            background-color: #636a63;
+        }
+
+        .main {
+            background-color: #fff;
+            border-radius: 20px;
+            width: 300px;
+            height: 450px;
+            margin: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+    </style>
+    <script type="text/javascript">
+
+        /**
+        * @param URL
+        * @param PARAMS
+        * @ref https://www.jianshu.com/p/cc9733465769
+        */
+        function postOpenWindow(URL, PARAMS) {
+            var temp_form = document.createElement("form");
+            temp_form.action = URL;
+            temp_form.target = "_blank";
+            temp_form.method = "post";
+            temp_form.style.display = "none";
+            for (var x in PARAMS) {
+                var opt = document.createElement("textarea");
+                opt.name = x;
+                opt.value = PARAMS[x];
+                temp_form.appendChild(opt);
+            }
+            document.body.appendChild(temp_form);
+            temp_form.submit();
+        }
+
+        function openVnc(token, vnctype) {
+            var pass = document.getElementById('password').value;
+            // TODO: encodeURIComponent(PASS) > decodeURIComponent
+
+            //try: post new window, post method forbidden by server.
+            // var url = "/" + vnctype + ".html?path=websockify/?token=" + token + "&autoconnect=true&resize=remote&bell=off";
+            // //var params={token:token, password:pass, autoconnect:true, resize:remote, bell:off}
+            // var params = { "password": pass }
+            // //postOpenWindow(url, params);
+            
+            //must: ?path=websockify/?token=
+            var url = "/vnc/noVNC-1.3.0/" + vnctype + ".html?path=wsvnc?token=" + token + "&autoconnect=true&resize=remote&bell=off&password=" + pass;
+            window.open(url);
+            // console.log(url);
+        }
+    </script>
+</head>
+
+<body>
+    <div class="main">
+        <div style="margin-top: 8px; margin-left: 22px;">
+            VNC_PASS: <input type="password" id="password" maxlength="20" value="headless" style="width: 80%;" />
+        </div>
+        <ul style="margin-top: 8px; margin-bottom: 3px;">
+            <!-- <li><a id="audioLink" target="_blank" href=":9222">Audio Broadcast</a></li> -->
+            <li><a id="audioLink" target="_blank" href="/bcs">Audio Broadcast</a></li>
+        </ul>
+        <!-- <script>
+            var audio=document.getElementById("audioLink");
+            audio.href="http://"+window.location.hostname+":9222";
+        </script> -->
+        <div style="height:70%; overflow:auto;">
+        <ul style="margin-top: 8px;">
+            <!-- ADD_HERE -->
+            <!-- <li><a href="javascript:void(0);" onclick="openVnc('display10')">display0</a></li> -->
+            
+            <!-- <li><a target="_blank" href="/vnc.html?path=websockify/?token=display10&password=xx">display0</a></li>
+            <li><a target="_blank" href="/vnc_lite.html?path=websockify/?token=display10&password=xx">display0-lite</a></li>
+            <li></li> -->
+            <!-- <li><a target="_blank" href="/vnc/noVNC-1.3.0/vnc.html?path=wsvnc&token=display10&autoconnect=true&resize=remote&bell=off&password=headless">display10</a></li>
+            <li><a target="_blank" href="/vnc/noVNC-1.3.0/vnc_lite.html?path=wsvnc&token=display10&autoconnect=true&resize=remote&bell=off&password=headless">display10-lite</a></li>
+            <li></li> -->
+
+            <!-- <li>[<a href="javascript:void(0);" onclick="openVnc('display$N', 'vnc')">$N-resize</a>&nbsp;&nbsp; 
+                <a href="javascript:void(0);" onclick="openVnc('display$N', 'vnc_lite')">lite</a>] | $name1</li> -->
+            
+                <!-- <li><a href="javascript:void(0);" onclick="openVnc('display10', 'vnc')">display10</a></li>
+            <li><a href="javascript:void(0);" onclick="openVnc('display10', 'vnc_lite')">display10-lite</a></li> -->
+            <li></li>
+        </ul>
+        </div>
+    </div>
+</body>

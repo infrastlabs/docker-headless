@@ -1,0 +1,71 @@
+#!/bin/sh
+#######: called by startfluxbox; needn's chmod +x;
+# fluxbox startup-script:
+#
+# Lines starting with a '#' are ignored.
+
+
+
+# Autostart Apps ##addy-dclxvi_dots
+# xset fp+ ~/.fonts/misc
+# xset b off
+# xset r rate 250 25
+
+# xbacklight -set 5
+# xsettingsd &
+# compton -b
+# /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 &
+# hsetroot -fill ~/.fluxbox/bg_retina.jpg #wallpaper
+# (sleep 1.4; xfce4-power-manager) &
+# (sleep 1.2; nm-applet) &
+(sleep 1.0; pnmixer) &
+(sleep 0.8; clipit) & #clipit/diodon ##both cause rdesktop conn-err?
+# thunar --daemon &
+dunst &
+# http://t.zoukankan.com/huapox-p-3516155.html
+# sakura no border.; diable: remote quicker view.
+# xcompmgr -Ss -n -Cc -fF -I-10 -O-10 -D1 -t-3 -l-4 -r4 &
+# xcompmgr &
+# compton --config ~/.compton.conf&
+#plank &
+sleep 2 && sakura & #stterm #directRun: topPosition HideBar
+
+# Change your keymap:
+# xmodmap "/home/alexsson/.Xmodmap"
+
+# Applications you want to run with fluxbox.
+# MAKE SURE THAT APPS THAT KEEP RUNNING HAVE AN ''&'' AT THE END.
+#
+# unclutter -idle 2 &
+# wmnd &
+# wmsmixer -w &
+# idesk &
+
+# # nm-applet&
+# # xfce4-power-manager&
+# setxkbmap se&
+# # xfce4-volumed-pulse&
+# # nitrogen --restore&
+# dropboxd&
+# volumeicon&
+# # cbatticon -i standard &
+# # conky -c ~/.conky/Conky-Weather/conky_config&
+# discord&
+
+# Start DBUS session bus:
+if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
+   eval $(dbus-launch --sh-syntax --exit-with-session)
+fi
+
+# +feh
+# feh --no-fehbg --bg-scale ~/.fluxbox/res/wallpapers_slax_wallpaper.jpg 
+# (sleep 0.1; ibus-daemon -drx) &
+ibus-daemon -drx #backend
+
+# And last but not least we start fluxbox.
+# Because it is the last app you have to run it with ''exec'' before it.
+# Launch Fluxbox
+exec fluxbox
+# exec fluxbox -no-slit
+# or if you want to keep a log:
+# exec fluxbox -log "/home/alexsson/.fluxbox/log"

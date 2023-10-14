@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# https://github.com/pointtonull/dotfiles/blob/ce4dea17af1c1ea26afcefd4794826f507e9e028/user/bin/dpkg-busca
+LANG="C"
+if [ $# = 0 ]; then
+	dpkg-query -W --showformat='${Installed-Size} ${Package}\n' | awk 'BEGIN{formato="%4.2f Mbs\t%s\n"}{total+=$1; if ( NF == 1) printf  formato, 0, $1; else; if ( NF == 2 ) printf formato, $1/1024, $2}; END{printf formato,total/1024, "TOTALES" }' | sort -n
+	exit 0
+else
+	dpkg-query -W --showformat='${Installed-Size} ${Package}\n' $(apt-cache search $* | awk '{print $1}') 2>/dev/null | awk 'BEGIN{formato="%4.2f Mbs\t%s\n"}{total+=$1; if ( NF == 1) printf  formato, 0, $1; else; if ( NF == 2 ) printf formato, $1/1024, $2}; END{printf formato,total/1024, "TOTALES" }' | sort -n
+	exit 0
+fi

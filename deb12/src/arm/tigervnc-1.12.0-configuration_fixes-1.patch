@@ -1,0 +1,57 @@
+Submitted By:            Douglas R. Reno <renodr at linuxfromscratch dot org>
+Date:                    2020-10-21
+Initial Package Version: 1.11.0
+Upstream Status:         Unknown (BLFS Specific)
+Origin:                  Self
+Description:             Removes the SELinux requirement from the systemd unit,
+                         changes the PAM file to be compatible with LFS, and
+                         modifies the search path in /usr/libexec/vncserver
+                         to work with an Xsession installed in
+                         /etc/X11/tigervnc.
+
+Update for version 1.12.0 on 2021-11-18
+
+diff -Naurp tigervnc-1.11.0.orig/unix/vncserver/tigervnc.pam tigervnc-1.11.0/unix/vncserver/tigervnc.pam
+--- tigervnc-1.11.0.orig/unix/vncserver/tigervnc.pam	2020-09-08 07:16:08.000000000 -0500
++++ tigervnc-1.11.0/unix/vncserver/tigervnc.pam	2020-10-21 21:01:57.838565149 -0500
+@@ -1,11 +1,10 @@
+-#%PAM-1.0
+-# pam_selinux.so close should be the first session rule
+--session   required     pam_selinux.so close
++# Begin /etc/pam.d/tigervnc
++
+ session    required     pam_loginuid.so
+--session   required     pam_selinux.so open
+ session    required     pam_namespace.so
+ session    optional     pam_keyinit.so force revoke
+ session    required     pam_limits.so
+--session   optional     pam_systemd.so
++session    optional     pam_systemd.so
+ session    required     pam_unix.so
+--session   optional     pam_reauthorize.so prepare
++
++# End /etc/pam.d/tigervnc
+diff -Naurp tigervnc-1.11.0.orig/unix/vncserver/vncserver.in tigervnc-1.11.0/unix/vncserver/vncserver.in
+--- tigervnc-1.11.0.orig/unix/vncserver/vncserver.in	2020-09-08 07:16:08.000000000 -0500
++++ tigervnc-1.11.0/unix/vncserver/vncserver.in	2020-10-21 21:04:41.342563348 -0500
+@@ -438,7 +438,7 @@ sub SanityCheck
+ 	die "$prog: couldn't find \"$cmd\" on your PATH.\n";
+     }
+ 
+-    foreach $cmd ("/etc/X11/xinit/Xsession", "/etc/X11/Xsession") {
++    foreach $cmd ("/etc/X11/xinit/Xsession", "/etc/X11/Xsession", "/etc/X11/tigervnc/Xsession") {
+         if (-x "$cmd") {
+             $Xsession = $cmd;
+             last;
+diff -Naurp tigervnc-1.11.0.orig/unix/vncserver/vncserver@.service.in tigervnc-1.11.0/unix/vncserver/vncserver@.service.in
+--- tigervnc-1.11.0.orig/unix/vncserver/vncserver@.service.in	2020-09-08 07:16:08.000000000 -0500
++++ tigervnc-1.11.0/unix/vncserver/vncserver@.service.in	2020-10-21 21:02:16.532564943 -0500
+@@ -36,8 +36,7 @@ After=syslog.target network.target
+ [Service]
+ Type=forking
+ ExecStart=@CMAKE_INSTALL_FULL_LIBEXECDIR@/vncsession-start %i
+ PIDFile=/run/vncsession-%i.pid
+-SELinuxContext=system_u:system_r:vnc_session_t:s0
+ 
+ [Install]
+ WantedBy=multi-user.target
