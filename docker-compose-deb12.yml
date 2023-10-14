@@ -1,0 +1,67 @@
+##Prod: Change Password############################
+#  SSH_PASS=ChangeMe  VNC_PASS=ChangeMe2  VNC_PASS_RO=ChangeMe3
+#  echo "headless:$SSH_PASS" |sudo chpasswd
+#  echo -e "$VNC_PASS\n$VNC_PASS\ny\n$VNC_PASS_RO\n$VNC_PASS_RO"  |sudo vncpasswd /etc/xrdp/vnc_pass; sudo chmod 644 /etc/xrdp/vnc_pass
+# 
+#  sed -i "s/password=.*/password=$SV_ADMIN_PASS/g" /etc/supervisor/supervisord.conf #restartContainer
+###################################################
+version: '2.4'
+services:
+  latest:
+    image: infrastlabs/docker-headless:deb12
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "bash", "-c", "sv status |grep -v 'Running' && exit 1 || exit 0 "]
+    shm_size: 1g
+    privileged: true
+    network_mode: host
+    environment:
+      - SSH_PASS=headless
+      - VNC_PASS=headless
+      - VNC_PASS_RO=View123
+      - VNC_OFFSET=21
+      - PORT_SSH=21022
+      - PORT_VNC=21081
+      - PORT_RDP=21089
+      - TZ=Asia/Shanghai
+      - L=zh_CN
+    volumes: 
+      - /_ext:/_ext
+      - /opt:/opt
+      - /:/mnt  
+
+  sogou:
+    image: infrastlabs/docker-headless:deb12-sogou
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "bash", "-c", "sv status |grep -v 'Running' && exit 1 || exit 0 "]
+    shm_size: 1g
+    privileged: true
+    network_mode: host
+    environment:
+      - VNC_OFFSET=22  #5900+12
+      - PORT_SSH=22022
+      - PORT_VNC=22081
+      - PORT_RDP=22089
+    volumes: 
+      - /_ext:/_ext
+      - /opt:/opt
+      - /:/mnt  
+
+  core:
+    image: registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:deb12-core
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "bash", "-c", "sv status |grep -v 'Running' && exit 1 || exit 0 "]
+    shm_size: 1g
+    privileged: true
+    network_mode: host
+    environment:
+      - VNC_OFFSET=23
+      - PORT_SSH=23022
+      - PORT_VNC=23081
+      - PORT_RDP=23089
+    volumes: 
+      - /_ext:/_ext
+      - /opt:/opt
+      - /:/mnt      
