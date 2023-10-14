@@ -14,33 +14,21 @@
 # - To prevent any other app from overwriting your menu
 #   you can change the menu name in ~/.fluxbox/init to:
 #     session.menuFile: ~/.fluxbox/my-menu
-[begin] (Slackware)
+[begin] (FLUXBOX)
 [encoding] {UTF-8}
-		[exec]   (➤ stTerm) {stterm} 
-        [exec]   (➤ Run) {fbrun}
+	#[exec]   (♠ stTerm) {stterm} 
+	#[exec]   (♠ Run) {fbrun}
+	[exec] (● Sakura) {sakura}
+	[exec] (● Thunar) {thunar}
+	[exec] (● Geany) {geany}
+	[exec]   (♠ Ristretto) {ristretto} 
+	[exec]   (♠ Asbru-cm) {asbru-cm} 
+	[exec]   (♠ Engrampa) {engrampa} 
+	[exec]   (♠ Gnome-monitor) {gnome-system-monitor} 
 	[separator]
-      	[exec] (⚫ Thunar) {thunar}
-      	[exec] (⚫ Geany) {geany}
-     	[exec] (⚫ Sakura) {sakura}
-		[exec] (⚫ Qmmp) {qmmp}
-		[exec] (⚫ Pavucontrol) {pavucontrol}
-     	[exec] (⚫ Lxappearance) {lxappearance}
-      	[exec] (❖ Google Chrome) {google-chrome-stable}
-      	[exec] (❖ VPN) {vpnui}
-     	# [exec] (⚫ Urxvt) {urxvt -bg "#000000" -fg "#FFFFFF" +sb -fn "xft:Dejavu Sans Mono:pixelsize=12" -uc -bd "#000000" -geometry 60x20 -letsp -1}
-		# [exec] (⚫ Slack) {slack}
-     	# [exec] (⚫ Skype) {skype}
-		# [exec] (⚫ Thunderbird) {thunderbird}
-     	# [exec] (⚫ Transmission) {transmission-gtk}
-     	# [exec] (⚫ Rstudio) {/usr/lib64/rstudio/bin/rstudio}
-     	# [exec] (⚫ Spotify) {spotify & kdocker -i ~/Programs/kdocker/Spotify/Spotify.svg -n Spotify -q &}
-      	# [exec] (⚫ Gcolor2) {gcolor2}
-      	# [exec] (⚫ Nitrogen) {nitrogen}
-     	# [exec] (⚫ Partition manager) {partitionmanager}
-     	# [separator]
-     	[exec] (❖ Dosbox) {dosbox} 
-     	[exec] (❖ Steam) {steam}    	
-	[nop]
+	[submenu] (Tools)
+		[exec] (♣ gparted) {sudo gparted}  
+	[end]
 	[submenu] (Fluxbox menu)
 		[nop] (Custom configs)
 		[exec] (menu) {geany ~/.fluxbox/menu}
@@ -72,14 +60,35 @@
       			[restart] (○ blackbox) {startblackbox}
       			[restart] (○ windowmaker) {wmaker}
 		[end]
-      		[exec] (○ Lock screen) {xlock}
-      		[commanddialog] (○ Fluxbox Command)
-      		[reconfig] (○ Reload config)
-      		[restart] (○ Restart)
-      		[exec] (○ About) {(fluxbox -v; fluxbox -info | sed 1d) | xmessage -file - -center}
-      		[nop]
-      		[exit] (○ Exit)
+		[nop]
+		[exec] (○ Lock screen) {xlock}
+		[commanddialog] (○ Fluxbox Command)
+		[reconfig] (○ Reload config)
+		[restart] (○ Restart)
+		[exec] (○ About) {(fluxbox -v; fluxbox -info | sed 1d) | xmessage -file - -center}
+		[exit] (○ Exit)
 	[end]
+	# ●http://www.fhdq.net/
+	[exec] (♫ Lxappearance) {lxappearance}
+	[exec] (♫ Pavucontrol) {pavucontrol}
+	[exec] (♫ Qmmp) {qmmp}
+	[exec] (♣ Google Chrome) {google-chrome-stable}
+	[exec] (♣ VPN) {vpnui}
+	# [exec] (⚫ Urxvt) {urxvt -bg "#000000" -fg "#FFFFFF" +sb -fn "xft:Dejavu Sans Mono:pixelsize=12" -uc -bd "#000000" -geometry 60x20 -letsp -1}
+	# [exec] (⚫ Slack) {slack}
+	# [exec] (⚫ Skype) {skype}
+	# [exec] (⚫ Thunderbird) {thunderbird}
+	# [exec] (⚫ Transmission) {transmission-gtk}
+	# [exec] (⚫ Rstudio) {/usr/lib64/rstudio/bin/rstudio}
+	# [exec] (⚫ Spotify) {spotify & kdocker -i ~/Programs/kdocker/Spotify/Spotify.svg -n Spotify -q &}
+	# [exec] (⚫ Gcolor2) {gcolor2}
+	# [exec] (⚫ Nitrogen) {nitrogen}
+	# [exec] (⚫ Partition manager) {partitionmanager}
+	# [separator]
+	[exec] (♣ Dosbox) {dosbox} 
+	[exec] (♣ Steam) {steam}    	
+	# [nop]
+	
 [endencoding]
 [end]
 
