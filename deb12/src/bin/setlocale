@@ -1,0 +1,29 @@
+#!/bin/sh
+# TZ, L
+
+function setLocale(){
+    # L="zh_CN" ##${L##*.} > zh_CN
+    # LANG="zh_CN.UTF-8" #lang_area.charset
+    charset=${L##*.}; test "$charset" == "$L" && charset="UTF-8" || echo "charset: $charset"
+    lang_area=${L%%.*}
+    export LANG=${lang_area}.${charset}
+    export LANGUAGE=${lang_area}:en #default> en
+    echo "====LANG: $LANG, LANGUAGE: $LANGUAGE=========================="
+    sleep 1
+
+    # LOCALE
+    sudo sed -i -e "s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
+    sudo sed -i -e "s/# ${LANG} ${charset}/${LANG} ${charset}/" /etc/locale.gen
+    sudo locale-gen ${LANG}
+    sudo update-locale LANG=${LANG} LANGUAGE=${LANGUAGE}
+    # echo "# " > /etc/default/locale;
+
+    echo "==[locale -a]===================================="
+    locale -a
+    cat /etc/default/locale
+    # sleep 2
+}
+env |grep "TZ\|^L="
+test -z "$L" || setLocale
+test -z "$TZ" || echo "${TZ}" | sudo tee /etc/timezone
+test -z "$TZ" || sudo ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime
