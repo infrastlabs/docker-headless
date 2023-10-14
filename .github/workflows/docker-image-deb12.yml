@@ -1,0 +1,42 @@
+name: docker-image
+on:
+  push:
+    branches: [ "feat/deb12" ]
+  pull_request:
+    branches: [ "feat/deb12" ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Call buildx.sh(build with ali's cache, push)
+        run: |
+          # VARS
+          echo ${{ github.repository_owner }} #infrastlabs
+          echo ${{ github.repository }}
+          echo ${{ secrets.DOCKER_REGISTRY_PW_DOCKERHUB }} #fill not show in log
+          # INFO
+          pwd && ls -l
+          docker version
+          free -h; df -h; ip a |grep inet; uname -a;
+          
+          # ENV
+          export DOCKER_REGISTRY_USER_infrastSubUser2=${{ secrets.DOCKER_REGISTRY_USER_INFRASTSUBUSER2 }}
+          export DOCKER_REGISTRY_PW_infrastSubUser2=${{ secrets.DOCKER_REGISTRY_PW_INFRASTSUBUSER2 }}
+          export DOCKER_REGISTRY_USER_dockerhub=${{ secrets.DOCKER_REGISTRY_USER_DOCKERHUB }}
+          export DOCKER_REGISTRY_PW_dockerhub=${{ secrets.DOCKER_REGISTRY_PW_DOCKERHUB }}
+
+          # BUILD
+          echo deb12; cd deb12; 
+            # sh buildx.sh slim; #sh buildx.sh base
+            # sh buildx.sh compile
+            # sh buildx.sh compile2
+            # sh buildx.sh #deb12-core
+            sh buildx.sh cust
