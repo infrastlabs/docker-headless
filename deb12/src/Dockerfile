@@ -1,157 +1,104 @@
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:xfce-deb9-v1 as loc
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:compile-v1 as xrdpbin
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/novnc-audio:bcs as bcs
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:box07-slim as box07
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-ubuntu-desktop-vnc:x11 as Xvnc
-FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-ubuntu-desktop-vnc:compile31 as bin2
+FROM infrastlabs/docker-headless:deb12-compile as bin
+FROM debian:bookworm-slim as files1
+  COPY --from=bin /rootfs /rootfs/
 
-# ==DO: 用1个空镜像，再转一层： x5+6+2=13 > 1层;
-FROM scratch as files
-  ARG FULL=""
-  # NOVNC +1.352 MB; clear: 6.5M > 5.4M
-  COPY --from=box07 /usr/local/novnc /usr/local/novnc
-  # locale 9.214 MB
-  COPY --from=loc /usr/share/locale1/emp${FULL} /usr/share/locale1
-  # xrdp0914, xrdp3: v0916
-  COPY --from=xrdpbin /usr/local/appdata/xrdp /usr/local/xrdp
-  COPY --from=xrdpbin /usr/local/sysdata/var/lib/xrdp-pulseaudio-installer /var/lib/xrdp-pulseaudio-installer
-  COPY --from=bcs /app/broadcast-server /usr/local/novnc-audio/broadcast-server
-  # up tigervnc: v1.10.1 for gnome, cinnamon
-  COPY --from=Xvnc /usr/bin/Xvnc /usr/bin/Xvnc
-  COPY --from=Xvnc /usr/lib64/swrast_dri.so /usr/lib64/swrast_dri.so
-  COPY --from=Xvnc /usr/lib64/xorg/protocol.txt /usr/lib64/xorg/protocol.txt
-  COPY --from=bin2 /src/webhookd /usr/local/webhook/webhookd
-  
-FROM scratch as files2
-  # COPY --chown=root:root ./src
-  ADD src/dot /etc/skel
-  ADD src/etc /etc
-  ADD src/*.sh /
-  ADD src/xrdp.conf /etc/supervisor/conf.d/xrdp.conf
-  ADD src/index.tpl.html /usr/local/novnc/index.tpl.html
-  Add src/clear3d.theme /usr/share/plank/themes/Default/dock.theme
-  COPY src/f/dconf.ini /usr/share/dconf.ini 
-  ADD src/xdict.* /usr/local/webhook/scripts/
-  # RUN bash xxx ##TODO single file bash: goBash?? > xrdp-link; qmmp unpack;
-
-FROM debian:stretch-slim
-ENV \
-  DEBIAN_FRONTEND=noninteractive \
-  LOC_APPS="tint2 plank thunar sakura" \
-  LOC_APPS2="gnome-system-monitor engrampa ristretto" \
-  LOC_XFCE="xfce4-settings xfce4-session xfwm4 xfdesktop4"
-
-RUN domain="mirrors.aliyun.com" \
-  && echo "deb http://$domain/debian/ stretch main contrib non-free" > /etc/apt/sources.list \
-  && echo "deb http://$domain/debian/ stretch-updates main contrib non-free">> /etc/apt/sources.list; \
-  \
-  echo 'apt update -qq && apt install -yq --no-install-recommends $@ && apt-get clean && rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
-  && chmod +x /usr/local/bin/apt.sh; \
-  \
-  # XRDP 26.673 MB
-  # \18.0 MB
-  apt.sh tigervnc-standalone-server tigervnc-common xrdp; \
-    mkdir -p /etc/xrdp && xrdp-keygen xrdp auto && apt -y remove xrdp; \
-  # \23.4 MB
-  apt.sh libfdk-aac1 pulseaudio supervisor; \
-  # \5984 kB
-  apt.sh wget ca-certificates python-numpy; \
-  # \
-  apt.sh curl lame sox libsox-fmt-mp3; \
-  # \5868 kB
-  apt.sh htop rsync tree tmux lrzsz psmisc fuse net-tools iputils-ping procps sudo iproute2 iptables \
-  zip unzip xz-utils vim-tiny; \
-  # \6248 kB
-  apt.sh fluxbox stterm hsetroot xcompmgr  dropbear-bin dropbear-run openssh-sftp-server lftp jq; \
-  bash -c "rm -rf /usr/share/fluxbox{nls,styles}";
-
-# --build-arg AUDIO=true --build-arg FULL=/..
-ARG AUDIO=""
-#XFCE 36.596 MB; #APP1 19.746 MB; #MP3 23.872 MB
-RUN test -z "$AUDIO" && exit 0;\
-    # \40.1 MB
-    apt.sh ${LOC_XFCE} greybird-gtk-theme; \
-    rm -f /usr/share/backgrounds/greybird.svg; \
-    # \24.4 MB
-    apt.sh ${LOC_APPS}; \
-    # \18.8 MB
-    apt.sh pavucontrol pnmixer qmmp; \
-    # \82.0 kB
-    apt.sh lxappearance dbus-x11; \
-    # \615 kB 
-    apt.sh xfce4-notifyd clipit gtk2-engines-pixbuf; \
+FROM debian:bookworm-slim as files2
+  ARG TARGETPLATFORM
+  RUN export DOMAIN="mirrors.ustc.edu.cn"; \
+  test -z "$(echo $TARGETPLATFORM |grep arm)" && target=bookworm || target=bookworm-ports; \
+  echo "deb http://$DOMAIN/debian/ bookworm main contrib non-free" > /etc/apt/sources.list; \
+  echo "deb http://$DOMAIN/debian/ bookworm-updates main contrib non-free">> /etc/apt/sources.list; \
+  apt update && apt -y install curl
+  # webhookd, noVNC
+  # https://gitee.com/infrastlabs/fk-webhookd/releases/download/v22.08.18/webhookd.tar.gz
+  RUN echo a.123; \
+    test -z "$(echo $TARGETPLATFORM |grep arm)" && file=webhookd.tar.gz || file=webhookd-arm64.tar.gz; \
+    cd /tmp; curl -fSL -k -O https://gitee.com/infrastlabs/fk-webhookd/releases/download/v22.08.18/$file; \
+    hookd=/rootfs/usr/local/webhookd; mkdir -p $hookd; tar -zxvf $file -C $hookd; rm -f $file; \
+    test -z "$(echo $TARGETPLATFORM |grep arm)" || mv $hookd/webhookd-arm64 $hookd/webhookd; \
+    test -z "$(echo $TARGETPLATFORM |grep arm)" || sed -i 's^cmd="go run ./"^cmd=./webhookd^g' $hookd/run.sh; \
     \
-    apt -y remove stterm; 
-
-# --build-arg FULL=/..
-ARG FULL=""
-RUN test -z "$FULL" && exit 0;\
-  domain="mirrors.aliyun.com" \
-  && echo "deb http://$domain/debian/ stretch-backports main non-free contrib">> /etc/apt/sources.list \
-  && echo "deb http://$domain/debian-security/ stretch/updates main non-free contrib">> /etc/apt/sources.list; \
-  \
-  #19.642 MB; #APPS2 5.6 MB #LOCALE 13.4 MB
-  # \14.8 MB
-  apt.sh at-spi2-core  geany rofi papirus-icon-theme; \
-  # \5729 kB
-  apt.sh ${LOC_APPS2}; \
-  # \11.6 MB
-  apt.sh dconf-cli locales tzdata fonts-wqy-zenhei; \
-  \
-  ##largerApps 63.789 MB  #IBUS: 26.5 MB #PIC: flameshot 10M, tumbler 6666kB(image cache); git 12.4 MB; 
-  # \24.8 MB
-  apt.sh ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi; \
-  # \18.4 MB
-  apt.sh flameshot tumbler arandr; \
-  # \6160 kB
-  apt.sh git; \
-  # \2249 kB
-  apt.sh gnupg libsecret-1-0 libnss3 libxtst6 libasound2 libglu1-mesa xdg-utils;
-  
-# asbru-cm: 10.5 MB
-RUN test -z "$FULL" && exit 0;\
-  curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash; \
-  apt.sh asbru-cm; rm -f /etc/apt/sources.list.d/asbru-cm-release.list; \
-  mv /opt/asbru /usr/local; rm -f /usr/bin/asbru-cm; ln -s /usr/local/asbru/asbru-cm /usr/bin/; \
-  cd /usr/share/icons/hicolor/scalable/apps; rm -f asbru-cm.svg; ln -s /usr/local/asbru/res/asbru-logo.svg ./asbru-cm.svg
-
-# stterm: TERM="xterm|vt100"
-ENV \
-  TERM=xterm \
-  SSH_PORT=10022 \
-  RDP_PORT=10089 \
-  VNC_PORT=10081 \
-  BCS_PORT=10082 \
-  # HEADLESS=headless \ #just static username.
-  SSH_PASS=headless \
-  VNC_PASS=headless \
-  VNC_PASS_RO=View123 \
+    # https://gitee.com/infrastlabs/fk-webhookd/releases/download/v22.08.18/v1.3.0.tar.gz #https://github.com/novnc/noVNC/archive
+    cd /rootfs/usr/local/webhookd/static; file=v1.3.0.tar.gz; curl -k -O -fSL https://gitee.com/infrastlabs/fk-webhookd/releases/download/v22.08.18/$file; \
+    bash down_vnc.sh; rm -f $file;
+  RUN \
+    # XCursor
+    downUrl=https://ghproxy.com/https://github.com/ful1e5/XCursor-pro/releases/download/v2.0.1; \
+    # downUrl=https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/assets/theme; \
+    mkdir -p /rootfs/usr/share/icons; \
+    file=XCursor-Pro-Dark.tar.gz; curl -k -fSL $downUrl/$file |tar -zx -C /rootfs/usr/share/icons/; \
+    file=XCursor-Pro-Light.tar.gz; curl -k -fSL $downUrl/$file |tar -zx -C /rootfs/usr/share/icons/; \
+    ls -lh /rootfs/usr/share/icons/;
   # 
-  VNC_SSL_ONLY=false \
-  VNC_CERT= \
-  # TODO: setRange; 再由客户端自行指定所要的端口;
-  VNC_OFFSET=0 \
-  VNC_LIMIT=1 \
-  VNC_INIT="" \
-  # VNC_INIT="23|mate,24|cinna,25|xfce,26|flux" \
-  # VNC_INIT="21|gnome,22|plama,23|mate,24|cinna,25|xfce,26|flux" \
-  # L=zh_CN \
-  TZ=Asia/Shanghai
+  COPY src/*.sh /rootfs/
+  ADD src/etc /rootfs/etc
+  ADD src/dot /rootfs/etc/skel
+  ADD src/bin /rootfs/usr/bin
+  ADD src/svd.conf /rootfs/etc/supervisor/supervisord.conf
+  ADD src/sv.conf /rootfs/etc/supervisor/conf.d/sv.conf
+  COPY src/*.service /rootfs/etc/systemd/system/
+  RUN cd /rootfs/usr/bin; chmod +x *; \
+    cd /rootfs/etc/skel/Desktop; chmod +x *.desktop; \
+    # https://github.com/TigerVNC/tigervnc/issues/800 #bernhardu,2019=Tigervnc killed just after connect 
+    test -z "$(echo $TARGETPLATFORM |grep arm64)" || sed -i "s^exec Xvnc^LD_PRELOAD=/lib/aarch64-linux-gnu/libgcc_s.so.1 exec Xvnc^g" /rootfs/xvnc.sh;
 
-COPY --from=files / /
-COPY --from=files2 / /
-RUN bash /xconf.sh "param|${AUDIO}" "param|${FULL}"
-# /home/headless/.config权限..
-COPY --chown=headless:headless src/f/emp${FULL} /home/headless/
-RUN test -z "$AUDIO" && exit 0;\ 
-  test -z "$FULL" && apt.sh gnome-system-monitor; \
-  cd /home/headless/.qmmp/skins/; unzip Dark_Materia.wsz; chmod 755 -R darkmateria; \
-  test -z "$FULL" && exit 0;\ 
-  # replace bg with: xfce-blue.jpg
-  cat /usr/share/backgrounds/xfce/xfce-blue.jpg > /usr/share/backgrounds/xfce/xfce-teal.jpg; \
-  cd /home/headless/.config/plank/dock1/launchers; rm -f ristretto* geany* flameshot*; \
-  bash -c "arr=\"$(cd /usr/share/locale1; ls)\"; for ONE in \${arr[@]}; do rm -rf /usr/share/locale/\$ONE ; ln -s /usr/share/locale1/\$ONE /usr/share/locale/ ; done";
+# FROM registry.cn-shenzhen.aliyuncs.com/infrastlabs/docker-headless:base-v51-slim
+FROM infrastlabs/docker-headless:deb12-base-v51slim
+# 轻量级桌面 openbox + tint2 + conky + stalonetray + pcmanfm + xcompmgr #http://t.zoukankan.com/huapox-p-3516155.html #huapox
+#   无thunar/lxappearance: 结合asbru纯SSH,音频场景（管维）
+RUN apt.sh \
+    # plank \ #compton-plank遮盖去域不可用
+    # compton \
+    xcompmgr \
+    dunst \
+    hsetroot pnmixer clipit;
+# TODO: drop deps of libgl1
+RUN apt.sh libunwind8 libxfont2 libgl1; \
+  rm -f /usr/lib/x86_64-linux-gnu/libLLVM-12.so.1; \
+  rm -f /usr/lib/aarch64-linux-gnu/libLLVM-12.so.1; 
 
-WORKDIR /home/headless
-EXPOSE 10089/tcp 10081/tcp 10022/tcp
-CMD ["/entry.sh"]
+# +服务器维护工具(gparted, wifiPojie,..); core与latest差异化
+RUN apt.sh \
+  gparted \
+  \
+  # +papirus-icon-theme
+  # dbus-x11 at-spi2-core
+  thunar lxappearance \
+  language-pack-gnome-zh-hans papirus-icon-theme greybird-gtk-theme; \
+  rm -f /usr/share/backgrounds/greybird.svg; \
+  \
+  wget https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
+  dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb; \
+  cd /usr/share/icons && rm -rf Papirus-Bunsen-Dark-bluegrey Papirus-Bunsen-Dark-grey Papirus-Dark Papirus-Light ePapirus; \
+  \
+  # Papirus left: 16x(clipit:21M) 64x(desktop:21M)
+  cd /usr/share/icons/Papirus && rm -rf 18x* 22x* 24x* 32x*  48x* 64x* ; \
+  ls -lh /usr/share/icons/Papirus; \
+  \
+  dpkg -l |grep bunsen && exit 0 || exit 1;
+
+RUN apt.sh ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
+  flameshot
+# firefox> midori > ?
+# RUN apt.sh midori
+
+# 拆分包体与配置项两块，免频繁变动基础包
+# HEADLESS
+COPY --from=files1 /rootfs /rootfs/bin
+COPY --from=files2 /rootfs /rootfs/conf
+
+# fluxbox's conf
+# RUN bash /rootfs/conf/etc/skel/.fluxbox/fluxbox.sh
+# RUN bash /xconf.sh
+
+RUN \
+  echo "cp -a /rootfs/bin/* /; \n\
+cp -a /rootfs/conf/* /; \n\
+bash /etc/skel/.fluxbox/fluxbox.sh; \n\
+bash /xconf.sh;\n\
+touch /rootfs/.core-init-lock\n\
+" > /rootfs/.core-init
+# .fluxbox/startup >> if -z $DBUS ; eval $(dbus-launch --sh-syntax --exit-with-session)
+# ENV DBUS_SESSION_BUS_ADDRESS="unix:path=/run/dbus/system_bus_socket"
+# WORKDIR /home/headless
+CMD ["bash", "-c", "test -f /rootfs/.core-init-lock || bash /rootfs/.core-init;  exec /entry.sh"]
