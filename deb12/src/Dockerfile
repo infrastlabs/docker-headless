@@ -1,8 +1,8 @@
-FROM infrastlabs/docker-headless:deb12-compile as bin
-FROM debian:bookworm-slim as files1
+FROM infrastlabs/docker-headless:deb12-compile2 as bin
+FROM debian:12-slim as files1
   COPY --from=bin /rootfs /rootfs/
 
-FROM debian:bookworm-slim as files2
+FROM debian:12-slim as files2
   ARG TARGETPLATFORM
   RUN export DOMAIN="mirrors.ustc.edu.cn"; \
   test -z "$(echo $TARGETPLATFORM |grep arm)" && target=bookworm || target=bookworm-ports; \
@@ -57,6 +57,11 @@ RUN apt.sh libunwind8 libxfont2 libgl1; \
   rm -f /usr/lib/x86_64-linux-gnu/libLLVM-12.so.1; \
   rm -f /usr/lib/aarch64-linux-gnu/libLLVM-12.so.1; 
 
+RUN apt.sh ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
+  flameshot
+# firefox> midori > ?
+# RUN apt.sh midori
+
 # +服务器维护工具(gparted, wifiPojie,..); core与latest差异化
 RUN apt.sh \
   gparted \
@@ -65,22 +70,17 @@ RUN apt.sh \
   # dbus-x11 at-spi2-core
   thunar lxappearance \
   language-pack-gnome-zh-hans papirus-icon-theme greybird-gtk-theme; \
-  rm -f /usr/share/backgrounds/greybird.svg; \
-  \
-  wget https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
-  dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb; \
-  cd /usr/share/icons && rm -rf Papirus-Bunsen-Dark-bluegrey Papirus-Bunsen-Dark-grey Papirus-Dark Papirus-Light ePapirus; \
-  \
-  # Papirus left: 16x(clipit:21M) 64x(desktop:21M)
-  cd /usr/share/icons/Papirus && rm -rf 18x* 22x* 24x* 32x*  48x* 64x* ; \
-  ls -lh /usr/share/icons/Papirus; \
-  \
-  dpkg -l |grep bunsen && exit 0 || exit 1;
-
-RUN apt.sh ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
-  flameshot
-# firefox> midori > ?
-# RUN apt.sh midori
+  rm -f /usr/share/backgrounds/greybird.svg; 
+  # \
+  # wget https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
+  # dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb; \
+  # cd /usr/share/icons && rm -rf Papirus-Bunsen-Dark-bluegrey Papirus-Bunsen-Dark-grey Papirus-Dark Papirus-Light ePapirus; \
+  # \
+  # # Papirus left: 16x(clipit:21M) 64x(desktop:21M)
+  # cd /usr/share/icons/Papirus && rm -rf 18x* 22x* 24x* 32x*  48x* 64x* ; \
+  # ls -lh /usr/share/icons/Papirus; \
+  # \
+  # dpkg -l |grep bunsen && exit 0 || exit 1;
 
 # 拆分包体与配置项两块，免频繁变动基础包
 # HEADLESS
