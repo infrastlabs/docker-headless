@@ -1,5 +1,5 @@
 # 29.15M @23.10.14
-FROM debian:bookworm-slim
+FROM debian:12-slim
 ENV \
   DEBIAN_FRONTEND=noninteractive \
   LOCALE_INCLUDE="zh_CN zh_HK zh_TW en en_AU fr fr_CA pt pt_BR es ar cs de it ru nl tr is sv uk ja ko th vi"
@@ -12,9 +12,15 @@ ENV \
 # mirrors.tencentyun.com
 ARG TARGETPLATFORM
 RUN export DOMAIN="mirrors.ustc.edu.cn"; \
+  rm -f /etc/apt/sources.list.d/debian.sources; \
   test -z "$(echo $TARGETPLATFORM |grep arm)" && target=bookworm || target=bookworm-ports; \
-  echo "deb http://$DOMAIN/debian bookworm main contrib non-free" > /etc/apt/sources.list; \
-  echo "deb http://$DOMAIN/debian bookworm-updates main contrib non-free">> /etc/apt/sources.list; \
+  echo "deb http://$DOMAIN/debian bookworm main contrib non-free non-free-firmware" > /etc/apt/sources.list; \
+  echo "deb http://$DOMAIN/debian bookworm-updates main contrib non-free non-free-firmware">> /etc/apt/sources.list; \
+  echo "deb http://$DOMAIN/debian bookworm-backports main non-free contrib non-free-firmware">> /etc/apt/sources.list; \
+  echo "deb http://$DOMAIN/debian-security bookworm-security main non-free contrib non-free-firmware">> /etc/apt/sources.list; \
+    \
+# https://mirrors.ustc.edu.cn/help/debian.html
+# RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources; \
     \
   # default:echo -e;
   echo "path-exclude /usr/share/doc/*\n\
@@ -37,13 +43,14 @@ path-exclude /usr/share/lintian/*\n\
     && chmod +x /usr/local/bin/apt.sh; \
   \
 # MISC 15.1 MB
+# deb12.out: netcat 
 # RUN \
   # \2487 kB
   apt.sh wget ca-certificates \
   # \5529 kB 
   curl lame sox libsox-fmt-mp3 \
   # \4610 kB
-  htop rsync tree tmux lrzsz psmisc fuse net-tools netcat iputils-ping \
+  htop rsync tree tmux lrzsz psmisc fuse net-tools iputils-ping \
   procps sudo iproute2 iptables zip unzip xz-utils vim-tiny \
   # \2476 kB
   dropbear-bin dropbear-run openssh-sftp-server lftp jq;
@@ -52,6 +59,8 @@ path-exclude /usr/share/lintian/*\n\
 # 预装软件: geany sakura ristretto sys-monitor engrampa asbru
 # xrdp-chansrv: libfdk-aac1 libopus0
 # strip: binutils
+# chansrv-err: libfdk-aac.so.2: cannot open shared object file: No such file
+# deb12.out: libfdk-aac1 
 RUN \
   # LOCALE 15.0 MB 
   apt.sh dconf-cli locales tzdata binutils apt-utils fonts-wqy-zenhei \
@@ -61,7 +70,7 @@ RUN \
   # 343 kB
   # +xrdp 0.9.12 (compile: 0.9.16/19)
   # supervisor \
-  x11-xkb-utils libfdk-aac1 libopus0 \
+  x11-xkb-utils libopus0 \
   libsecret-1-0 libnss3 libxtst6 libasound2 xdg-utils \
   \
   # APPS 25.7 MB
@@ -75,15 +84,16 @@ RUN \
   xinit xterm fluxbox systemd systemd-sysv; \
   cd /usr/share/fluxbox/nls && rm -rf `ls |grep -v "^C$\|zh_CN"` ; \
   cd /usr/share/fluxbox/styles && rm -rf `ls |grep -v "ubuntu-light"` ; \
-  find /usr/share/fluxbox/; \
-  \
+  find /usr/share/fluxbox/; 
+  # \
 # ASBRU: 3586 kB (disk: 15.5 MB)
 # RUN echo 1;\
-  curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash; \
-  apt.sh asbru-cm; rm -f /etc/apt/sources.list.d/asbru-cm-release.list; \
-  mv /opt/asbru /usr/local; rm -f /usr/bin/asbru-cm; ln -s /usr/local/asbru/asbru-cm /usr/bin/; \
-  cd /usr/share/icons/hicolor/scalable/apps; rm -f asbru-cm.svg; ln -s /usr/local/asbru/res/asbru-logo.svg ./asbru-cm.svg; \
-  dpkg -l |grep asbru && exit 0 || exit 1;  
+#   curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash; \
+#   apt.sh asbru-cm; rm -f /etc/apt/sources.list.d/asbru-cm-release.list; \
+#   mv /opt/asbru /usr/local; rm -f /usr/bin/asbru-cm; ln -s /usr/local/asbru/asbru-cm /usr/bin/; \
+#   cd /usr/share/icons/hicolor/scalable/apps; rm -f asbru-cm.svg; ln -s /usr/local/asbru/res/asbru-logo.svg ./asbru-cm.svg; \
+#   dpkg -l |grep asbru && exit 0 || exit 1;  
+
 # go-supervisor
 RUN echo a.1; \
   test -z "$(echo $TARGETPLATFORM |grep arm)" && arch=64-bit || arch=ARM64; \
@@ -91,16 +101,24 @@ RUN echo a.1; \
   tar -zxf supervisord_0.7.3_Linux_$arch.tar.gz; \cp -a supervisord_0.7.3_Linux_$arch/supervisord /usr/local/bin/go-supervisord; \
   rm -rf /tmp/supervisord_0.7.3_Linux*; ls -lh /usr/local/bin/
 
+# TEMP@deb12
+RUN apt.sh \
+  # xrdp-chansrv
+  libfdk-aac2 \
+  # tiger-Xvnc
+  libjpeg62-turbo openssl x11-xkb-utils xkb-data
+
 ARG FULL=""
 # TODO: full瘦身: ibus-rime librime-data-wubi启动时安装;
   # Need to get 71.5 MB of archives. >> layer: 113M
+# deb12.out: language-pack-gnome-zh-hans 
 RUN test -z "$FULL" && exit 0 || echo fullInstall;\  
   # VIDEO: 30.5 MB
   # libllvm12 已包含 # libgl1-mesa-glx >libgl1-mesa-dri ##ex:  mesa-utils 
   apt.sh libgl1-mesa-glx mesa-utils libglu1-mesa \
   \
   tumbler gtk2-engines-pixbuf gnupg \
-  dbus-x11 at-spi2-core language-pack-gnome-zh-hans \
+  dbus-x11 at-spi2-core \
   \
   # FULL(icon,ibus,git,flameshot) 49.1 MB
   # \12.3 MB (默认输入法: IBus)

@@ -1,8 +1,8 @@
-FROM infrastlabs/docker-headless:deb12-compile as bin
-FROM debian:bookworm-slim as files1
+FROM infrastlabs/docker-headless:deb12-compile2 as bin
+FROM debian:12-slim as files1
   COPY --from=bin /rootfs /rootfs/
 
-FROM debian:bookworm-slim as files2
+FROM debian:12-slim as files2
   ARG TARGETPLATFORM
   RUN export DOMAIN="mirrors.ustc.edu.cn"; \
   test -z "$(echo $TARGETPLATFORM |grep arm)" && target=bookworm || target=bookworm-ports; \
@@ -46,25 +46,32 @@ FROM debian:bookworm-slim as files2
 FROM infrastlabs/docker-headless:deb12-base-v51slim
 # 轻量级桌面 openbox + tint2 + conky + stalonetray + pcmanfm + xcompmgr #http://t.zoukankan.com/huapox-p-3516155.html #huapox
 #   无thunar/lxappearance: 结合asbru纯SSH,音频场景（管维）
+# deb12: clipit 88M; diodon 6597 kB
 RUN apt.sh \
     # plank \ #compton-plank遮盖去域不可用
     # compton \
     xcompmgr \
     dunst \
-    hsetroot pnmixer clipit;
+    hsetroot pnmixer diodon;
 # TODO: drop deps of libgl1
 RUN apt.sh libunwind8 libxfont2 libgl1; \
-  rm -f /usr/lib/x86_64-linux-gnu/libLLVM-12.so.1; \
-  rm -f /usr/lib/aarch64-linux-gnu/libLLVM-12.so.1; 
+  #libLLVM-12.so.1@ubt2004 #libLLVM-15.so.1 #115M
+  rm -f /usr/lib/*-linux-gnu/libLLVM*
+
+RUN apt.sh ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
+  flameshot
+# firefox> midori > ?
+# RUN apt.sh midori
 
 # +服务器维护工具(gparted, wifiPojie,..); core与latest差异化
+# deb12: language-pack-gnome-zh-hans @ubt2004
 RUN apt.sh \
   gparted \
   \
   # +papirus-icon-theme
   # dbus-x11 at-spi2-core
   thunar lxappearance \
-  language-pack-gnome-zh-hans papirus-icon-theme greybird-gtk-theme; \
+  papirus-icon-theme greybird-gtk-theme; \
   rm -f /usr/share/backgrounds/greybird.svg; \
   \
   wget https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
@@ -77,10 +84,20 @@ RUN apt.sh \
   \
   dpkg -l |grep bunsen && exit 0 || exit 1;
 
-RUN apt.sh ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
-  flameshot
-# firefox> midori > ?
-# RUN apt.sh midori
+
+RUN export DOMAIN="mirrors.ustc.edu.cn"; \
+  rm -f /etc/apt/sources.list.d/debian.sources; \
+  test -z "$(echo $TARGETPLATFORM |grep arm)" && target=bookworm || target=bookworm-ports; \
+  echo "deb http://$DOMAIN/debian bookworm main contrib non-free" > /etc/apt/sources.list; \
+  echo "deb http://$DOMAIN/debian bookworm-updates main contrib non-free">> /etc/apt/sources.list; \
+  echo "deb http://$DOMAIN/debian bookworm-backports main non-free contrib">> /etc/apt/sources.list; \
+  echo "deb http://$DOMAIN/debian-security bookworm-security main non-free contrib">> /etc/apt/sources.list;
+# TEMP
+RUN apt.sh \
+  # xrdp-chansrv
+  libfdk-aac2 \
+  # tiger-Xvnc
+  libjpeg62-turbo openssl x11-xkb-utils xkb-data
 
 # 拆分包体与配置项两块，免频繁变动基础包
 # HEADLESS
