@@ -14,7 +14,5 @@
     "workbench.editor.enablePreview": false,
     "workbench.editor.tabSizing": "shrink",
     "diffEditor.renderSideBySide": true,
-    "update.mode": "none",
-    "go.testFlags": ["-v"], 
-    "go.testTimeout": "1m"
+    "update.mode": "none"
 }
