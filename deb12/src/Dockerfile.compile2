@@ -96,18 +96,25 @@ RUN test "yes" != "$COMPILE_PULSE" && exit 0 || echo doMake; \
 # ref: https://github.com/abcdesktopio/tigervnc/blob/main/Dockerfile
 FROM stage-base as stage-tiger
 ARG COMPILE_TIGER="yes"
+
+# ins: dev, dep and sources
+# TODO: 版本不一定对得上..v1.12.0; 手动ct-compileImg: 未执行本步;
+# RUN apt update; \
+#   # 129 MB
+#   apt build-dep -y tigervnc 
+
 # deb12: Could NOT find X11 (missing: X11_X11_LIB)
 #  X11_X11_LIB: +xorg-dev
 #  +cmake
 #  apt install -y libfltk1.3-dev ##Could NOT find FLTK (missing: FLTK_LIBRARIES FLTK_INCLUDE_DIR)
-RUN apt.sh \
+# RUN apt.sh \
+RUN apt update; apt install -y \
   cmake libfltk1.3-dev libxi-dev libxshmfence-dev \
-  libx11-dev libxext-dev libxrender-dev libxtst-dev libxt-dev \
-  xorg-dev
-# ins: dev, dep and sources
-RUN apt update; \
-  # 129 MB 
-  apt build-dep -y tigervnc 
+  libxcb-dri3-0 \
+  libdrm-dev libxfont-dev mesa-common-dev \
+  libx11-dev libxext-dev libxrender-dev libxtst-dev libxt-dev
+  # xorg-dev
+
 # src
 ADD src/arm /src/arm
 WORKDIR /src/arm
@@ -115,6 +122,7 @@ RUN mkdir -p /usr/local/tigervnc; \
   \
   mkdir -p /build; \
   tar -zxf tigervnc-1.12.0.tar.gz -C /build/; \
+  # tar -jxf xorg-server-1.20.7.tar.bz2; 21.1.7.tar.gz
   tar -jxf xorg-server-1.20.7.tar.bz2 --strip-components=1 -C /build/tigervnc-1.12.0/unix/xserver/; \
   \cp -a tigervnc-1.12.0-configuration_fixes-1.patch /build/; \
   \
@@ -122,26 +130,36 @@ RUN mkdir -p /usr/local/tigervnc; \
 
 # apply patch: tigervnc-1.12.0; xserver120
 WORKDIR /build/tigervnc-1.12.0 
-RUN \
-  patch -Np1 -i ../tigervnc-1.12.0-configuration_fixes-1.patch; \
-  cd unix/xserver && patch -Np1 -i ../xserver120.patch;
+# RUN \
+#   patch -Np1 -i ../tigervnc-1.12.0-configuration_fixes-1.patch; \
+#   cd unix/xserver && patch -Np1 -i ../xserver21.1.1.patch;
 
 #make vncpasswd, vncconfig, vncviewver, ...
 # err with armv7:
 #   0 16.95 CMake Error at /usr/share/cmake-3.16/Modules/FindPackageHandleStandardArgs.cmake:146 (message):
 #   0 16.95   Could NOT find X11 (missing: X11_X11_LIB) ###ubt2004_armv7: 尝试go_vncpasswd
-# # deb12: gitac_ERR; tenVM2下手动正常
-# #   Dockerfile.compile2:148
-# #  --------------------
-# #   147 |     #0 16.95   Could NOT find X11 (missing: X11_X11_LIB)
-# RUN test "yes" != "$COMPILE_TIGER" && exit 0 || echo doMake; \
-#   cd /build/tigervnc-1.12.0; \
-#   # https://github.com/glfw/glfw/issues/1957
-#   # export CMAKE_LIBRARY_ARCHITECTURE=x86_64-unknown-linux-gnu; \
-#   export CMAKE_LIBRARY_ARCHITECTURE=x86_64-linux-gnu; \
-#   cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr \
-#     -DCMAKE_BUILD_TYPE=Release -DINSTALL_SYSTEMD_UNITS=OFF -Wno-dev .; \
-#   make
+# deb12: gitac_ERR; tenVM2下手动正常
+#   Dockerfile.compile2:148
+#  --------------------
+#   147 |     #0 16.95   Could NOT find X11 (missing: X11_X11_LIB)
+# 
+# https://github.com/TigerVNC/tigervnc/issues/1534
+#   build the normal parts of TigerVNC first.
+#   Xvnc-build-err: No rule to make target '../../../../common/network/libnetwork.la', needed by 'Xvnc'.  Stop.
+
+# ref: https://github.com/abcdesktopio/tigervnc/blob/main/Dockerfile
+RUN test "yes" != "$COMPILE_TIGER" && exit 0 || echo doMake; \
+  patch -Np1 -i ../tigervnc-1.12.0-configuration_fixes-1.patch; \
+  cd unix/xserver && patch -Np1 -i ../xserver120.patch; \
+  \
+  cd /build/tigervnc-1.12.0; \
+  # https://github.com/glfw/glfw/issues/1957
+  # export CMAKE_LIBRARY_ARCHITECTURE=x86_64-unknown-linux-gnu; \
+  # export CMAKE_LIBRARY_ARCHITECTURE=x86_64-linux-gnu; \
+  cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release -DINSTALL_SYSTEMD_UNITS=OFF -Wno-dev . ; \
+  cat /build/tigervnc-1.12.0/CMakeFiles/CMakeError.log; \
+  make;
 
 # make XServer [plat x3: 构建耗时 52min]
 WORKDIR /build/tigervnc-1.12.0/unix/xserver
@@ -151,24 +169,47 @@ WORKDIR /build/tigervnc-1.12.0/unix/xserver
 # 
 # https://github.com/TigerVNC/tigervnc/issues/740
 # deb12: --enable-dri3 >> --disable-dri3
+# https://github.com/TigerVNC/tigervnc/blob/master/contrib/packages/rpm/el7/SPECS/tigervnc.spec#L164
+# --disable-static > --enable-static \ #https://github.com/TigerVNC/tigervnc/issues/1534 #--enable-static无效(openssl_libcrypto.so.3)
 RUN test "yes" != "$COMPILE_TIGER" && exit 0 || echo doMake; \
     autoreconf -fiv; \
     CPPFLAGS="-I/usr/include/drm"       \
     ./configure $XORG_CONFIG            \
+        # build-nginx
+        # --with-cc-opt="-static" \
+        # --with-ld-opt="-static" \
+        # --with-cpu-opt="generic" \
+        \
+        # https://github.com/jlesage/docker-baseimage-gui/blob/master/src/tigervnc/build.sh
+        # 手动重buildOK; 
+        --sysconfdir=/etc/X11 \
+        --localstatedir=/var \
+        --with-xkb-path=/usr/share/X11/xkb \
+        --with-xkb-output=/var/lib/xkb \
+        --with-xkb-bin-directory=/usr/bin \
+      \
       --prefix=/usr/local/tigervnc \
-      --disable-xwayland    --disable-dri        --disable-dmx         \
+      --disable-xwayland                         --disable-dmx         \
       --disable-xorg        --disable-xnest      --disable-xvfb        \
       --disable-xwin        --disable-xephyr     --disable-kdrive      \
       --disable-devel-docs  --disable-config-hal --disable-config-udev \
       --disable-unit-tests  --disable-selective-werror                 \
-      --disable-dri3      --enable-dri2                  \
+      --disable-dri         --disable-dri3       --enable-dri2         \
+      --enable-glx \
+      # --enable-static \
       --with-pic \
-      --without-dtrace;                              \
-      make && make install; \
+      --without-dtrace ; \
+      # try1: CFLAGS="-static" LDFLAGS="-static"
+      make; \
+      find /build/tigervnc-1.12.0/ |egrep Xvnc; \
+      find /build/tigervnc-1.12.0/ |egrep "libos|librfb|librdr|libnetwork|libunixcommon"; \
+      \
+      make install; \
+      find /usr/local/tigervnc; \
     echo "finished!";
 # vncpasswd
 # alter_try: https://github.com/KarpelesLab/vncpasswd #golang实现
-# RUN cp /build/tigervnc-1.12.0/unix/vncpasswd/vncpasswd /usr/local/tigervnc/bin/
+RUN cp /build/tigervnc-1.12.0/unix/vncpasswd/vncpasswd /usr/local/tigervnc/bin/
 
 # https://github.com/TigerVNC/tigervnc/issues/800
 # LD_PRELOAD=/lib/aarch64-linux-gnu/libgcc_s.so.1 vncserver :2 -localhost no
@@ -182,7 +223,7 @@ RUN test "yes" != "$COMPILE_TIGER" && exit 0 || echo doMake; \
 # FROM scratch
 FROM debian:12-slim
 ARG TARGETPLATFORM
-RUN RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources; \
+RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources; \
   \
   echo 'apt update -qq && apt install -yq --no-install-recommends $@ && apt clean && rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
     && chmod +x /usr/local/bin/apt.sh
@@ -190,12 +231,30 @@ WORKDIR /rootfs/usr/local/tigervnc/bin
 COPY --from=stage-xrdp /usr/local/xrdp /rootfs/usr/local/xrdp
 COPY --from=stage-pulse /var/lib/xrdp-pulseaudio-installer /rootfs/var/lib/xrdp-pulseaudio-installer
 COPY --from=stage-tiger /usr/local/tigervnc /rootfs/usr/local/tigervnc
+# X11/xkb
+# COPY --from=stage-tiger /usr/share/X11/xkb/ /usr/share/X11/xkb/
+# COPY --from=stage-tiger /usr/share/X11/xkb/ /rootfs/usr/share/X11/xkb/
 # test
-# deb12.out: libjpeg8 
+# deb12.out: libjpeg8@ubt2004 > libjpeg62-turbo
+#  libjpeg62-turbo| error while loading shared libraries: libjpeg.so.62: cannot open shared object file
+#  openssl| error while loading shared libraries: libcrypto.so.3: cannot open shared object file
+#    try:binutils-x86-64-linux-gnu 6401 kB
+#  run-keymap-err:
+#    xkb-data:/usr/share/X11/xkb/
 RUN apt.sh \
   # --enable-xx ##还是需要libGL.so.1
-  libgl1 \
-  libunwind8 libpixman-1-0 libxfont2 \
-  libxau6 libxdmcp6
+  libjpeg62-turbo openssl \
+  x11-xkb-utils xkb-data \
+  \
+  libgl1 libxau6 libxdmcp6 \
+  libpixman-1-0 \
+  libxfont2
+  # libunwind8 \
+  # libopus0 \
+  # libcrypt1
 RUN find /rootfs; 
-# RUN /rootfs/usr/local/tigervnc/bin/Xvnc -version
+RUN /rootfs/usr/local/tigervnc/bin/Xvnc -version
+
+RUN echo "/rootfs/usr/local/tigervnc/bin/Xvnc -ac :50 -listen tcp -rfbauth=/etc/xrdp/vnc_pass -depth 16 -BlacklistThreshold=3 -BlacklistTimeout=1" > /entry.sh; \
+  chmod +x /entry.sh
+CMD ["/entry.sh"]
