@@ -1,4 +1,4 @@
-FROM infrastlabs/docker-headless:core-compile as bin
+FROM infrastlabs/docker-headless:core-compile2 as bin
 FROM ubuntu:20.04 as files1
   COPY --from=bin /rootfs /rootfs/
 
@@ -67,7 +67,7 @@ RUN apt.sh \
   language-pack-gnome-zh-hans papirus-icon-theme greybird-gtk-theme; \
   rm -f /usr/share/backgrounds/greybird.svg; \
   \
-  wget https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
+  wget --no-check-certificate https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
   dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb; \
   cd /usr/share/icons && rm -rf Papirus-Bunsen-Dark-bluegrey Papirus-Bunsen-Dark-grey Papirus-Dark Papirus-Light ePapirus; \
   \
