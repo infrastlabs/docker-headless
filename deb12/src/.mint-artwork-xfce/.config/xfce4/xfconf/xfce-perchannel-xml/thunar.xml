@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<channel name="thunar" version="1.0">
+  <property name="misc-volume-management" type="bool" value="true"/>
+  <property name="shortcuts-icon-size" type="string" value="THUNAR_ICON_SIZE_SMALLEST"/>
+  <property name="misc-thumbnail-mode" type="string" value="THUNAR_THUMBNAIL_MODE_ALWAYS"/>
+  <property name="misc-show-delete-action" type="string" value="true"/>
+  <property name="last-location-bar" type="string" value="ThunarLocationButtons"/>
+  <property name="hidden-bookmarks" type="array">
+    <value type="string" value="network://"/>
+  </property>
+</channel>
