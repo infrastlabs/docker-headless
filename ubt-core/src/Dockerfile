@@ -1,6 +1,9 @@
-FROM infrastlabs/docker-headless:core-compile as bin
+FROM infrastlabs/docker-headless:core-compile2 as bin
+FROM infrastlabs/x11-base:deb12-rootfs as bin2
+# FROM infrastlabs/x11-base:deb12-rootfs as bin2
 FROM ubuntu:20.04 as files1
   COPY --from=bin /rootfs /rootfs/
+  COPY --from=bin2 /rootfs /rootfs/
 
 FROM ubuntu:20.04 as files2
   ARG TARGETPLATFORM
@@ -67,7 +70,7 @@ RUN apt.sh \
   language-pack-gnome-zh-hans papirus-icon-theme greybird-gtk-theme; \
   rm -f /usr/share/backgrounds/greybird.svg; \
   \
-  wget https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
+  wget --no-check-certificate https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
   dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb; \
   cd /usr/share/icons && rm -rf Papirus-Bunsen-Dark-bluegrey Papirus-Bunsen-Dark-grey Papirus-Dark Papirus-Light ePapirus; \
   \
@@ -77,8 +80,9 @@ RUN apt.sh \
   \
   dpkg -l |grep bunsen && exit 0 || exit 1;
 
-RUN apt.sh ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
-  flameshot
+# ibus,flameshot
+# RUN apt.sh ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi \
+#   flameshot
 # firefox> midori > ?
 # RUN apt.sh midori
 
@@ -92,7 +96,9 @@ COPY --from=files2 /rootfs /rootfs/conf
 # RUN bash /xconf.sh
 
 RUN \
-  echo "cp -a /rootfs/bin/* /; \n\
+  echo "\n\
+rm -f /usr/bin/Xvnc /usr/bin/vncpasswd; \n\
+cp -a /rootfs/bin/* /; \n\
 cp -a /rootfs/conf/* /; \n\
 bash /etc/skel/.fluxbox/fluxbox.sh; \n\
 bash /xconf.sh;\n\
