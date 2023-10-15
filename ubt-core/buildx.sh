@@ -13,22 +13,44 @@ ns=infrastlabs
 ver=v51 #base-v5 base-v5-slim
 case "$1" in
 compile)
+    repo=registry-1.docker.io
+    img="docker-headless:core-compile"
+    # cache
+    ali="registry.cn-shenzhen.aliyuncs.com"
+    cimg="docker-headless-cache:core-compile"
+    cache="--cache-from type=registry,ref=$ali/$ns/$cimg --cache-to type=registry,ref=$ali/$ns/$cimg"
+    
+    plat="--platform linux/amd64,linux/arm64,linux/arm" #,linux/arm
+    # plat="--platform linux/arm"
+    # --network=host: docker buildx create --use --name mybuilder2 --buildkitd-flags '--allow-insecure-entitlement network.host'
+    docker buildx build $cache $plat --push -t $ns/$img -f src/Dockerfile.compile . 
+    ;;
+compile2)
     # TigerVNC 1.12.0 |10 Nov 2021
     old=$(pwd); cd src/arm
-    # xrdp
-    ver="0.9.16"
-    file=xrdp-${ver}.tar.gz; test -s $file || curl -k -O -fSL https://github.com/neutrinolabs/xrdp/releases/download/v${ver}/$file
-    # tiger
-    file=xorg-server-1.20.7.tar.bz2; test -s $file || curl -k -O -fSL https://www.x.org/pub/individual/xserver/$file #6.1M
-    file=tigervnc-1.12.0.tar.gz; test -s $file || curl -k -O -fSL https://github.com/TigerVNC/tigervnc/archive/v1.12.0/$file #1.5M
-    # curl -O -fsSL https://www.linuxfromscratch.org/patches/blfs/svn/tigervnc-1.12.0-configuration_fixes-1.patch
+        # xrdp
+        ver="0.9.16"
+        file=xrdp-${ver}.tar.gz; test -s $file || curl -k -O -fSL https://github.com/neutrinolabs/xrdp/releases/download/v${ver}/$file
+        # tiger
+        file=xorg-server-1.20.7.tar.bz2; test -s $file || curl -k -O -fSL https://www.x.org/pub/individual/xserver/$file #6.1M
+        file=tigervnc-1.12.0.tar.gz; test -s $file || curl -k -O -fSL https://github.com/TigerVNC/tigervnc/archive/v1.12.0/$file #1.5M
+        # curl -O -fsSL https://www.linuxfromscratch.org/patches/blfs/svn/tigervnc-1.12.0-configuration_fixes-1.patch
     cd $old;
     #  
     repo=registry-1.docker.io
-    img="docker-headless:core-compile"
-    plat="--platform linux/amd64,linux/arm64" #,linux/arm
+    img="docker-headless:core-compile2"
+    plat="--platform linux/amd64,linux/arm64,linux/arm" #,linux/arm
+    # plat="--platform linux/arm" #45m42s
+    # plat="--platform linux/amd64" #5m22s
+    args="--provenance=false"
+    args="""
+    --provenance=false 
+    --build-arg COMPILE_XRDP=yes
+    --build-arg COMPILE_PULSE=yes
+    --build-arg COMPILE_TIGER=yes
+    """
     # --network=host: docker buildx create --use --name mybuilder2 --buildkitd-flags '--allow-insecure-entitlement network.host'
-    docker buildx build $plat --push -t $ns/$img -f src/Dockerfile.compile . 
+    docker buildx build $plat $args --push -t $ns/$img -f src/Dockerfile.compile2 . 
     ;;
 
 # +slim,base (docker-headless,weskit; use docker-headless's)
@@ -69,7 +91,8 @@ base)
     cimg="docker-headless-cache:core"
     cache="--cache-from type=registry,ref=$ali/$ns/$cimg --cache-to type=registry,ref=$ali/$ns/$cimg"
 
-    plat="--platform linux/amd64,linux/arm64"
+    plat="--platform linux/amd64,linux/arm64,linux/arm"
+    # plat="--platform linux/arm"
     docker buildx build $cache $plat $args --push -t $repo/$ns/$img -f src/Dockerfile . 
     ;;          
 esac
