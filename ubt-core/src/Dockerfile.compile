@@ -24,22 +24,45 @@ RUN apt.sh \
   curl sudo iputils-ping procps iproute2 iptables ca-certificates \
   zip unzip xz-utils
 # BUILD_common 81M
-RUN apt.sh \
-  git autoconf libtool pkg-config gcc g++ make \
-  autoconf m4 intltool build-essential dpkg-dev \
-  build-essential check
+    RUN apt.sh \
+      git autoconf libtool pkg-config gcc g++ make \
+      autoconf m4 intltool build-essential dpkg-dev \
+      build-essential check
+
+# BUILD_xrdp ##########
+    RUN apt.sh \
+      git autoconf libtool pkg-config gcc g++ make  libssl-dev libpam0g-dev \
+      libjpeg-dev libx11-dev libxfixes-dev libxrandr-dev  flex bison libxml2-dev \
+      intltool xsltproc xutils-dev python-libxml2 g++ xutils libfuse-dev \
+      libmp3lame-dev nasm libpixman-1-dev xserver-xorg-dev
+    RUN apt.sh \
+      libfdk-aac-dev libopus-dev
+# BUILD_pulse ##########
+    # ARG TARGETPLATFORM
+    # deb-src
+    RUN export DOMAIN="mirrors.ustc.edu.cn"; \
+      test -z "$(echo $TARGETPLATFORM |grep arm)" && target=ubuntu || target=ubuntu-ports; \
+      echo "deb-src http://$DOMAIN/$target focal main restricted universe multiverse" >> /etc/apt/sources.list \
+      && echo "deb-src http://$DOMAIN/$target focal-updates main restricted universe multiverse">> /etc/apt/sources.list
+    RUN apt update && apt install -qy pulseaudio libpulse-dev \
+      autoconf m4 intltool build-essential dpkg-dev
+# BUILD_tiger ##########
+    # src
+    RUN export domain="mirrors.ustc.edu.cn"; \
+      test -z "$(echo $TARGETPLATFORM |grep arm)" && target=ubuntu || target=ubuntu-ports; \
+      echo "deb-src http://$domain/$target focal main restricted universe multiverse" >> /etc/apt/sources.list \
+      && echo "deb-src http://$domain/$target focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
+      cat /etc/apt/sources.list;
+    # INSTALL dev, dep and sources
+    RUN apt update; \
+      # 25.6M
+      apt install -y --no-install-recommends ca-certificates fakeroot devscripts devscripts binutils wget;
 
 WORKDIR /opt
 
 ###xrdp, xorgxrdp###############################################
 FROM stage-base as stage-xrdp
-RUN apt.sh \
-    git autoconf libtool pkg-config gcc g++ make  libssl-dev libpam0g-dev \
-    libjpeg-dev libx11-dev libxfixes-dev libxrandr-dev  flex bison libxml2-dev \
-    intltool xsltproc xutils-dev python-libxml2 g++ xutils libfuse-dev \
-    libmp3lame-dev nasm libpixman-1-dev xserver-xorg-dev
-RUN apt.sh \
-  libfdk-aac-dev libopus-dev
+
 #0.9.5 > 0.9.16 > 0.9.19(thunar@gemmi-deb11卡死)
 ENV ver="0.9.16"
 # https://hub.fastgit.org/neutrinolabs/xrdp/wiki/Building-on-Debian-8
@@ -78,14 +101,6 @@ make install;
 FROM stage-base as stage-pulsexrdp
 #### pulseaudio-module-xrdp >> pulseaudio ver: 10.0
 # RUN git submodule update --init --recursive
-
-# deb-src
-RUN export DOMAIN="mirrors.ustc.edu.cn"; \
- test -z "$(echo $TARGETPLATFORM |grep arm)" && target=ubuntu || target=ubuntu-ports; \
- echo "deb-src http://$DOMAIN/$target focal main restricted universe multiverse" >> /etc/apt/sources.list \
- && echo "deb-src http://$DOMAIN/$target focal-updates main restricted universe multiverse">> /etc/apt/sources.list
-RUN apt update && apt install -qy pulseaudio libpulse-dev \
-  autoconf m4 intltool build-essential dpkg-dev
 RUN apt update && apt build-dep -q -y pulseaudio && \
   cd /opt && apt source pulseaudio && \
   pulseaudio=$(pulseaudio --version | awk '{print $2}') && \
@@ -107,20 +122,9 @@ RUN cd /opt && git clone --branch v0.5 https://gitee.com/g-system/pulseaudio-mod
 ###tigervnc###############################################
 # ref: https://github.com/abcdesktopio/tigervnc/blob/main/Dockerfile
 FROM stage-base as stage-tiger
-ARG TARGETPLATFORM
-# DEB-SRC
-RUN export domain="mirrors.ustc.edu.cn"; \
- test -z "$(echo $TARGETPLATFORM |grep arm)" && target=ubuntu || target=ubuntu-ports; \
- echo "deb-src http://$domain/$target focal main restricted universe multiverse" >> /etc/apt/sources.list \
- && echo "deb-src http://$domain/$target focal-updates main restricted universe multiverse">> /etc/apt/sources.list; \
- cat /etc/apt/sources.list;
-# INSTALL dev, dep and sources
-RUN apt update; \
-  # 25.6M
-  apt install -y --no-install-recommends ca-certificates fakeroot devscripts devscripts binutils wget; \
+RUN \
   # 129 MB 
   apt build-dep -y tigervnc 
-
 
 # SRC
 ADD src/arm /src/arm
@@ -184,7 +188,6 @@ RUN export DOMAIN="mirrors.ustc.edu.cn"; \
     && chmod +x /usr/local/bin/apt.sh
 WORKDIR /rootfs/usr/local/tigervnc/bin
 COPY --from=stage-xrdp /usr/local/xrdp /rootfs/usr/local/xrdp
-# COPY --from=stage-xrdp /usr/lib/xorg/modules /rootfs/usr/lib/xorg/modules
 COPY --from=stage-pulsexrdp /var/lib/xrdp-pulseaudio-installer /rootfs/var/lib/xrdp-pulseaudio-installer
 COPY --from=stage-tiger /usr/local/tigervnc /rootfs/usr/local/tigervnc
 # test
