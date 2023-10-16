@@ -1,0 +1,61 @@
+name: docker-image-tiger
+on:
+  push:
+    branches: [ "dev", "feat/ubt-armv7AAA" ]
+  pull_request:
+    branches: [ "dev" ]
+jobs:
+  build:
+    # runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup QEMU
+        # uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2 #ref docker-baseimage-gui
+        with:
+          platforms: arm,arm64,ppc64le,mips64,s390x
+
+      - name: Setup Docker Buildx
+        # uses: docker/setup-buildx-action@
+        uses: docker/setup-buildx-action@v2
+        with:
+          driver-opts: network=host
+
+      - name: Call buildx.sh(build with ali's cache, push)
+        run: |
+          # VARS
+          echo ${{ github.repository_owner }} #infrastlabs
+          echo ${{ github.repository }}
+          echo ${{ secrets.DOCKER_REGISTRY_PW_DOCKERHUB }} #fill not show in log
+          # INFO
+          pwd && ls -l
+          docker version
+          free -h; df -h; ip a |grep inet; uname -a;
+          
+          # ENV
+          export DOCKER_REGISTRY_USER_infrastSubUser2=${{ secrets.DOCKER_REGISTRY_USER_INFRASTSUBUSER2 }}
+          export DOCKER_REGISTRY_PW_infrastSubUser2=${{ secrets.DOCKER_REGISTRY_PW_INFRASTSUBUSER2 }}
+          export DOCKER_REGISTRY_USER_dockerhub=${{ secrets.DOCKER_REGISTRY_USER_DOCKERHUB }}
+          export DOCKER_REGISTRY_PW_dockerhub=${{ secrets.DOCKER_REGISTRY_PW_DOCKERHUB }}
+
+          # BUILD
+          echo core; cd ubt-core/src/gcc/static; 
+            # sh buildx.sh compile2
+            bash alpine-build.sh docker.io
+  # post-build:
+  #   name: Post-build
+  #   needs: [ build ]
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Prepare
+  #       id: prep
+  #       run: |
+  #         # Determine the release type.
+  #         echo 123
+  # notification:
+  #   name: Notification
+  #   needs: [ build, post-build ]
+  #   runs-on: ubuntu-20.04
+  #   if: ${{ always() }}
