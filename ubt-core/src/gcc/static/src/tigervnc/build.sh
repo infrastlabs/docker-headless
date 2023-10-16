@@ -45,6 +45,7 @@ LIBXSHMFENCE_URL=https://www.x.org/releases/individual/lib/libxshmfence-${LIBXSH
 XKEYBOARDCONFIG_URL=https://www.x.org/archive/individual/data/xkeyboard-config/xkeyboard-config-${XKEYBOARDCONFIG_VERSION}.tar.bz2
 XKBCOMP_URL=https://www.x.org/releases/individual/app/xkbcomp-${XKBCOMP_VERSION}.tar.bz2
 
+test -z "$targetDir" && export targetDir=/opt/base
 function down_catfile(){
   url=$1
   file=${url##*/}
@@ -127,7 +128,7 @@ function log {
 # The static library is not provided by Alpine repository, so we need to build
 # it ourself.
 #
-mkdir /tmp/gnutls
+mkdir -p /tmp/gnutls
 log "Downloading GNU TLS..."
 down_catfile ${GNUTLS_URL} | tar -xJ --strip 1 -C /tmp/gnutls
 log "Configuring GNU TLS..."
@@ -157,7 +158,7 @@ make DESTDIR=$(xx-info sysroot) -C /tmp/gnutls install
 # The static library is not provided by Alpine repository, so we need to build
 # it ourself.
 #
-mkdir /tmp/libxfont2
+mkdir -p /tmp/libxfont2
 log "Downloading libXfont2..."
 down_catfile ${LIBXFONT2_URL} | tar -xz --strip 1 -C /tmp/libxfont2
 log "Configuring libXfont2..."
@@ -183,7 +184,7 @@ make DESTDIR=$(xx-info sysroot) -C /tmp/libxfont2 install
 # The static library is not provided by Alpine repository, so we need to build
 # it ourself.
 #
-mkdir /tmp/libfontenc
+mkdir -p /tmp/libfontenc
 log "Downloading libfontenc..."
 down_catfile ${LIBFONTENC_URL} | tar -xz --strip 1 -C /tmp/libfontenc
 log "Configuring libfontenc..."
@@ -206,7 +207,7 @@ make DESTDIR=$(xx-info sysroot) -C /tmp/libfontenc install
 # The static library is not provided by Alpine repository, so we need to build
 # it ourself.
 #
-mkdir /tmp/libtasn1
+mkdir -p /tmp/libtasn1
 log "Downloading libtasn1..."
 down_catfile ${LIBTASN1_URL} | tar -xz --strip 1 -C /tmp/libtasn1
 log "Configuring libtasn1..."
@@ -228,7 +229,7 @@ make DESTDIR=$(xx-info sysroot) -C /tmp/libtasn1 install
 # The static library is not provided by Alpine repository, so we need to build
 # it ourself.
 #
-mkdir /tmp/libxshmfence
+mkdir -p /tmp/libxshmfence
 log "Downloading libxshmfence..."
 down_catfile ${LIBXSHMFENCE_URL} | tar -xz --strip 1 -C /tmp/libxshmfence
 log "Configuring libxshmfence..."
@@ -249,7 +250,7 @@ make DESTDIR=$(xx-info sysroot) -C /tmp/libxshmfence install
 #
 # Build TigerVNC
 #
-mkdir /tmp/tigervnc
+mkdir -p /tmp/tigervnc
 log "Downloading TigerVNC..."
 down_catfile ${TIGERVNC_URL} | tar -xz --strip 1 -C /tmp/tigervnc
 log "Downloading Xorg server..."
@@ -297,9 +298,9 @@ autoreconf -fiv /tmp/tigervnc/unix/xserver
         --prefix=/usr \
         --sysconfdir=/etc/X11 \
         --localstatedir=/var \
-        --with-xkb-path=/opt/base/share/X11/xkb \
+        --with-xkb-path=${targetDir}/share/X11/xkb \
         --with-xkb-output=/var/lib/xkb \
-        --with-xkb-bin-directory=/opt/base/bin \
+        --with-xkb-bin-directory=${targetDir}/bin \
         --with-default-font-path=/usr/share/fonts/misc,/usr/share/fonts/100dpi:unscaled,/usr/share/fonts/75dpi:unscaled,/usr/share/fonts/TTF,/usr/share/fonts/Type1 \
         --disable-docs \
         --disable-unit-tests \
@@ -358,7 +359,7 @@ make DESTDIR=/tmp/tigervnc-install -C /tmp/tigervnc/unix/vncpasswd install
 #
 # Build XKeyboardConfig.
 #
-mkdir /tmp/xkb
+mkdir -p /tmp/xkb
 log "Downloading XKeyboardConfig..."
 down_catfile ${XKEYBOARDCONFIG_URL} | tar -xj --strip 1 -C /tmp/xkb
 log "Configuring XKeyboardConfig..."
@@ -410,7 +411,7 @@ find /tmp/xkb-install/usr/share/X11/xkb -mindepth 1 ! -type d $(printf "! -whole
 #
 # Build xkbcomp.
 #
-mkdir /tmp/xkbcomp
+mkdir -p /tmp/xkbcomp
 log "Downloading xkbcomp..."
 down_catfile ${XKBCOMP_URL} | tar -xj --strip 1 -C /tmp/xkbcomp
 

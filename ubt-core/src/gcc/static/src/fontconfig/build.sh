@@ -17,6 +17,14 @@ FONTCONFIG_VERSION=2.14.0
 
 # Define software download URLs.
 FONTCONFIG_URL=https://www.freedesktop.org/software/fontconfig/release/fontconfig-${FONTCONFIG_VERSION}.tar.gz
+test -z "$targetDir" && export targetDir=/opt/base
+function down_catfile(){
+  url=$1
+  file=${url##*/}
+  #curl -# -L -f 
+  test -f /mnt/$file || curl -# -k -fSL $url > /mnt/$file
+  cat /mnt/$file
+}
 
 # Set same default compilation flags as abuild.
 export CFLAGS="-Os -fomit-frame-pointer"
@@ -55,10 +63,10 @@ function log {
 # Only the fonts used by JWM are installed.
 #
 log "Installing Noto fonts..."
-mkdir -p /tmp/fontconfig-install/opt/base/share/fonts
+mkdir -p /tmp/fontconfig-install${targetDir}/share/fonts
 for FONT in Arimo-Regular Arimo-Bold
 do
-    cp -v /usr/share/fonts/noto/$FONT.ttf /tmp/fontconfig-install/opt/base/share/fonts/
+    \cp -v /usr/share/fonts/noto/$FONT.ttf /tmp/fontconfig-install${targetDir}/share/fonts/
 done
 
 #
@@ -69,9 +77,9 @@ done
 # dependent.  Thus, we won't generate one, but it's not a problem since
 # we have very few fonts installed.
 #
-mkdir /tmp/fontconfig
+mkdir -p /tmp/fontconfig
 log "Downloading fontconfig..."
-curl -# -L -f ${FONTCONFIG_URL} | tar -xz --strip 1 -C /tmp/fontconfig
+down_catfile ${FONTCONFIG_URL} | tar -xz --strip 1 -C /tmp/fontconfig
 
 log "Configuring fontconfig..."
 (
@@ -79,10 +87,10 @@ log "Configuring fontconfig..."
         --build=$(TARGETPLATFORM= xx-clang --print-target-triple) \
         --host=$(xx-clang --print-target-triple) \
         --prefix=/usr \
-        --with-default-fonts=/opt/base/share/fonts \
-        --with-baseconfigdir=/opt/base/share/fontconfig \
-        --with-configdir=/opt/base/share/fontconfig/conf.d \
-        --with-templatedir=/opt/base/share/fontconfig/conf.avail \
+        --with-default-fonts=${targetDir}/share/fonts \
+        --with-baseconfigdir=${targetDir}/share/fontconfig \
+        --with-configdir=${targetDir}/share/fontconfig/conf.d \
+        --with-templatedir=${targetDir}/share/fontconfig/conf.avail \
         --with-cache-dir=/config/xdg/cache/fontconfig \
         --disable-shared \
         --enable-static \
