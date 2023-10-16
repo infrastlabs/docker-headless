@@ -1,0 +1,7 @@
+
+ARG BUILDPLATFORM=linux/amd64
+FROM --platform=$BUILDPLATFORM registry.cn-shenzhen.aliyuncs.com/infrasync/tonistiigi-xx AS xx
+
+FROM --platform=$BUILDPLATFORM registry.cn-shenzhen.aliyuncs.com/infrasync/alpine:3.15 AS upx
+COPY --from=xx / /
+
