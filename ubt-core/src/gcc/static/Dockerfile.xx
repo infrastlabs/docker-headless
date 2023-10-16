@@ -1,0 +1,99 @@
+
+# ARG BUILDPLATFORM=linux/amd64
+# ARG TARGETPLATFORM
+# FROM --platform=$BUILDPLATFORM registry.cn-shenzhen.aliyuncs.com/infrasync/tonistiigi-xx AS xx
+FROM registry.cn-shenzhen.aliyuncs.com/infrasync/tonistiigi-xx AS xx
+
+# ARG BUILDPLATFORM=linux/amd64
+# ARG TARGETPLATFORM
+# FROM --platform=$BUILDPLATFORM registry.cn-shenzhen.aliyuncs.com/infrasync/alpine:3.15 AS upx
+FROM registry.cn-shenzhen.aliyuncs.com/infrasync/alpine:3.15 AS upx
+COPY --from=xx / /
+
+# https://gitee.com/infrastlabs/alpine-ext/blob/master/src/build.sh
+# https://www.jakehu.me/2021/alpine-mirrors/
+# domain="mirrors.ustc.edu.cn"
+# domain="mirrors.aliyun.com";
+# mirrors.tuna.tsinghua.edu.cn
+RUN export domain="mirrors.ustc.edu.cn"; \
+  echo "http://$domain/alpine/v3.15/main" > /etc/apk/repositories; \
+  echo "http://$domain/alpine/v3.15/community" >> /etc/apk/repositories
+RUN ping -c 2 qq.com; apk update; \
+  apk --no-cache add build-base curl make cmake git
+
+
+###TIGERVNC
+# log "Installing required Alpine packages..."
+# ping -c 2 qq.com
+RUN apk --no-cache add \
+    curl \
+    build-base \
+    clang \
+    cmake \
+    autoconf \
+    automake \
+    libtool \
+    pkgconf \
+    meson \
+    util-macros \
+    font-util-dev \
+    xtrans 
+
+# ping -c 2 qq.com
+RUN xx-apk --no-cache --no-scripts add \
+    g++ \
+    xcb-util-dev \
+    pixman-dev \
+    libx11-dev \
+    libgcrypt-dev \
+    libgcrypt-static \
+    libgpg-error-static \
+    libxkbfile-dev \
+    libxfont2-dev \
+    libjpeg-turbo-dev \
+    nettle-dev \
+    libunistring-dev \
+    gnutls-dev \
+    fltk-dev \
+    libxrandr-dev \
+    libxtst-dev \
+    freetype-dev \
+    libfontenc-dev \
+    zlib-dev \
+    libx11-static \
+    libxcb-static \
+    zlib-static \
+    pixman-static \
+    libjpeg-turbo-static \
+    freetype-static \
+    libpng-static \
+    bzip2-static \
+    brotli-static \
+    libunistring-static \
+    nettle-static \
+    gettext-static \
+    libunistring-dev \
+    libbsd-dev 
+
+
+###FONTCONFIG
+# log "Installing required Alpine packages..."
+RUN apk --no-cache add \
+    curl \
+    build-base \
+    clang \
+    pkgconfig \
+    gperf \
+    python3 \
+    font-croscore 
+
+RUN xx-apk --no-cache --no-scripts add \
+    glib-dev \
+    g++ \
+    freetype-dev \
+    expat-dev 
+
+
+###XDPY
+RUN xx-apk --no-cache add gcc musl-dev libx11-dev libx11-static libxcb-static
+
