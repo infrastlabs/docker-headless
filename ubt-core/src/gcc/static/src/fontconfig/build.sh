@@ -34,21 +34,21 @@ function log {
 #
 # Install required packages.
 #
-log "Installing required Alpine packages..."
-apk --no-cache add \
-    curl \
-    build-base \
-    clang \
-    pkgconfig \
-    gperf \
-    python3 \
-    font-croscore \
+# log "Installing required Alpine packages..."
+# apk --no-cache add \
+#     curl \
+#     build-base \
+#     clang \
+#     pkgconfig \
+#     gperf \
+#     python3 \
+#     font-croscore \
 
-xx-apk --no-cache --no-scripts add \
-    glib-dev \
-    g++ \
-    freetype-dev \
-    expat-dev \
+# xx-apk --no-cache --no-scripts add \
+#     glib-dev \
+#     g++ \
+#     freetype-dev \
+#     expat-dev \
 
 #
 # Install Noto fonts.

@@ -37,13 +37,21 @@ TIGERVNC_URL=https://ghproxy.com/https://github.com/TigerVNC/tigervnc/archive/v$
 XSERVER_URL=https://www.x.org/releases/individual/xserver/xorg-server-${XSERVER_VERSION}.tar.gz
 
 GNUTLS_URL=https://www.gnupg.org/ftp/gcrypt/gnutls/v${GNUTLS_VERSION%.*}/gnutls-${GNUTLS_VERSION}.tar.xz
+LIBTASN1_URL=https://ftp.gnu.org/gnu/libtasn1/libtasn1-${LIBTASN1_VERSION}.tar.gz
 LIBXFONT2_URL=https://www.x.org/pub/individual/lib/libXfont2-${LIBXFONT2_VERSION}.tar.gz
 LIBFONTENC_URL=https://www.x.org/releases/individual/lib/libfontenc-${LIBFONTENC_VERSION}.tar.gz
-LIBTASN1_URL=https://ftp.gnu.org/gnu/libtasn1/libtasn1-${LIBTASN1_VERSION}.tar.gz
 LIBXSHMFENCE_URL=https://www.x.org/releases/individual/lib/libxshmfence-${LIBXSHMFENCE_VERSION}.tar.gz
 
 XKEYBOARDCONFIG_URL=https://www.x.org/archive/individual/data/xkeyboard-config/xkeyboard-config-${XKEYBOARDCONFIG_VERSION}.tar.bz2
 XKBCOMP_URL=https://www.x.org/releases/individual/app/xkbcomp-${XKBCOMP_VERSION}.tar.bz2
+
+function down_catfile(){
+  url=$1
+  file=${url##*/}
+  #curl -# -L -f 
+  test -f /mnt/$file || curl -# -k -fSL $url > /mnt/$file
+  cat /mnt/$file
+}
 
 # Set same default compilation flags as abuild.
 export CFLAGS="-Os -fomit-frame-pointer"
@@ -62,55 +70,57 @@ function log {
 #
 # Install required packages.
 #
-log "Installing required Alpine packages..."
-apk --no-cache add \
-    curl \
-    build-base \
-    clang \
-    cmake \
-    autoconf \
-    automake \
-    libtool \
-    pkgconf \
-    meson \
-    util-macros \
-    font-util-dev \
-    xtrans \
+# log "Installing required Alpine packages..."
+# ping -c 2 qq.com
+# apk --no-cache add \
+#     curl \
+#     build-base \
+#     clang \
+#     cmake \
+#     autoconf \
+#     automake \
+#     libtool \
+#     pkgconf \
+#     meson \
+#     util-macros \
+#     font-util-dev \
+#     xtrans \
 
-xx-apk --no-cache --no-scripts add \
-    g++ \
-    xcb-util-dev \
-    pixman-dev \
-    libx11-dev \
-    libgcrypt-dev \
-    libgcrypt-static \
-    libgpg-error-static \
-    libxkbfile-dev \
-    libxfont2-dev \
-    libjpeg-turbo-dev \
-    nettle-dev \
-    libunistring-dev \
-    gnutls-dev \
-    fltk-dev \
-    libxrandr-dev \
-    libxtst-dev \
-    freetype-dev \
-    libfontenc-dev \
-    zlib-dev \
-    libx11-static \
-    libxcb-static \
-    zlib-static \
-    pixman-static \
-    libjpeg-turbo-static \
-    freetype-static \
-    libpng-static \
-    bzip2-static \
-    brotli-static \
-    libunistring-static \
-    nettle-static \
-    gettext-static \
-    libunistring-dev \
-    libbsd-dev \
+# ping -c 2 qq.com
+# xx-apk --no-cache --no-scripts add \
+#     g++ \
+#     xcb-util-dev \
+#     pixman-dev \
+#     libx11-dev \
+#     libgcrypt-dev \
+#     libgcrypt-static \
+#     libgpg-error-static \
+#     libxkbfile-dev \
+#     libxfont2-dev \
+#     libjpeg-turbo-dev \
+#     nettle-dev \
+#     libunistring-dev \
+#     gnutls-dev \
+#     fltk-dev \
+#     libxrandr-dev \
+#     libxtst-dev \
+#     freetype-dev \
+#     libfontenc-dev \
+#     zlib-dev \
+#     libx11-static \
+#     libxcb-static \
+#     zlib-static \
+#     pixman-static \
+#     libjpeg-turbo-static \
+#     freetype-static \
+#     libpng-static \
+#     bzip2-static \
+#     brotli-static \
+#     libunistring-static \
+#     nettle-static \
+#     gettext-static \
+#     libunistring-dev \
+#     libbsd-dev \
 
 #
 # Build GNU TLS.
@@ -119,7 +129,7 @@ xx-apk --no-cache --no-scripts add \
 #
 mkdir /tmp/gnutls
 log "Downloading GNU TLS..."
-curl -# -L -f ${GNUTLS_URL} | tar -xJ --strip 1 -C /tmp/gnutls
+down_catfile ${GNUTLS_URL} | tar -xJ --strip 1 -C /tmp/gnutls
 log "Configuring GNU TLS..."
 (
     cd /tmp/gnutls && ./configure \
@@ -149,7 +159,7 @@ make DESTDIR=$(xx-info sysroot) -C /tmp/gnutls install
 #
 mkdir /tmp/libxfont2
 log "Downloading libXfont2..."
-curl -# -L -f ${LIBXFONT2_URL} | tar -xz --strip 1 -C /tmp/libxfont2
+down_catfile ${LIBXFONT2_URL} | tar -xz --strip 1 -C /tmp/libxfont2
 log "Configuring libXfont2..."
 (
     cd /tmp/libxfont2 && ./configure \
@@ -175,7 +185,7 @@ make DESTDIR=$(xx-info sysroot) -C /tmp/libxfont2 install
 #
 mkdir /tmp/libfontenc
 log "Downloading libfontenc..."
-curl -# -L -f ${LIBFONTENC_URL} | tar -xz --strip 1 -C /tmp/libfontenc
+down_catfile ${LIBFONTENC_URL} | tar -xz --strip 1 -C /tmp/libfontenc
 log "Configuring libfontenc..."
 (
     cd /tmp/libfontenc && ./configure \
@@ -198,7 +208,7 @@ make DESTDIR=$(xx-info sysroot) -C /tmp/libfontenc install
 #
 mkdir /tmp/libtasn1
 log "Downloading libtasn1..."
-curl -# -L -f ${LIBTASN1_URL} | tar -xz --strip 1 -C /tmp/libtasn1
+down_catfile ${LIBTASN1_URL} | tar -xz --strip 1 -C /tmp/libtasn1
 log "Configuring libtasn1..."
 (
     cd /tmp/libtasn1 && CFLAGS="$CFLAGS -Wno-error=inline" ./configure \
@@ -220,7 +230,7 @@ make DESTDIR=$(xx-info sysroot) -C /tmp/libtasn1 install
 #
 mkdir /tmp/libxshmfence
 log "Downloading libxshmfence..."
-curl -# -L -f ${LIBXSHMFENCE_URL} | tar -xz --strip 1 -C /tmp/libxshmfence
+down_catfile ${LIBXSHMFENCE_URL} | tar -xz --strip 1 -C /tmp/libxshmfence
 log "Configuring libxshmfence..."
 (
     cd /tmp/libxshmfence && ./configure \
@@ -241,9 +251,9 @@ make DESTDIR=$(xx-info sysroot) -C /tmp/libxshmfence install
 #
 mkdir /tmp/tigervnc
 log "Downloading TigerVNC..."
-curl -# -L -f ${TIGERVNC_URL} | tar -xz --strip 1 -C /tmp/tigervnc
+down_catfile ${TIGERVNC_URL} | tar -xz --strip 1 -C /tmp/tigervnc
 log "Downloading Xorg server..."
-curl -# -L -f ${XSERVER_URL} | tar -xz --strip 1 -C /tmp/tigervnc/unix/xserver
+down_catfile ${XSERVER_URL} | tar -xz --strip 1 -C /tmp/tigervnc/unix/xserver
 
 log "Patching TigerVNC..."
 # Apply the TigerVNC patch against the X server.
@@ -350,7 +360,7 @@ make DESTDIR=/tmp/tigervnc-install -C /tmp/tigervnc/unix/vncpasswd install
 #
 mkdir /tmp/xkb
 log "Downloading XKeyboardConfig..."
-curl -# -L -f ${XKEYBOARDCONFIG_URL} | tar -xj --strip 1 -C /tmp/xkb
+down_catfile ${XKEYBOARDCONFIG_URL} | tar -xj --strip 1 -C /tmp/xkb
 log "Configuring XKeyboardConfig..."
 (
     cd /tmp/xkb && abuild-meson . build
@@ -402,7 +412,7 @@ find /tmp/xkb-install/usr/share/X11/xkb -mindepth 1 ! -type d $(printf "! -whole
 #
 mkdir /tmp/xkbcomp
 log "Downloading xkbcomp..."
-curl -# -L -f ${XKBCOMP_URL} | tar -xj --strip 1 -C /tmp/xkbcomp
+down_catfile ${XKBCOMP_URL} | tar -xj --strip 1 -C /tmp/xkbcomp
 
 log "Configuring xkbcomp..."
 (
