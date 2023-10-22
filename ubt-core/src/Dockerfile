@@ -97,8 +97,8 @@ COPY --from=files2 /rootfs /rootfs/conf
 # RUN bash /xconf.sh
 
 RUN \
-  echo "
-rm -f /usr/bin/Xvnc /usr/bin/vncpasswd
+  echo "\n\
+rm -f /usr/bin/Xvnc /usr/bin/vncpasswd \n\
 \cp -a /rootfs/bin/* /; \n\
 \cp -a /rootfs/conf/* /; \n\
 bash /etc/skel/.fluxbox/fluxbox.sh; \n\
