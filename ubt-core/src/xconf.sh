@@ -114,8 +114,8 @@ $RUN \
   sed -i "s^OSH_THEME=\"font\"^OSH_THEME=\"axin\"^g" /home/headless/.bashrc; 
 
 # link: Xvnc, vncpasswd
-# $RUN rm -f /usr/bin/Xvnc; ln -s /usr/local/tigervnc/bin/Xvnc /usr/bin/Xvnc; \
-#   rm -f /usr/bin/vncpasswd; ln -s /usr/local/tigervnc/bin/vncpasswd /usr/bin/vncpasswd;
+$RUN rm -f /usr/bin/Xvnc; ln -s /usr/local/static/bin/Xvnc /usr/bin/Xvnc; \
+  rm -f /usr/bin/vncpasswd; ln -s /usr/local/static/bin/vncpasswd /usr/bin/vncpasswd;
 
 # for core: avoid multi> 'dbus-daemon --syslog --fork --print-pid 4 --print-address 6 --session'; #(headless x2, root x1)
 kill -9 `ps -ef |grep dbus |grep -v grep |awk '{print $2}'`
