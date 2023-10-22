@@ -64,10 +64,10 @@ jobs:
           # BUILD
           echo core; cd ubt-core; 
             # sh buildx.sh compile
-            sh buildx.sh compile2
+            # sh buildx.sh compile2
             # 
             # sh buildx.sh slim; sh buildx.sh base
-            # sh buildx.sh #core
+            sh buildx.sh #core
           # #HEADLESS's merge
           # if [ "infrastlabs/docker-headless" == "${{ github.repository }}" ]; then
           #   echo custom; cd ../ubt-custom; sh buildx.sh; #sh buildx.sh sogou; 
