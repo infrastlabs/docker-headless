@@ -1,7 +1,7 @@
 name: docker-image-tiger
 on:
   push:
-    # branches: [ "dev", "feat/ubt-armv7" ]
+    branches: [ "dev", "feat/ubt-armv7AAA" ]
   pull_request:
     branches: [ "dev" ]
 jobs:
