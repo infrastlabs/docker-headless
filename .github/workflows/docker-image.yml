@@ -1,8 +1,8 @@
 name: docker-image
 on:
   push:
-    branches: [ "dev" ]
-    # branches: [ "dev", "feat/ubt-armv7" ]
+    # branches: [ "dev" ]
+    branches: [ "dev", "feat/ubt-armv7" ]
   pull_request:
     branches: [ "dev" ]
 jobs:
