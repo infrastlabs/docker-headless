@@ -98,9 +98,9 @@ COPY --from=files2 /rootfs /rootfs/conf
 
 RUN \
   echo "\n\
-rm -f /usr/bin/Xvnc /usr/bin/vncpasswd \n\
-\cp -a /rootfs/bin/* /; \n\
-\cp -a /rootfs/conf/* /; \n\
+rm -f /usr/bin/Xvnc /usr/bin/vncpasswd; \n\
+cp -a /rootfs/bin/* /; \n\
+cp -a /rootfs/conf/* /; \n\
 bash /etc/skel/.fluxbox/fluxbox.sh; \n\
 bash /xconf.sh;\n\
 touch /rootfs/.core-init-lock\n\
