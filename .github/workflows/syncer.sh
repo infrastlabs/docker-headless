@@ -61,15 +61,19 @@ $src/infrastlabs/docker-headless:ubt2004-gnome: $dst/infrastlabs/docker-headless
 $src/infrastlabs/docker-headless:ubt2004-plasma: $dst/infrastlabs/docker-headless:ubt2004-plasma
 
 # distros:app
-$src/infrastlabs/docker-headless:app-alpine: $dst/infrastlabs/docker-headless:app-alpine
-$src/infrastlabs/docker-headless:app-ubuntu: $dst/infrastlabs/docker-headless:app-ubuntu
-$src/infrastlabs/docker-headless:app-opensuse: $dst/infrastlabs/docker-headless:app-opensuse
-$src/infrastlabs/docker-headless:app-alpine-3.19: $dst/infrastlabs/docker-headless:app-alpine-3.19
-$src/infrastlabs/docker-headless:app-ubuntu-20.04: $dst/infrastlabs/docker-headless:app-ubuntu-20.04
-$src/infrastlabs/docker-headless:app-ubuntu-22.04: $dst/infrastlabs/docker-headless:app-ubuntu-22.04
-$src/infrastlabs/docker-headless:app-ubuntu-24.04: $dst/infrastlabs/docker-headless:app-ubuntu-24.04
-$src/infrastlabs/docker-headless:app-opensuse-15.0: $dst/infrastlabs/docker-headless:app-opensuse-15.0
-$src/infrastlabs/docker-headless:app-opensuse-15.5: $dst/infrastlabs/docker-headless:app-opensuse-15.5
+$src/infrastlabs/docker-headless:alpine: $dst/infrastlabs/docker-headless:alpine
+$src/infrastlabs/docker-headless:ubuntu: $dst/infrastlabs/docker-headless:ubuntu
+$src/infrastlabs/docker-headless:debian: $dst/infrastlabs/docker-headless:debian
+$src/infrastlabs/docker-headless:opensuse: $dst/infrastlabs/docker-headless:opensuse
+$src/infrastlabs/docker-headless:alpine-3.19: $dst/infrastlabs/docker-headless:alpine-3.19
+$src/infrastlabs/docker-headless:ubuntu-20.04: $dst/infrastlabs/docker-headless:ubuntu-20.04
+$src/infrastlabs/docker-headless:ubuntu-22.04: $dst/infrastlabs/docker-headless:ubuntu-22.04
+$src/infrastlabs/docker-headless:ubuntu-24.04: $dst/infrastlabs/docker-headless:ubuntu-24.04
+$src/infrastlabs/docker-headless:debian-10: $dst/infrastlabs/docker-headless:debian-10
+$src/infrastlabs/docker-headless:debian-11: $dst/infrastlabs/docker-headless:debian-11
+$src/infrastlabs/docker-headless:debian-12: $dst/infrastlabs/docker-headless:debian-12
+$src/infrastlabs/docker-headless:opensuse-15.0: $dst/infrastlabs/docker-headless:opensuse-15.0
+$src/infrastlabs/docker-headless:opensuse-15.5: $dst/infrastlabs/docker-headless:opensuse-15.5
 EOF
 
   # awk 'BEGIN{print systime()}';
