@@ -55,20 +55,50 @@ jobs:
           free -h; df -h; ip a |grep inet; uname -a;
           
           # ENV
-          export DOCKER_REGISTRY_USER_infrastSubUser2=${{ secrets.DOCKER_REGISTRY_USER_INFRASTSUBUSER2 }}
-          export DOCKER_REGISTRY_PW_infrastSubUser2=${{ secrets.DOCKER_REGISTRY_PW_INFRASTSUBUSER2 }}
+          # registry-1.docker.io| noneView
           export DOCKER_REGISTRY_USER_dockerhub=${{ secrets.DOCKER_REGISTRY_USER_DOCKERHUB }}
           export DOCKER_REGISTRY_PW_dockerhub=${{ secrets.DOCKER_REGISTRY_PW_DOCKERHUB }}
+          # ali's| size, none-arch, layers;
+          export DOCKER_REGISTRY_USER_infrastSubUser2=${{ secrets.DOCKER_REGISTRY_USER_INFRASTSUBUSER2 }}
+          export DOCKER_REGISTRY_PW_infrastSubUser2=${{ secrets.DOCKER_REGISTRY_PW_INFRASTSUBUSER2 }}
+
+          export REPO_HUB=registry-1.docker.io
+          export REPO_ALI=registry.cn-shenzhen.aliyuncs.com
+          export REPO=$REPO_ALI #REPO_HUB REPO_ALI ##without "xx/"
 
           # BUILD
-          echo core; cd ubt-core; 
-            # sh buildx.sh compile
-            # sh buildx.sh slim; sh buildx.sh base
-            sh buildx.sh #core
-          #HEADLESS's merge
-          if [ "infrastlabs/docker-headless" == "${{ github.repository }}" ]; then
-            echo custom; cd ../ubt-custom; sh buildx.sh; #sh buildx.sh sogou; 
-            echo desktop; cd ../ubt-desktop; 
-              sh buildx.sh; sh buildx.sh plasma; 
-              sh buildx.sh cxfce; sh buildx.sh cinna; #sh buildx.sh cmate; 
+          :> /tmp/.timecost
+          # echo core; cd ubt-core; 
+          #   # sh buildx.sh compile
+          #   # sh buildx.sh slim; sh buildx.sh base
+          #   sh buildx.sh #core
+          # #HEADLESS's merge
+          # if [ "infrastlabs/docker-headless" == "${{ github.repository }}" ]; then
+          #   echo custom; cd ../ubt-custom; sh buildx.sh; #sh buildx.sh sogou; 
+          #   echo desktop; cd ../ubt-desktop; 
+          #     sh buildx.sh; sh buildx.sh plasma; 
+          #     sh buildx.sh cxfce; sh buildx.sh cinna; #sh buildx.sh cmate; 
+          # fi
+
+          cd .github; doBuild=true
+          if [ "true" == "$doBuild" ]; then
+          echo distros; cd ../distros;
+            # bash buildx.sh type dist ver [latest]
+            # app
+            bash buildx.sh app alpine 3.19 latest &
+            # bash buildx.sh app ubuntu 20.04 &
+            bash buildx.sh app ubuntu 22.04 &
+            bash buildx.sh app ubuntu 24.04 latest &
+            # bash buildx.sh app opensuse 15.0 & ##
+            # bash buildx.sh app opensuse 15.5 latest &
+            wait
           fi
+          # 
+          # 同步到ali仓
+          #REPO_ALI>> REPO_HUB REPO_TEN REPO_QING 
+          unset REPO_ALI REPO_TEN REPO_QING #skipSync
+          echo syncer; doSync=false
+          cd ../.github/workflows; test "true" == "$doSync" && bash syncer.sh;
+          # 
+          # view timecost
+          cat /tmp/.timecost
