@@ -59,6 +59,141 @@ RUN \
   # \2476 kB
   # dropbear-bin dropbear-run openssh-sftp-server lftp jq;
 
+# xrdb; +leafpad mousepad@app
+RUN \
+  apt.sh x11-xserver-utils leafpad ; \
+  exit 0
+
+
+##APP################################################
+# img: 362MB> 444MB (none-font); after mv-top: 610MB> 546MB
+# MESA-LLVM img: 362MB> 398MB
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\  
+  # VIDEO: 30.5 MB
+  # libllvm12 已包含 # libgl1-mesa-glx >libgl1-mesa-dri ##ex:  mesa-utils 
+  apt.sh libgl1-mesa-glx libglu1-mesa; \
+  \
+  # LLVM(定制版这里删调它,除gnome,cinna其它de无影响); clear big lib: 88M (qt: flameshot,sogoupinyin) > img: -27M
+  rm -f /usr/lib/x86_64-linux-gnu/libLLVM-12.so.1; \
+  rm -f /usr/lib/aarch64-linux-gnu/libLLVM-12.so.1; 
+
+# ubt2404-drop: libasound2 
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  mkdir -p /usr/share/X11/xkb; \
+  apt.sh \
+  # firefox #esr/115.1>> libdbus-glib-1-2
+  libxtst6 libdbus-glib-1-2 \
+# 163music v1.2.1
+# RUN apt.sh \
+  libharfbuzz0b libpangocairo-1.0-0 libgdk-pixbuf2.0-0 \
+# wps2019 11.1.0.11719
+# RUN apt.sh \
+  libfreetype6 libcups2 libglib2.0-0 libglu1-mesa libsm6 libxrender1 libfontconfig1 libxext6 libxcb1 \
+# vscode 1.88.1 ##libgtk-3-0: 16M; img: 362MB> 398MB > 475MB
+# RUN apt.sh \
+  libnss3 libatk1.0-0 libatk-bridge2.0-0 libgtk-3-0 libgbm1; \
+  # err: ubt1604
+  exit 0
+
+# img: 362MB> 398MB > 433MB
+# LOC 87.4 MB
+# strip: binutils
+# xrdp-chansrv: libfdk-aac1 libopus0
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  # LOCALE 15.0 MB 
+  apt.sh tzdata locales binutils dconf-cli \
+  dbus-x11 at-spi2-core gtk2-engines-pixbuf \
+  # 343 kB
+  apt-utils x11-xkb-utils xdg-utils; \
+  exit 0
+
+  # AUD img: 546MB[239M]> 560MB
+  # INPUT img: 546MB[239M]> 658MB[252M]
+  RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+    apt.sh \
+    # Audio 39.8 MB 
+    pavucontrol \
+    \
+    # \12.3 MB (默认不含输入法: IBus/Fcitx)
+    ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi; \
+    exit 0
+
+  # # 2868 kB #fcitx ##img:78.095 MB
+  # # 15.3 kB #输入法依赖 https://shurufa.sogou.com/linux/guide
+  # RUN apt.sh fcitx fcitx-bin fcitx-config-common fcitx-config-gtk fcitx-data \
+  #   fcitx-frontend-all fcitx-frontend-gtk2 fcitx-frontend-gtk3 \
+  #   fcitx-frontend-qt5 fcitx-module-dbus fcitx-module-kimpanel fcitx-module-lua \
+  #   fcitx-module-x11 fcitx-modules fcitx-table fcitx-ui-classic \
+  #   # libxss1: needed by sogou, fcitx -r for debug
+  #   lsb-release libxss1 im-config \
+  #   libqt5qml5 libqt5quick5 libqt5quickwidgets5 qml-module-qtquick2 libgsettings-qt1
+
+
+  # MISC2 arandr
+  # flameshot: none@1604,1404 
+  RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+    test "14.04" == "${VER}" && exit 0; \
+    test "16.04" == "${VER}" && exit 0; \
+    apt.sh \
+    # tumbler gnupg \
+    # # \20.5 MB
+    flameshot; \
+    # flameshot_qt;
+    strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5; \
+    strip --remove-section=.note.ABI-tag /usr/lib/aarch64-linux-gnu/libQt5Core.so.5; \
+    exit 0
+
+  # XFCE4
+    # tint2 
+    # plank rofi clipit pnmixer lxappearance thunar \
+  RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+    apt.sh \
+    # 2536 kB #18.9 MB > 14.3 MB
+    xfwm4 xfdesktop4 \
+    xfce4-notifyd xfce4-settings xfce4-session; \
+    exit 0
+
+
+    
+  # 预装软件: sakura geany ristretto sys-monitor engrampa asbru
+# gparted
+# ubt14.04_none: pnmixer plank engrampa
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  apt.sh thunar dunst clipit \
+  pcmanfm lxappearance \
+  sakura geany ristretto gnome-system-monitor; \
+  # misc2
+  \
+  # link: sakura, thunar
+  # ln -s /usr/bin/thunar /usr/bin/pcmanfm; \
+  mv /usr/bin/st /usr/bin/st00; ln -s /usr/bin/sakura /usr/bin/st; \
+  test "14.04" == "${VER}" && exit 0; \
+  apt.sh pnmixer plank engrampa; \
+  exit 0
+
+  # # wps: libxss1
+  # # Xvnc-compile: libunwind8 libxfont2
+  # RUN apt.sh libxss1 libunwind8 libxfont2
+
+
+# OHMYBASH
+# git ohmybash # \12.6 MB
+# firefox: ubt2204+>> @snap: snap install firefox
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  apt.sh git mousepad; \
+  exit 0
+
+
+# FONT, THEME, ICON
+# font-ttf: @win:msyh.zip> fonts-wqy-microhei
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  apt.sh \
+  greybird-gtk-theme \
+  fonts-wqy-microhei language-pack-gnome-zh-hans; \
+  \
+  rm -f /usr/share/backgrounds/greybird.svg;
+
+
 # HEADLESS
 COPY --from=rootfs /rootfs/files1 /
 COPY --from=rootfs /rootfs/files2 /
