@@ -48,17 +48,18 @@ function doSync(){
   test "$dst" == "$src" && return #skip
 
   cat > conf/images.yaml<<EOF
-# deb9
-$src/infrastlabs/docker-headless:deb9: $dst/infrastlabs/docker-headless:deb9
-$src/infrastlabs/docker-headless:deb9-full: $dst/infrastlabs/docker-headless:deb9-full
-$src/infrastlabs/docker-headless:deb9-slim: $dst/infrastlabs/docker-headless:deb9-slim
-# ubt2004
-$src/infrastlabs/docker-headless:ubt2004: $dst/infrastlabs/docker-headless:ubt2004
-$src/infrastlabs/docker-headless:ubt2004-sogou: $dst/infrastlabs/docker-headless:ubt2004-sogou
-$src/infrastlabs/docker-headless:ubt2004-cinna: $dst/infrastlabs/docker-headless:ubt2004-cinna
-$src/infrastlabs/docker-headless:ubt2004-cmate: $dst/infrastlabs/docker-headless:ubt2004-cmate
-$src/infrastlabs/docker-headless:ubt2004-gnome: $dst/infrastlabs/docker-headless:ubt2004-gnome
-$src/infrastlabs/docker-headless:ubt2004-plasma: $dst/infrastlabs/docker-headless:ubt2004-plasma
+# caution!!! overwrite.
+# # deb9
+# $src/infrastlabs/docker-headless:deb9: $dst/infrastlabs/docker-headless:deb9
+# $src/infrastlabs/docker-headless:deb9-full: $dst/infrastlabs/docker-headless:deb9-full
+# $src/infrastlabs/docker-headless:deb9-slim: $dst/infrastlabs/docker-headless:deb9-slim
+# # ubt2004
+# $src/infrastlabs/docker-headless:ubt2004: $dst/infrastlabs/docker-headless:ubt2004
+# $src/infrastlabs/docker-headless:ubt2004-sogou: $dst/infrastlabs/docker-headless:ubt2004-sogou
+# $src/infrastlabs/docker-headless:ubt2004-cinna: $dst/infrastlabs/docker-headless:ubt2004-cinna
+# $src/infrastlabs/docker-headless:ubt2004-cmate: $dst/infrastlabs/docker-headless:ubt2004-cmate
+# $src/infrastlabs/docker-headless:ubt2004-gnome: $dst/infrastlabs/docker-headless:ubt2004-gnome
+# $src/infrastlabs/docker-headless:ubt2004-plasma: $dst/infrastlabs/docker-headless:ubt2004-plasma
 
 # distros:app
 $src/infrastlabs/docker-headless:alpine: $dst/infrastlabs/docker-headless:alpine
