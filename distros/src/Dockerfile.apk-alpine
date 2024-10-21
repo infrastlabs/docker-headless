@@ -27,11 +27,11 @@ ARG TYPE=core
 ARG VER=3.19
 # Set multiple labels at once, author,builtdate
 LABEL \
-  github.com.infrastlabs.docker-x11base.vendor=Infrastlabs \
-  github.com.infrastlabs.docker-x11base.release="production" \
-  github.com.infrastlabs.docker-x11base.version="1.0.1-beta" \
-  github.com.infrastlabs.docker-x11base.maintainer="sam <sldevsir@126.com>" \
-  github.com.infrastlabs.docker-x11base.builtdate="$(date -u +'%Y-%m-%d %H:%M:%S')"
+  github.com.infrastlabs.docker-headless.vendor=Infrastlabs \
+  github.com.infrastlabs.docker-headless.release="production" \
+  github.com.infrastlabs.docker-headless.version="1.0.1-beta" \
+  github.com.infrastlabs.docker-headless.maintainer="sam <sldevsir@126.com>" \
+  github.com.infrastlabs.docker-headless.builtdate="$(date -u +'%Y-%m-%d %H:%M:%S')"
 
 
 # https://www.jakehu.me/2021/alpine-mirrors/

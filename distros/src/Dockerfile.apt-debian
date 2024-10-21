@@ -5,11 +5,11 @@ FROM ${REPO}infrastlabs/x11-base:rootfs AS rootfs
 FROM debian:${VER}-slim
 # Set multiple labels at once, author,builtdate
 LABEL \
-  github.com.infrastlabs.docker-x11base.vendor=Infrastlabs \
-  github.com.infrastlabs.docker-x11base.release="production" \
-  github.com.infrastlabs.docker-x11base.version="1.0.1-beta" \
-  github.com.infrastlabs.docker-x11base.maintainer="sam <sldevsir@126.com>" \
-  github.com.infrastlabs.docker-x11base.builtdate="$(date -u +'%Y-%m-%d %H:%M:%S')"
+  github.com.infrastlabs.docker-headless.vendor=Infrastlabs \
+  github.com.infrastlabs.docker-headless.release="production" \
+  github.com.infrastlabs.docker-headless.version="1.0.1-beta" \
+  github.com.infrastlabs.docker-headless.maintainer="sam <sldevsir@126.com>" \
+  github.com.infrastlabs.docker-headless.builtdate="$(date -u +'%Y-%m-%d %H:%M:%S')"
 ENV \
   DEBIAN_FRONTEND=noninteractive \
   LOCALE_INCLUDE="zh_CN zh_HK zh_TW en en_AU fr fr_CA pt pt_BR es ar cs de it ru nl tr is sv uk ja ko th vi"
