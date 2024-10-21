@@ -234,20 +234,23 @@ RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
 ###########################################################################
 # mate-session gnome-session plasma_session
 
+# mate-desktop
 # after mint-meta-mate # mate-desktop-environment-core: 5436B;
 RUN \
   apt.sh mate-desktop-environment-core
+
 # ubuntu-desktop 128 MB
-# gnome-tweak-tool papirus-icon-theme \
-RUN \
-  apt.sh ubuntu-desktop nautilus; \
-  apt -y remove gdm3  gvfs* update-manager software-properties-common xterm;
-# kubuntu-desktop 273 MB # 7054 kB #plasma-desktop 已装
-# https://github.com/ms-jpq/kde-in-docker/blob/daddy/base/bionic/Dockerfile #nautilus > dolphin
-RUN \
-  apt.sh kubuntu-desktop dolphin konsole; \
-  # KDE环境: pavucontrol图标丑出天际
-  rm -f /home/headless/Desktop/pavucontrol.desktop;
+# # gnome-tweak-tool papirus-icon-theme \
+# RUN \
+#   apt.sh ubuntu-desktop nautilus; \
+#   apt -y remove gdm3  gvfs* update-manager software-properties-common xterm;
+
+  # kubuntu-desktop 273 MB # 7054 kB #plasma-desktop 已装
+# # https://github.com/ms-jpq/kde-in-docker/blob/daddy/base/bionic/Dockerfile #nautilus > dolphin
+# RUN \
+#   apt.sh kubuntu-desktop dolphin konsole; \
+#   # KDE环境: pavucontrol图标丑出天际
+#   rm -f /home/headless/Desktop/pavucontrol.desktop;
 
 # split papirus-icon-theme: none@1604,1404
 # bunsen-papirus-icon-theme> papirus-icon-theme; ERR: 14.04 16.04 1804?
