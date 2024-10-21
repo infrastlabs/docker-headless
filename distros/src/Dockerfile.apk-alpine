@@ -170,6 +170,11 @@ RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
   test -z "$match1" && apk add --no-cache leafpad; \
   exit 0;
 
+# mate-desktop
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  apk add --no-cache \
+  mate-desktop; \
+  exit 0;
 
 # gtk2: icon/theme
 # https://pkgs.alpinelinux.org/packages?name=*theme* #pgs5
