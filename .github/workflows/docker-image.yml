@@ -86,14 +86,14 @@ jobs:
             # bash buildx.sh type dist ver [latest]
             # app
             bash buildx.sh app alpine 3.19 latest &
-            # bash buildx.sh app ubuntu 20.04 &
-            bash buildx.sh app ubuntu 22.04 &
-            bash buildx.sh app ubuntu 24.04 latest &
+            # # bash buildx.sh app ubuntu 20.04 &
+            # bash buildx.sh app ubuntu 22.04 &
+            # bash buildx.sh app ubuntu 24.04 latest &
             bash buildx.sh app debian 10 &
             bash buildx.sh app debian 11 &
             bash buildx.sh app debian 12 latest &
-            bash buildx.sh app opensuse 15.0 & ##
-            bash buildx.sh app opensuse 15.5 latest &
+            # bash buildx.sh app opensuse 15.0 & ##
+            # bash buildx.sh app opensuse 15.5 latest &
             wait
           fi
           # 
