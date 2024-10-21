@@ -60,8 +60,9 @@ RUN \
   # dropbear-bin dropbear-run openssh-sftp-server lftp jq;
 
 # xrdb; +leafpad mousepad@app
+# deb_none: leafpad 
 RUN \
-  apt.sh x11-xserver-utils leafpad ; \
+  apt.sh x11-xserver-utils ; \
   exit 0
 
 
@@ -186,10 +187,11 @@ RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
 
 # FONT, THEME, ICON
 # font-ttf: @win:msyh.zip> fonts-wqy-microhei
+# deb_none: language-pack-gnome-zh-hans
 RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
   apt.sh \
   greybird-gtk-theme \
-  fonts-wqy-microhei language-pack-gnome-zh-hans; \
+  fonts-wqy-microhei ; \
   \
   rm -f /usr/share/backgrounds/greybird.svg;
 
