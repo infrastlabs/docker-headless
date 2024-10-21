@@ -63,7 +63,7 @@ ns=infrastlabs
 ver=v51 #base-v5 base-v5-slim
 type=$1; dist=$2
 dver=$3; latest=$4; test -z "$dver" && dver=errVer
-tag=$type-$dist-$dver
+tag=$dist-$dver # tag=$type-$dist-$dver
 
 # PLAT0
 PLAT0="--platform linux/amd64,linux/arm64,linux/arm"
