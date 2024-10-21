@@ -138,4 +138,5 @@ EXPOSE 10089/tcp 10081/tcp 10022/tcp
 CMD ["bash", "-c", "exec /entry.sh"]
 ENV \
   TERM=xterm \
-  SHELL=/bin/bash
+  SHELL=/bin/bash \
+  START_SESSION=xfce4-session

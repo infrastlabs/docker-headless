@@ -289,7 +289,8 @@ EXPOSE 10089/tcp 10081/tcp 10022/tcp
 CMD ["bash", "-c", "exec /entry.sh"]
 ENV \
   TERM=xterm \
-  SHELL=/bin/bash
+  SHELL=/bin/bash \
+  START_SESSION=xfce4-session
   # 默认约定
   # L="zh_CN" \
   # TZ="Asia/Shanghai"
