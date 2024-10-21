@@ -1,0 +1,141 @@
+ARG REPO=
+ARG VER=15.5
+FROM ${REPO}infrastlabs/x11-base:rootfs AS rootfs
+
+# 20.04> 24.04: betterThemeView
+FROM --platform=linux/amd64 registry.cn-shenzhen.aliyuncs.com/infrastlabs/x11-base:app-ubuntu-24.04 AS ubt
+FROM scratch AS res
+  COPY --from=ubt /usr/share/themes/Greybird /usr/share/themes/Greybird
+  COPY --from=ubt /usr/share/themes/Greybird-compact /usr/share/themes/Greybird-compact
+  COPY --from=ubt /usr/share/themes/Greybird-dark /usr/share/themes/Greybird-dark
+  COPY --from=ubt /usr/share/icons/Papirus /usr/share/icons/Papirus
+  COPY --from=ubt /usr/share/icons/Papirus-Bunsen-bluegrey /usr/share/icons/Papirus-Bunsen-bluegrey
+  COPY --from=ubt /usr/share/icons/Papirus-Bunsen-grey /usr/share/icons/Papirus-Bunsen-grey
+  COPY --from=ubt /usr/share/fonts/DejaVuSansMono /usr/share/fonts/DejaVuSansMono
+  COPY --from=ubt /usr/share/fonts/truetype/wqy /usr/share/fonts/truetype/wqy
+  COPY --from=ubt /etc/fonts /etc/fonts
+  # locale_ubt: /usr/sbin/locale-gen,update-locale; /etc/default/locale
+  COPY --from=ubt /usr/share/locale /usr/share/locale
+  # COPY --from=ubt /usr/share/i18n /usr/share/i18n
+  COPY --from=ubt /usr/sbin/locale-gen /usr/sbin/locale-gen
+  COPY --from=ubt /usr/sbin/update-locale /usr/sbin/update-locale
+  COPY --from=ubt /etc/locale.gen /etc/locale.gen
+  COPY --from=ubt /etc/default/locale /etc/default/locale
+  #COPY --from=ubt /usr/share/
+
+FROM opensuse/leap:${VER}
+ARG TARGETPLATFORM
+ARG TYPE=core
+ARG VER=15.5
+# Set multiple labels at once, author,builtdate
+LABEL \
+  github.com.infrastlabs.docker-x11base.vendor=Infrastlabs \
+  github.com.infrastlabs.docker-x11base.release="production" \
+  github.com.infrastlabs.docker-x11base.version="1.0.1-beta" \
+  github.com.infrastlabs.docker-x11base.maintainer="sam <sldevsir@126.com>" \
+  github.com.infrastlabs.docker-x11base.builtdate="$(date -u +'%Y-%m-%d %H:%M:%S')"
+
+# zyp-source
+# http://mirrors.ustc.edu.cn/help/opensuse.html
+# https://blog.csdn.net/zhuzhenyu215/article/details/133523918
+# mirrors.ustc.edu.cn  mirrors.aliyun.com  +mirrors.163.com
+#  ustc: 15.4+ https://mirrors.ustc.edu.cn/opensuse/distribution/leap/
+#  ali: 15.2+ https://mirrors.aliyun.com/opensuse/distribution/leap/
+#  TODO: 15.0-gtk2@163 http://mirrors.163.com/openSUSE/distribution/leap/15.0/repo/
+#   https://mirrors.163.com/openSUSE/distribution/leap/15.0/repo/oss/
+#   https://mirrors.163.com/openSUSE/distribution/leap/15.0/repo/non-oss/
+RUN \
+  # test "15.0" != "${VER}" && exit 0; \
+  \
+  # export dm="mirrors.ustc.edu.cn"; \
+  # zypper ar -fc https://$dm/opensuse/distribution/leap/${VER}/repo/oss openSUSE-Aliyun-OSS; \
+  # zypper ar -fc https://$dm/opensuse/distribution/leap/${VER}/repo/non-oss openSUSE-Aliyun-NON-OSS; \
+  # zypper ar -fc https://$dm/opensuse/update/leap/${VER}/oss openSUSE-Aliyun-UPDATE-OSS; \
+  # zypper ar -fc https://$dm/opensuse/update/leap/${VER}/non-oss openSUSE-Aliyun-UPDATE-NON-OSS; \
+  \
+  # 163: opensuse> openSUSE
+  export dm="mirrors.163.com"; \
+  zypper ar -fc https://$dm/openSUSE/distribution/leap/${VER}/repo/oss openSUSE-Aliyun-OSS; \
+  zypper ar -fc https://$dm/openSUSE/distribution/leap/${VER}/repo/non-oss openSUSE-Aliyun-NON-OSS; \
+  zypper ar -fc https://$dm/openSUSE/update/leap/${VER}/oss openSUSE-Aliyun-UPDATE-OSS; \
+  zypper ar -fc https://$dm/openSUSE/update/leap/${VER}/non-oss openSUSE-Aliyun-UPDATE-NON-OSS; \
+  \
+  cd /etc/zypp/repos.d && ls |grep -v Aliyun |while read one; do rm -f $one; done; \
+  find /etc/zypp/repos.d; \
+  zypper clean; rm -rf /var/cache/zypp;
+RUN \
+  echo 'zypper install -y $@ && zypper clean; rm -rf /var/cache/zypp; ' > /usr/local/bin/zyp.sh \
+    && chmod +x /usr/local/bin/zyp.sh; 
+  # 刷新更新
+  # zypper refresh; 
+
+# zypper clean && zypper refresh \
+# ping: @iputils
+#  v15.0_none?: wget zip unzip 
+RUN \
+  zyp.sh iproute net-tools \
+  sudo psmisc sysstat tree tmux lrzsz which openssl \
+  iputils wget zip unzip \
+  procps jq \
+  lame; \
+  # test "15.0" != "${VER}" && zyp.sh wget zip unzip ; \
+  # 01: chmod u+s /bin/ping #02: sudo setcap cap_net_raw+p /bin/ping #setcap 无指令
+  chmod u+s /bin/ping; \
+  exit 0
+
+##APP################################################
+# gpg check failed too? @alma 8.7
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  zyp.sh firefox; \
+  exit 0
+
+# sakura+
+# zyp-ex: clipit pnmixer 
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  zyp.sh pavucontrol \
+  ibus ibus-rime flameshot \
+  sakura thunar lxappearance   geany ristretto engrampa gnome-system-monitor; \
+  exit 0
+
+# XFCE4
+  # plank rofi clipit pnmixer lxappearance thunar \
+  # tint2
+  # xfdesktop4 > xfdesktop @opsuse15.5
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  # 2536 kB #18.9 MB > 14.3 MB
+  echo a.123; \
+  zyp.sh \
+  xfwm4 xfdesktop \
+  xfce4-notifyd xfce4-settings xfce4-session; \
+  exit 0
+
+# locales dconf-cli gtk2-engines-pixbuf x11-xkb-utils
+#  zyp-ex: tzdata dbus-x11
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  zyp.sh binutils at-spi2-core xdg-utils \
+  # lanpacks: rhel>> yum install langpacks-zh_CN;
+  glibc-locale plank \
+  # xrdb-font
+  xrdb git \
+  # vim, locale, ping; ubt:iptuils-ping; vim 2.2M;
+  iputils vim \
+  # dbus-x11: perp> xfce4-session: err #hand run> xfce4-session: ok
+  dbus-1-x11; \
+  exit 0
+
+
+# HEADLESS
+COPY --from=rootfs /rootfs/files1 /
+COPY --from=rootfs /rootfs/files2 /
+RUN \
+  bash /xconf.sh core; bash /xconf.sh app; \
+  exit 0;
+
+# HEADLESS2
+COPY --from=res / /
+
+EXPOSE 10089/tcp 10081/tcp 10022/tcp
+CMD ["bash", "-c", "exec /entry.sh"]
+ENV \
+  TERM=xterm \
+  SHELL=/bin/bash

@@ -1,0 +1,199 @@
+# - FromAsCasing: 'as' and 'FROM' keywords' casing do not match (line 2)
+ARG REPO=
+ARG VER=3.19
+FROM ${REPO}infrastlabs/x11-base:rootfs AS rootfs
+
+# 20.04> 24.04: betterThemeView
+# TODO: FROM --platform=linux/amd64
+FROM --platform=linux/amd64 registry.cn-shenzhen.aliyuncs.com/infrastlabs/x11-base:app-ubuntu-24.04 AS ubt
+FROM scratch AS res
+  COPY --from=ubt /usr/share/themes/Greybird /usr/share/themes/Greybird
+  COPY --from=ubt /usr/share/themes/Greybird-compact /usr/share/themes/Greybird-compact
+  COPY --from=ubt /usr/share/themes/Greybird-dark /usr/share/themes/Greybird-dark
+  COPY --from=ubt /usr/share/icons/Papirus /usr/share/icons/Papirus
+  COPY --from=ubt /usr/share/icons/Papirus-Bunsen-bluegrey /usr/share/icons/Papirus-Bunsen-bluegrey
+  COPY --from=ubt /usr/share/icons/Papirus-Bunsen-grey /usr/share/icons/Papirus-Bunsen-grey
+  COPY --from=ubt /usr/share/locale /usr/share/locale
+  COPY --from=ubt /usr/share/fonts/DejaVuSansMono /usr/share/fonts/DejaVuSansMono
+  COPY --from=ubt /usr/share/fonts/truetype/wqy /usr/share/fonts/truetype/wqy
+  COPY --from=ubt /etc/fonts /etc/fonts
+  #COPY --from=ubt /usr/share/
+
+## ref kube-cmd/src/Dockerfile
+# FROM alpine:3.13.12
+FROM alpine:${VER}
+ARG TARGETPLATFORM
+ARG TYPE=core
+ARG VER=3.19
+# Set multiple labels at once, author,builtdate
+LABEL \
+  github.com.infrastlabs.docker-x11base.vendor=Infrastlabs \
+  github.com.infrastlabs.docker-x11base.release="production" \
+  github.com.infrastlabs.docker-x11base.version="1.0.1-beta" \
+  github.com.infrastlabs.docker-x11base.maintainer="sam <sldevsir@126.com>" \
+  github.com.infrastlabs.docker-x11base.builtdate="$(date -u +'%Y-%m-%d %H:%M:%S')"
+
+
+# https://www.jakehu.me/2021/alpine-mirrors/
+#   mirrors.tuna.tsinghua.edu.cn  mirrors.ustc.edu.cn  mirrors.aliyun.com
+# v3.0, v3.1, v3.2: 3.0-noneImg; v2.7:withImg,withoutRepo;
+# v3.3: +community
+# v3.2 https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.2/main/armhf/ #x64,armv7
+# v3.5 https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.5/main/aarch64/ #first-arm64 `xfwm4 (4.12.3-r0) --- gtk+2.0 (2.24.28-r3)`
+# v3.15 https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.13/main/aarch64/
+RUN domain="mirrors.tuna.tsinghua.edu.cn"; \
+  echo "http://$domain/alpine/v${VER}/main" > /etc/apk/repositories; \
+  match1=$(echo "${VER}" |grep -E "3.1$|3.2$"); \
+  test -z "$match1" && echo "http://$domain/alpine/v${VER}/community" >> /etc/apk/repositories; \
+  test -z "$match1" && echo "http://$domain/alpine/edge/testing" >> /etc/apk/repositories; \
+  # alpine_v3.1_v3.2_v3.5: 需提前获取pkgs; 
+  # match2=$(echo "${VER}" |grep -E "3.1$|3.2$|3.5$"); \
+  test ! -z "$match1" && apk update; \
+  exit 0;
+  # v3.1 v3.2 v3.8: ERROR: http://mirrors.tuna.tsinghua.edu.cn/alpine/edge/testing: UNTRUSTED signature
+  # v3.5 WARNING: Ignoring http://mirrors.tuna.tsinghua.edu.cn/alpine/edge/testing/x86_64/APKINDEX.tar.gz: UNTRUSTED signature
+  # 
+  # alpine/v3.1/main: 4861 distinct packages available
+  # alpine/v3.2/main: 5294 distinct packages available
+  # alpine/v3.5/main: 7963 distinct packages available
+  # alpine/v3.8/main: 9564 distinct packages available
+  # alpine/v3.13/main: 21344 distinct packages available
+  # alpine/v3.19/main: 30477 distinct packages available
+
+# procps: free -h
+# shadow: chpasswd jumpserver, expect<mkpasswd>
+# tmux: libevent ncurses (2.7-VimEnter-err, by hand with low ver); compile with src: v2.3
+# findutils: for k3s agent node.
+# coreutils: base64 for secrets
+# busybox-extras: telnet  ## nc -vzw 2 host port
+# dig: bind-tools; netstat:net-tools; 
+# alpine.gzip: by tinylog
+# xterm :/usr/share/applications/{xterm,uxterm}
+# 3.8_none: iputils-ping iproute2-ss 
+# v3.13: +iproute2-ss
+# v3.1: WARN unrecognized option `--no-cache'
+RUN apk add --no-cache \
+  ca-certificates tzdata curl wget gzip \
+  sed grep gawk findutils sudo tree procps htop \
+  expect bash bash-completion coreutils \
+  \
+  lftp jq sysstat lame net-tools; \
+  test "3.1" != "${VER}" && apk add --no-cache unzip; \
+  match1=$(echo "${VER}" |grep -E "3.1$|3.2$"); \
+  test -z "$match1" && apk add --no-cache shadow; \
+  match2=$(echo "${VER}" |grep -E "3.1$|3.2$|3.5$"); \
+  test -z "$match2" && apk add --no-cache busybox-extras; \
+  test "3.19" == "${VER}" && apk add --no-cache iputils-ping iproute2-ss; \
+  test "3.19" == "${VER}" && chmod u+s /bin/ping; \
+  exit 0;
+  # \
+  # dropbear openssh-sftp-server openssh-client \
+  # libevent ncurses openssl bind-tools
+
+##APP################################################
+# font-wqy-zenhei@edge
+# v3.1: firefox (31.2.0-r1)
+# v3.2: firefox (38.3.0-r0)
+# v3.5/v3.8: none-firefox
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  test "3.5" == "${VER}" && exit 0; \  
+  test "3.8" == "${VER}" && exit 0; \
+  apk add --no-cache firefox; \
+  exit 0;
+
+# locales dconf-cli gtk2-engines-pixbuf x11-xkb-utils
+# xrdb: font; apk add --no-cache xrdb  	musl-locales; 
+# v3.13: +musl-locales
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall; \
+  apk add --no-cache \
+  tzdata  binutils  dbus-x11 at-spi2-core    xdg-utils xrdb; \
+  test "3.13" == "${VER}" && apk add --no-cache musl-locales; \
+  test "3.19" == "${VER}" && apk add --no-cache musl-locales; \
+  exit 0;
+
+# v3.1 v3.2: +gnome-system-monitor
+# v3.5/v3.8: none gnome-system-monitor
+# v3.13: +pavucontrol
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  apk add --no-cache \
+  git \
+  thunar geany ristretto; \
+  test "3.8" != "${VER}" && apk add --no-cache gnome-system-monitor; \
+  test "3.13" == "${VER}" && apk add --no-cache pavucontrol ; \
+  test "3.19" == "${VER}" && apk add --no-cache pavucontrol ; \
+  exit 0;
+
+# # flameshot-lib-err; engrampa-mate-deskDeps; ibus-tray-err;
+# # pnmixer/clipit-segfault-err; lxapperance-func-err; 
+# RUN apk add --no-cache \
+#   ibus flameshot \
+#   clipit pnmixer lxappearance engrampa 
+
+# +Apps
+# RUN apk add --no-cache --no-cache \
+#   pcmanfm geany ristretto engrampa
+#   # sakura lxtask lxappearance
+
+# Apps2
+# lxtask: none
+# sakura #@3.19
+# v3.13: +rofi clipit pnmixer lxappearance
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  test "3.13" == "${VER}" && apk add --no-cache rofi clipit pnmixer lxappearance; \
+  test "3.19" == "${VER}" && apk add --no-cache sakura rofi clipit pnmixer lxappearance; \
+  exit 0;
+
+# XFCE4
+  # plank #none
+  # rofi clipit pnmixer lxappearance \ #@3.19
+  # thunar tint2
+  # xfdesktop4 > xfdesktop @alpine3.19
+  # v3.1: xfwm4 (4.10.1-r0)
+  # v3.2: xfwm4 (4.12.3-r0)
+  # v3.8: xfwm4 (4.12.4-r1)
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  # 2536 kB #18.9 MB > 14.3 MB
+  apk add --no-cache \
+  xfwm4 xfdesktop \
+  xfce4-notifyd xfce4-settings xfce4-session; \
+  exit 0;
+
+# lxde
+# v3.8: pcmanfm (1.2.5-r2)
+# 3.8_none: lxappearance lxtask
+# v3.2_none: 
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  # 2536 kB #18.9 MB > 14.3 MB
+  apk add --no-cache \
+  pcmanfm mousepad; \
+  match1=$(echo "${VER}" |grep -E "3.1$|3.2$"); \
+  test -z "$match1" && apk add --no-cache leafpad; \
+  exit 0;
+
+
+# gtk2: icon/theme
+# https://pkgs.alpinelinux.org/packages?name=*theme* #pgs5
+# https://pkgs.alpinelinux.org/packages?name=*icon* #pgs4
+# ubt1604:
+  # root@tenvm2:/# pkgsize |grep engine
+  # 0.11 Mbs	gtk2-engines-pixbuf #ubt1404,only-this
+  # 0.27 Mbs	gtk2-engines-murrine
+RUN \
+  apk add --no-cache gtk-murrine-engine; \
+  exit 0;
+
+# HEADLESS
+COPY --from=rootfs /rootfs/files1 /
+COPY --from=rootfs /rootfs/files2 /
+RUN \
+  bash /xconf.sh core; bash /xconf.sh app; \
+  exit 0;
+
+# HEADLESS2
+COPY --from=res / /
+
+EXPOSE 10089/tcp 10081/tcp 10022/tcp
+CMD ["bash", "-c", "exec /entry.sh"]
+ENV \
+  TERM=xterm \
+  SHELL=/bin/bash

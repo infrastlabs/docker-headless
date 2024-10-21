@@ -1,0 +1,72 @@
+ARG REPO=
+ARG VER=12
+FROM ${REPO}infrastlabs/x11-base:rootfs AS rootfs
+# ref headless//br-deb12 #29.15M @23.10.14
+FROM debian:${VER}-slim
+# Set multiple labels at once, author,builtdate
+LABEL \
+  github.com.infrastlabs.docker-x11base.vendor=Infrastlabs \
+  github.com.infrastlabs.docker-x11base.release="production" \
+  github.com.infrastlabs.docker-x11base.version="1.0.1-beta" \
+  github.com.infrastlabs.docker-x11base.maintainer="sam <sldevsir@126.com>" \
+  github.com.infrastlabs.docker-x11base.builtdate="$(date -u +'%Y-%m-%d %H:%M:%S')"
+ENV \
+  DEBIAN_FRONTEND=noninteractive \
+  LOCALE_INCLUDE="zh_CN zh_HK zh_TW en en_AU fr fr_CA pt pt_BR es ar cs de it ru nl tr is sv uk ja ko th vi"
+# mirrors.tuna.tsinghua.edu.cn  mirrors.ustc.edu.cn
+# mirrors.163.com  mirrors.aliyun.com  mirrors.tencentyun.com
+ARG TARGETPLATFORM
+RUN echo "Acquire {\n\
+  APT::Get::Allow-Unauthenticated \"true\";\n\
+  GPG::Ignore \"true\";\n\
+  AllowInsecureRepositories \"true\";\n\
+  AllowDowngradeToInsecureRepositories \"true\";\n\
+}" > /etc/apt/apt.conf.d/skip-gpg-check-ig;
+RUN \
+  # \
+  # https://mirrors.ustc.edu.cn/help/debian.html #deb12: invalid signature
+  # rm -f /etc/apt/sources.list.d/debian.sources; \
+  sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources; \
+  # apt 2.1.9 及以后的版本中，apt 的 HTTP Pipelining 特性与 Nginx 服务器疑似存在一定的不兼容问题
+  echo "Acquire::http::Pipeline-Depth \"0\";" > /etc/apt/apt.conf.d/99nopipelining; \
+  # 使用 HTTPS 可以有效避免国内运营商的缓存劫持，但需要事先安装 apt-transport-https (Debian Buster 及以上版本不需要)
+  \
+  # default:echo -e;
+  echo "path-exclude /usr/share/doc/*\n\
+path-exclude /usr/share/man/*\n\
+path-exclude /usr/share/locale/*\n\
+path-exclude /usr/share/info/*\n\
+path-exclude /usr/share/help/*\n\
+path-exclude /usr/share/lintian/*\n\
+" > /etc/dpkg/dpkg.cfg.d/excludes; \
+  echo $LOCALE_INCLUDE |sed "s/ /\n/g" |while read one; do echo "path-include /usr/share/locale/$one/*" >> /etc/dpkg/dpkg.cfg.d/excludes; done; \
+  cat /etc/dpkg/dpkg.cfg.d/excludes; \
+  rm -rf /usr/share/locale/* ; \
+  \
+  echo 'apt update -qq && apt install -yq --no-install-recommends $@ && apt clean && rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
+    && chmod +x /usr/local/bin/apt.sh; 
+
+# MISC 15.1 MB
+# deb12.out: netcat 
+RUN \
+  # \2487 kB
+  apt.sh wget ca-certificates \
+  # \5529 kB 
+  curl lame sox libsox-fmt-mp3 \
+  # \4610 kB
+  htop rsync tree tmux lrzsz psmisc fuse net-tools iputils-ping \
+  procps sudo iproute2 iptables zip unzip xz-utils vim-tiny 
+  # \2476 kB
+  # dropbear-bin dropbear-run openssh-sftp-server lftp jq;
+
+# HEADLESS
+COPY --from=rootfs /rootfs/files1 /
+COPY --from=rootfs /rootfs/files2 /
+RUN \
+  bash /xconf.sh core; exit 0;
+
+EXPOSE 10089/tcp 10081/tcp 10022/tcp
+CMD ["bash", "-c", "exec /entry.sh"]
+ENV \
+  TERM=xterm \
+  SHELL=/bin/bash

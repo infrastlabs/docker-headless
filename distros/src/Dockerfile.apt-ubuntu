@@ -1,0 +1,273 @@
+ARG REPO=
+ARG VER=20.04
+FROM ${REPO}infrastlabs/x11-base:rootfs AS rootfs
+
+# TOOD origin-hub's sync to ${REPO}
+FROM ubuntu:${VER}
+ARG TARGETPLATFORM
+ARG TYPE=core
+ARG VER=20.04
+# Set multiple labels at once, author,builtdate
+LABEL \
+  github.com.infrastlabs.docker-x11base.vendor=Infrastlabs \
+  github.com.infrastlabs.docker-x11base.release="production" \
+  github.com.infrastlabs.docker-x11base.version="1.0.1-beta" \
+  github.com.infrastlabs.docker-x11base.maintainer="sam <sldevsir@126.com>" \
+  github.com.infrastlabs.docker-x11base.builtdate="$(date -u +'%Y-%m-%d %H:%M:%S')"
+
+ENV \
+  DEBIAN_FRONTEND=noninteractive \
+  LOCALE_INCLUDE="zh_CN zh_HK zh_TW en en_AU fr fr_CA pt pt_BR es ar cs de it ru nl tr is sv uk ja ko th vi"
+  # LOCALE_INCLUDE="en"
+RUN echo "Acquire {\n\
+  APT::Get::Allow-Unauthenticated \"true\";\n\
+  GPG::Ignore \"true\";\n\
+  AllowInsecureRepositories \"true\";\n\
+  AllowDowngradeToInsecureRepositories \"true\";\n\
+}" > /etc/apt/apt.conf.d/skip-gpg-check-ig;
+RUN export DOMAIN="mirrors.ustc.edu.cn"; \
+  case ${VER} in \
+    "14.04")  V2=trusty  ;; \
+    "16.04")  V2=xenial  ;; \
+    "18.04")  V2=bionic  ;; \
+    "20.04")  V2=focal   ;; \
+    "22.04")  V2=jammy   ;; \
+    "24.04")  V2=noble   ;; \
+  esac; \
+  test -z "$(echo $TARGETPLATFORM |grep arm)" && target=ubuntu || target=ubuntu-ports; \
+  echo "deb http://${DOMAIN}/$target ${V2} main restricted universe multiverse" > /etc/apt/sources.list \
+  && echo "deb http://${DOMAIN}/$target ${V2}-updates main restricted universe multiverse">> /etc/apt/sources.list; \
+  rm -f /etc/apt/sources.list.d/*; \
+    \
+  # default:echo -e;
+  echo "path-exclude /usr/share/doc/*\n\
+path-exclude /usr/share/man/*\n\
+path-exclude /usr/share/locale/*\n\
+path-exclude /usr/share/info/*\n\
+path-exclude /usr/share/help/*\n\
+path-exclude /usr/share/lintian/*\n\
+" > /etc/dpkg/dpkg.cfg.d/excludes; \
+  echo $LOCALE_INCLUDE |sed "s/ /\n/g" |while read one; do echo "path-include /usr/share/locale/$one/*" >> /etc/dpkg/dpkg.cfg.d/excludes; done; \
+  cat /etc/dpkg/dpkg.cfg.d/excludes; \
+  rm -rf /usr/share/locale/* ; \
+  \
+  # ubt14.04: err apt clean; E: Invalid operation clean
+  echo 'apt update -qq && apt install -yq --no-install-recommends $@ && apt clean; rm -rf /var/lib/apt/lists/*; ' > /usr/local/bin/apt.sh \
+    && chmod +x /usr/local/bin/apt.sh; 
+
+# MISC 15.1 MB
+#  lame sox libsox-fmt-mp3 
+# dropbear-bin dropbear-run openssh-sftp-server 
+# bash-completion
+# ex-ubt-2404: netcat 
+# -rwsr-xr-x 1 root root 73200 Apr 11  2023 /bin/ping* || chmod u+s /bin/ping;
+RUN \
+  apt.sh wget ca-certificates \
+  curl \
+  htop rsync tree tmux lrzsz psmisc fuse net-tools iputils-ping \
+  procps sudo iproute2 iptables zip unzip xz-utils vim-tiny \
+  openssh-sftp-server lftp jq \
+  lame
+
+  
+# xrdb; +leafpad mousepad@app
+RUN \
+  apt.sh x11-xserver-utils leafpad ; \
+  exit 0
+
+
+##APP################################################
+# img: 362MB> 444MB (none-font); after mv-top: 610MB> 546MB
+# MESA-LLVM img: 362MB> 398MB
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\  
+  # VIDEO: 30.5 MB
+  # libllvm12 已包含 # libgl1-mesa-glx >libgl1-mesa-dri ##ex:  mesa-utils 
+  apt.sh libgl1-mesa-glx libglu1-mesa; \
+  \
+  # LLVM(定制版这里删调它,除gnome,cinna其它de无影响); clear big lib: 88M (qt: flameshot,sogoupinyin) > img: -27M
+  rm -f /usr/lib/x86_64-linux-gnu/libLLVM-12.so.1; \
+  rm -f /usr/lib/aarch64-linux-gnu/libLLVM-12.so.1; 
+
+# ubt2404-drop: libasound2 
+  # 2.573 Package libasound2 is a virtual package provided by:
+  # 2.573   liboss4-salsa-asound2 4.2-build2020-1ubuntu3
+  # 2.573   libasound2t64 1.2.11-1build2 (= 1.2.11-1build2)
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  mkdir -p /usr/share/X11/xkb; \
+  apt.sh \
+  # firefox #esr/115.1>> libdbus-glib-1-2
+  libxtst6 libdbus-glib-1-2 \
+# 163music v1.2.1
+# RUN apt.sh \
+  libharfbuzz0b libpangocairo-1.0-0 libgdk-pixbuf2.0-0 \
+# wps2019 11.1.0.11719
+# RUN apt.sh \
+  libfreetype6 libcups2 libglib2.0-0 libglu1-mesa libsm6 libxrender1 libfontconfig1 libxext6 libxcb1 \
+# vscode 1.88.1 ##libgtk-3-0: 16M; img: 362MB> 398MB > 475MB
+# RUN apt.sh \
+  libnss3 libatk1.0-0 libatk-bridge2.0-0 libgtk-3-0 libgbm1; \
+  # err: ubt1604
+  exit 0
+
+# img: 362MB> 398MB > 433MB
+# LOC 87.4 MB
+# strip: binutils
+# xrdp-chansrv: libfdk-aac1 libopus0
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  # LOCALE 15.0 MB 
+  apt.sh tzdata locales binutils dconf-cli \
+  dbus-x11 at-spi2-core gtk2-engines-pixbuf \
+  # 343 kB
+  apt-utils x11-xkb-utils xdg-utils; \
+  exit 0
+
+  # AUD img: 546MB[239M]> 560MB
+  # INPUT img: 546MB[239M]> 658MB[252M]
+  RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+    apt.sh \
+    # Audio 39.8 MB 
+    pavucontrol \
+    \
+    # \12.3 MB (默认不含输入法: IBus/Fcitx)
+    ibus ibus-gtk ibus-gtk3 ibus-rime librime-data-wubi; \
+    exit 0
+
+  # # 2868 kB #fcitx ##img:78.095 MB
+  # # 15.3 kB #输入法依赖 https://shurufa.sogou.com/linux/guide
+  # RUN apt.sh fcitx fcitx-bin fcitx-config-common fcitx-config-gtk fcitx-data \
+  #   fcitx-frontend-all fcitx-frontend-gtk2 fcitx-frontend-gtk3 \
+  #   fcitx-frontend-qt5 fcitx-module-dbus fcitx-module-kimpanel fcitx-module-lua \
+  #   fcitx-module-x11 fcitx-modules fcitx-table fcitx-ui-classic \
+  #   # libxss1: needed by sogou, fcitx -r for debug
+  #   lsb-release libxss1 im-config \
+  #   libqt5qml5 libqt5quick5 libqt5quickwidgets5 qml-module-qtquick2 libgsettings-qt1
+
+
+  # MISC2 arandr
+  # flameshot: none@1604,1404 
+  RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+    test "14.04" == "${VER}" && exit 0; \
+    test "16.04" == "${VER}" && exit 0; \
+    apt.sh \
+    # tumbler gnupg \
+    # # \20.5 MB
+    flameshot; \
+    # flameshot_qt;
+    strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5; \
+    strip --remove-section=.note.ABI-tag /usr/lib/aarch64-linux-gnu/libQt5Core.so.5; \
+    exit 0
+
+  # XFCE4
+    # tint2 
+    # plank rofi clipit pnmixer lxappearance thunar \
+  RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+    apt.sh \
+    # 2536 kB #18.9 MB > 14.3 MB
+    xfwm4 xfdesktop4 \
+    xfce4-notifyd xfce4-settings xfce4-session; \
+    exit 0
+
+
+    
+  # 预装软件: sakura geany ristretto sys-monitor engrampa asbru
+  # RUN apt.sh \  
+  #   libsecret-1-0 libnss3 libxtst6 libasound2 \
+  #   \
+  #   # APPS 25.7 MB
+  #   # LOC_APPS="tint2 plank thunar sakura" # clipit; +pnmixer: 159 kB; +sv # 7056 kB
+  #   # LOC_APPS2="gnome-system-monitor engrampa ristretto" # 11.2 MB 
+  #   sakura geany ristretto engrampa gnome-system-monitor \
+  #   \
+  #   # 2422 kB #https://github.com/j8r/dockerfiles
+  #   xinit xterm systemd systemd-sysv;
+  
+# gparted
+# ubt14.04_none: pnmixer plank engrampa
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  apt.sh thunar dunst clipit \
+  pcmanfm lxappearance \
+  sakura geany ristretto gnome-system-monitor; \
+  # misc2
+  \
+  # link: sakura, thunar
+  # ln -s /usr/bin/thunar /usr/bin/pcmanfm; \
+  mv /usr/bin/st /usr/bin/st00; ln -s /usr/bin/sakura /usr/bin/st; \
+  test "14.04" == "${VER}" && exit 0; \
+  apt.sh pnmixer plank engrampa; \
+  exit 0
+
+  # # wps: libxss1
+  # # Xvnc-compile: libunwind8 libxfont2
+  # RUN apt.sh libxss1 libunwind8 libxfont2
+
+# # ASBRU: 3586 kB (disk: 15.5 MB)
+# # curl -k -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | \
+# #  distro=ubuntu version=20.04 codename=focal sudo -E bash;
+# #   err: Importing 'asbru-cm/release' repository GPG keys ...gpg: 找不到有效的 OpenPGP 数据。
+# RUN apt.sh gnupg;
+# RUN echo 1;\
+#   curl -k -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash; \
+#   apt.sh asbru-cm; rm -f /etc/apt/sources.list.d/asbru-cm-release.list; \
+#   mv /opt/asbru /usr/local; rm -f /usr/bin/asbru-cm; ln -s /usr/local/asbru/asbru-cm /usr/bin/; \
+#   cd /usr/share/icons/hicolor/scalable/apps; rm -f asbru-cm.svg; ln -s /usr/local/asbru/res/asbru-logo.svg ./asbru-cm.svg; \
+#   dpkg -l |grep asbru && exit 0 || exit 1; 
+
+
+# OHMYBASH
+# git ohmybash # \12.6 MB
+# firefox: ubt2204+>> @snap: snap install firefox
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  apt.sh git mousepad; \
+  exit 0
+
+
+# FONT, THEME, ICON
+# font-ttf: @win:msyh.zip> fonts-wqy-microhei
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  apt.sh \
+  greybird-gtk-theme \
+  fonts-wqy-microhei language-pack-gnome-zh-hans; \
+  \
+  rm -f /usr/share/backgrounds/greybird.svg;
+
+# split papirus-icon-theme: none@1604,1404
+# bunsen-papirus-icon-theme> papirus-icon-theme; ERR: 14.04 16.04 1804?
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  test "14.04" == "${VER}" && exit 0; \
+  test "16.04" == "${VER}" && exit 0; \
+  test "18.04" == "${VER}" && exit 0; \
+  echo a.123; \
+  apt.sh \
+  papirus-icon-theme; \
+  \
+  # 清理ubt自带图标, keep项: hicolor 
+  # locolor gnome bloom
+  cd /usr/share/icons && rm -rf Humanity* ubuntu-mono* LoginIcons Tango; \
+  \
+  wget https://gitee.com/infrastlabs/docker-headless/raw/dev/_doc/assets/bunsen-papirus-icon-theme_10.3-2_all.deb; \
+  dpkg -i bunsen-papirus-icon-theme_10.3-2_all.deb; rm -f bunsen-papirus-icon-theme_10.3-2_all.deb; \
+  cd /usr/share/icons && rm -rf Papirus-Bunsen-Dark-bluegrey Papirus-Bunsen-Dark-grey Papirus-Dark Papirus-Light ePapirus; \
+  \
+  # Papirus left: 16x(clipit:21M) 64x(desktop:21M)
+  cd /usr/share/icons/Papirus && rm -rf 18x* 22x* 24x* 32x*  48x* 64x* ; \
+  ls -lh /usr/share/icons/Papirus; \
+  \
+  dpkg -l |grep bunsen && exit 0 || exit 1;
+
+
+# 拆分包体与配置项两块，免频繁变动基础包
+# HEADLESS
+COPY --from=rootfs /rootfs/files1 /
+COPY --from=rootfs /rootfs/files2 /
+RUN \
+  bash /xconf.sh core; bash /xconf.sh app; \
+  exit 0;
+
+EXPOSE 10089/tcp 10081/tcp 10022/tcp
+CMD ["bash", "-c", "exec /entry.sh"]
+ENV \
+  TERM=xterm \
+  SHELL=/bin/bash
+  # 默认约定
+  # L="zh_CN" \
+  # TZ="Asia/Shanghai"
