@@ -1,8 +1,11 @@
 ARG REPO=
 ARG VER=12
 FROM ${REPO}infrastlabs/x11-base:rootfs AS rootfs
+
 # ref headless//br-deb12 #29.15M @23.10.14
 FROM debian:${VER}-slim
+ARG TYPE=core
+ARG VER=12
 # Set multiple labels at once, author,builtdate
 LABEL \
   github.com.infrastlabs.docker-headless.vendor=Infrastlabs \
