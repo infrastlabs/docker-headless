@@ -100,7 +100,7 @@ jobs:
           # 同步到ali仓
           #REPO_ALI>> REPO_HUB REPO_TEN REPO_QING 
           unset REPO_ALI REPO_TEN REPO_QING #skipSync
-          echo syncer; doSync=false
+          echo syncer; doSync=true
           cd ../.github/workflows; test "true" == "$doSync" && bash syncer.sh;
           # 
           # view timecost
