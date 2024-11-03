@@ -205,16 +205,20 @@ RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
   apt.sh git mousepad scrot; \
   exit 0
 
+# firefox-esr
+RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+  apt.sh firefox-esr; \
+  exit 0
 
 # FONT, THEME, ICON
 # font-ttf: @win:msyh.zip> fonts-wqy-microhei
 # deb_none: language-pack-gnome-zh-hans
-RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
-  apt.sh \
-  greybird-gtk-theme \
-  fonts-wqy-microhei ; \
-  \
-  rm -f /usr/share/backgrounds/greybird.svg;
+# RUN test "app" != "$TYPE" && exit 0 || echo appInstall;\
+#   apt.sh \
+#   greybird-gtk-theme \
+#   fonts-wqy-microhei ; \
+#   \
+#   rm -f /usr/share/backgrounds/greybird.svg;
 
 
 # HEADLESS
